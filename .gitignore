@@ -24,7 +24,8 @@ build
 .strapi-updater.json
 *.tsbuildinfo
 backend/database/*.db
-backend/public/uploads
+backend/public/uploads/*
+!backend/public/uploads/.gitkeep
 
 # OS files
 .DS_Store

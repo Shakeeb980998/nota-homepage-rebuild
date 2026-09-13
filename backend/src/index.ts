@@ -1,7 +1,15 @@
-﻿import type { Core } from '@strapi/strapi';
+import type { Core } from '@strapi/strapi';
+
+import fs from 'fs';
+import path from 'path';
 
 export default {
-  register(/* { strapi }: { strapi: Core.Strapi } */) {},
+  register(/* { strapi }: { strapi: Core.Strapi } */) {
+    const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
+    if (!fs.existsSync(uploadsDir)) {
+      fs.mkdirSync(uploadsDir, { recursive: true });
+    }
+  },
 
   async bootstrap({ strapi }: { strapi: Core.Strapi }) {
     // 1. Automatically enable public permissions for homepage, global, and form submissions
