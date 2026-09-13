@@ -1,7 +1,6 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { motion, useReducedMotion } from "framer-motion";
 
 interface PreloaderProps {
   /** Fired the instant counter reaches 100% (concurrently with overlay fade-out) */
@@ -18,7 +17,6 @@ interface PreloaderProps {
  * 6. Hard safety timeout at 3000ms ensures it never hangs or loops.
  */
 export const Preloader: React.FC<PreloaderProps> = ({ onRevealStart }) => {
-  const shouldReduceMotion = useReducedMotion();
   const [pct, setPct] = useState(0);
   const [isFadingOut, setIsFadingOut] = useState(false);
   const [isDone, setIsDone] = useState(false);
@@ -136,21 +134,11 @@ export const Preloader: React.FC<PreloaderProps> = ({ onRevealStart }) => {
         pointerEvents: isFadingOut ? "none" : "auto",
       }}
     >
-      {/* Centered Large Serif Counter with Soft Digit Ticking */}
-      <div className="relative overflow-hidden flex items-center justify-center select-none">
-        <motion.span
-          key={pct}
-          initial={
-            shouldReduceMotion
-              ? false
-              : { opacity: 0.45, y: 6, filter: "blur(4px)" }
-          }
-          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          transition={{ duration: 0.09, ease: "easeOut" }}
-          className="font-serif text-7xl sm:text-8xl md:text-9xl text-white font-normal tabular-nums tracking-tight"
-        >
+      {/* Centered Large Serif Counter - Sharp and Clear */}
+      <div className="relative flex items-center justify-center select-none">
+        <span className="font-serif text-7xl sm:text-8xl md:text-9xl text-white font-normal tabular-nums tracking-tight">
           {pct}%
-        </motion.span>
+        </span>
       </div>
     </div>
   );
