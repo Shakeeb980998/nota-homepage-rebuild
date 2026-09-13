@@ -55,7 +55,7 @@ export const SmartPaper: React.FC<SmartPaperProps> = ({ badge, title, slides }) 
     // Pinned container with clean unpin release buffer
     <div ref={containerRef} className="relative h-[300vh] bg-black text-white">
       {/* Sticky Viewport */}
-      <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between pt-24 pb-12 px-6 z-10">
+      <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between pt-24 pb-12 px-6 sm:px-10 lg:px-14 z-10">
         <div className="max-w-7xl mx-auto w-full">
           <TextInkReveal
             badge={`${badge} ${title}`}
@@ -68,7 +68,7 @@ export const SmartPaper: React.FC<SmartPaperProps> = ({ badge, title, slides }) 
         {/* Center Stage: Two-Column Sticky Layout */}
         <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center my-auto">
           {/* Left Column: Un-boxed large image directly on section background (~60-70% width) */}
-          <div className="lg:col-span-7 flex justify-center items-center relative min-h-[360px] sm:min-h-[440px]">
+          <div className="lg:col-span-7 flex justify-center items-center relative min-h-[260px] sm:min-h-[360px] lg:min-h-[440px]">
             <motion.div
               key={`img-${activeStep}`}
               initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, scale: 0.96 }}
@@ -79,7 +79,7 @@ export const SmartPaper: React.FC<SmartPaperProps> = ({ badge, title, slides }) 
               <LazyImage
                 src={activeImage}
                 alt={activeSlide?.title || "Nota Notebook"}
-                className="w-full h-auto max-h-[480px] object-contain mx-auto"
+                className="w-full h-auto max-h-[300px] sm:max-h-[380px] lg:max-h-[480px] object-contain mx-auto"
               />
             </motion.div>
           </div>

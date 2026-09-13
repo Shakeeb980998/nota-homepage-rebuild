@@ -135,6 +135,24 @@ export const ColorVariants: React.FC<ColorVariantsProps> = ({ variants, onOpenOr
             </div>
           </div>
 
+          {/* Mobile Tagline (visible on mobile screens) */}
+          <div className="md:hidden col-span-1 text-center py-2">
+            <span className="text-[11px] font-sans uppercase tracking-[0.12em] text-[#8a8a8a]">
+              {activeVariant.name}
+            </span>
+            <h4
+              className="text-2xl font-serif leading-tight mt-1"
+              style={{
+                color: TAGLINE_ACCENT[activeVariant.id] ?? "#ffffff",
+              }}
+            >
+              {activeVariant.tagline}
+            </h4>
+            <p className="text-xs text-neutral-400 font-light mt-1">
+              {activeVariant.subtext}
+            </p>
+          </div>
+
           {/* Right Taglines Crossfade: Absolute Positioning with Shared Container */}
           <div className="md:col-span-4 text-right hidden md:block">
             <div className="relative h-32 flex flex-col justify-center items-end">

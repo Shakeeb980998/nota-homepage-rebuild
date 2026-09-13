@@ -113,7 +113,7 @@ export const InsideTheBox: React.FC<InsideTheBoxProps> = ({
               ? { opacity: irisOpacity }
               : { clipPath: irisClipPath, willChange: "clip-path" }
           }
-          className="absolute inset-0 bg-[#f5f5f3] text-[#1a1a1a] flex flex-col justify-between py-20 px-6"
+          className="absolute inset-0 bg-[#f5f5f3] text-[#1a1a1a] flex flex-col justify-between py-20 px-6 sm:px-10 lg:px-14"
         >
           {/* Section heading — all copy Strapi-driven */}
           <div className="max-w-7xl mx-auto w-full">
@@ -131,7 +131,7 @@ export const InsideTheBox: React.FC<InsideTheBoxProps> = ({
           {/* Center Stage: un-boxed two-column step layout */}
           <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center my-auto">
             {/* Left Column: un-boxed large image — no card, border, radius, or padding box */}
-            <div className="lg:col-span-7 flex justify-center items-center relative min-h-[340px] sm:min-h-[420px]">
+            <div className="lg:col-span-7 flex justify-center items-center relative min-h-[240px] sm:min-h-[340px] lg:min-h-[420px]">
               <motion.div
                 key={`box-img-${activeStep}`}
                 initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, scale: 0.96 }}
@@ -142,7 +142,7 @@ export const InsideTheBox: React.FC<InsideTheBoxProps> = ({
                 <LazyImage
                   src={currentItem.image}
                   alt={currentItem.title}
-                  className="w-full h-auto max-h-[460px] object-contain mx-auto"
+                  className="w-full h-auto max-h-[280px] sm:max-h-[360px] lg:max-h-[460px] object-contain mx-auto"
                   shimmerClassName="bg-[#e8e8e6]"
                 />
               </motion.div>

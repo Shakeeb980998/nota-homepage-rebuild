@@ -97,8 +97,8 @@ export const Specs: React.FC<SpecsProps> = ({
               </motion.div>
             </div>
 
-            {/* Staggered Card Reveal (Middle card uses translucent glass so pen is clearly visible) */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 items-start relative z-10">
+            {/* Staggered Card Reveal: Horizontal snap carousel on mobile, 3-column grid on desktop */}
+            <div className="flex md:grid md:grid-cols-3 gap-4 sm:gap-6 items-stretch overflow-x-auto md:overflow-x-visible pb-4 md:pb-0 snap-x snap-mandatory relative z-10 no-scrollbar">
               {cards.map((card, idx) => {
                 const isMiddle = idx === 1;
                 const transform = cardTransforms[idx % cardTransforms.length];
@@ -114,7 +114,7 @@ export const Specs: React.FC<SpecsProps> = ({
                             y: transform.y,
                           }
                     }
-                    className={`relative rounded-[24px] p-6 sm:p-7 shadow-[0_10px_35px_rgba(0,0,0,0.04)] border border-neutral-200/70 hover:shadow-[0_20px_45px_rgba(0,0,0,0.08)] transition-all z-10 ${
+                    className={`relative rounded-[24px] p-6 sm:p-7 shadow-[0_10px_35px_rgba(0,0,0,0.04)] border border-neutral-200/70 hover:shadow-[0_20px_45px_rgba(0,0,0,0.08)] transition-all z-10 min-w-[84vw] sm:min-w-[340px] md:min-w-0 snap-center shrink-0 md:shrink ${
                       isMiddle
                         ? "bg-white/45 backdrop-blur-md md:-translate-y-2 border-neutral-300/80 shadow-[0_15px_40px_rgba(0,0,0,0.06)]"
                         : "bg-[#f4f4f5]/85 backdrop-blur-md"

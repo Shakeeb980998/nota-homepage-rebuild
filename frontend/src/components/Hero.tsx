@@ -118,8 +118,8 @@ export const Hero: React.FC<HeroProps> = ({
         />
 
         {/* Bottom-Left Big Headline (Matches sample site exactly: Smart pen / for real thinking) */}
-        <div className="absolute bottom-10 sm:bottom-16 lg:bottom-20 left-6 sm:left-12 lg:left-20 z-20 pointer-events-none max-w-4xl">
-          <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-[104px] font-serif font-normal text-white leading-[0.98] tracking-tight">
+        <div className="absolute bottom-8 sm:bottom-14 lg:bottom-20 left-6 sm:left-10 lg:left-14 z-20 pointer-events-none max-w-4xl pr-6">
+          <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-[96px] xl:text-[104px] font-serif font-normal text-white leading-[0.98] tracking-tight">
             <span className="block">
               <ScrambleText
                 text={titleLine1}

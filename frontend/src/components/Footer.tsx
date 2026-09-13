@@ -58,7 +58,7 @@ export const Footer: React.FC<FooterProps> = ({ siteName = "Nōta", copyright, l
       </section>
 
       {/* Abrupt Transition to Solid Black (#000000) Footer with 3-Column Layout */}
-      <footer className="bg-[#000000] py-24 px-6 text-neutral-400">
+      <footer className="bg-[#000000] py-24 px-6 sm:px-10 lg:px-14 text-neutral-400">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-12 pb-16 border-b border-neutral-800">
             {/* Column 1: Brand Blurb */}

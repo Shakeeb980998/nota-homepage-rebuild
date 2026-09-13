@@ -101,7 +101,7 @@ export const Header: React.FC<HeaderProps> = ({
           : "bg-transparent"
       }`}
     >
-      <div className="max-w-7xl mx-auto px-6 w-full flex items-center justify-between pointer-events-auto">
+      <div className="w-full px-6 sm:px-10 lg:px-14 flex items-center justify-between pointer-events-auto">
         {/* Left Side: Didone Serif Wordmark + Desktop Nav grouped together */}
         <div className="flex items-center gap-10 md:gap-14">
           <a
@@ -133,17 +133,17 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Right Side: White rectangular card with flower logo & Order button */}
         <div className="flex items-center gap-3">
-          <div className="hidden sm:flex items-center bg-[#ffffff] text-[#000000] rounded-2xl p-1.5 pl-3.5 pr-1.5 shadow-2xl gap-3 border border-white/20">
+          <div className="hidden sm:flex items-center bg-[#ffffff] text-[#000000] rounded-xl p-2 pl-4 pr-2 shadow-2xl gap-4 border border-white/20">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/nota-flower-logo.svg"
               alt="Nōta Logo"
               className="w-6 h-6 object-contain select-none"
             />
-            {/* Order Button: bg #000000, text #ffffff, rounded-xl */}
+            {/* Order Button: bg #000000, text #ffffff, rounded-lg */}
             <button
               onClick={onOpenOrder}
-              className="bg-[#000000] hover:bg-neutral-900 text-[#ffffff] px-6 py-2.5 rounded-xl font-sans font-medium text-xs sm:text-sm tracking-tight transition-all flex items-center gap-1.5"
+              className="bg-[#000000] hover:bg-neutral-900 text-[#ffffff] px-6 py-2.5 rounded-lg font-sans font-medium text-xs sm:text-sm tracking-tight transition-all flex items-center gap-1.5"
             >
               <span>Order</span>
               <span className="text-neutral-400 font-normal">Nota One</span>
