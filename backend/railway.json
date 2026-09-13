@@ -5,7 +5,10 @@
     "nixpacksPlan": {
       "phases": {
         "setup": {
-          "nixPkgs": ["nodejs_20", "python3", "gcc"]
+          "nixPkgs": ["nodejs_20"]
+        },
+        "install": {
+          "cmds": ["npm ci --omit=optional"]
         }
       }
     }
