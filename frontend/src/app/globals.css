@@ -25,3 +25,16 @@ body {
 .font-sans {
   font-family: var(--font-sans);
 }
+
+/* Safety: Ensure no motion path debug/helper guides are visible */
+svg path[stroke="red"],
+svg path[stroke="#ff0000"],
+svg path[stroke="#f00"],
+svg path[stroke*="rgb(255"],
+.motion-path-helper,
+.motionpath-helper,
+[class*="motionpath"] {
+  display: none !important;
+  stroke: transparent !important;
+  fill: none !important;
+}

@@ -100,25 +100,58 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
   const topic2X = useTransform(smoothProgress, [0.30, 0.60], ["110%", "0%"]);
   const topic3X = useTransform(smoothProgress, [0.50, 0.80], ["110%", "0%"]);
 
-  // Track scroll scrub for the white pen showcase section (matches nota.uprock.pro SCROLL_TRANSFORM specs)
+  // Track scroll scrub for the white pen showcase section (pinned flight from 0 to 1)
   const { scrollYProgress: penScrollProgress } = useScroll({
     target: penSectionRef,
-    offset: ["start end", "end start"],
+    offset: ["start start", "end end"],
   });
 
   const smoothPenProgress = useSpring(penScrollProgress, {
-    stiffness: 120,
-    damping: 24,
+    stiffness: 100,
+    damping: 20,
     restDelta: 0.001,
   });
 
-  // Official sample site keyframes:
-  // Keyframe 0-40: move y -12vh -> 0vh, scale 0.65 -> 1.0
-  // Keyframe 40-100: scale 1.0 -> 0.72, opacity 1.0 -> 0.25, move x 0vw -> -12vw, y 0vh -> 8vh
-  const penScale = useTransform(smoothPenProgress, [0.1, 0.45, 0.75, 1.0], [0.65, 1.0, 1.0, 0.72]);
-  const penY = useTransform(smoothPenProgress, [0.1, 0.45, 0.75, 1.0], ["-12vh", "0vh", "0vh", "8vh"]);
-  const penX = useTransform(smoothPenProgress, [0.5, 1.0], ["0vw", "-12vw"]);
-  const penOpacity = useTransform(smoothPenProgress, [0.65, 1.0], [1.0, 0.25]);
+  // Curved trajectory (X, Y, rotation, scale) - 1:1 scroll-scrubbed
+  const penX = useTransform(
+    smoothPenProgress,
+    [0, 0.25, 0.5, 0.75, 1.0],
+    ["18vw", "6vw", "0vw", "-6vw", "-18vw"]
+  );
+
+  const penY = useTransform(
+    smoothPenProgress,
+    [0, 0.25, 0.5, 0.75, 1.0],
+    ["-14vh", "-4vh", "0vh", "4vh", "14vh"]
+  );
+
+  const penRotate = useTransform(
+    smoothPenProgress,
+    [0, 0.25, 0.5, 0.75, 1.0],
+    ["-5deg", "-2deg", "0deg", "2deg", "5deg"]
+  );
+
+  const penScale = useTransform(
+    smoothPenProgress,
+    [0, 0.2, 0.8, 1.0],
+    [0.82, 1.0, 1.0, 0.82]
+  );
+
+  // Soft power1.inOut opacity: 0 -> 1 over first 20%, 1.0 in middle, 1 -> 0 over final 20%
+  const penOpacity = useTransform(smoothPenProgress, (v) => {
+    if (v <= 0) return 0;
+    if (v < 0.2) {
+      const t = v / 0.2;
+      return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+    }
+    if (v <= 0.8) return 1;
+    if (v < 1.0) {
+      const t = (v - 0.8) / 0.2;
+      const fade = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+      return 1 - fade;
+    }
+    return 0;
+  });
 
   const quoteText =
     introQuote ||
@@ -131,8 +164,8 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
 
   return (
     <section id="who-it-is-for" className="bg-black text-white relative z-20">
-      {/* Top Manifesto Quote (Matches sample site media_1789312019030.png - NO border line) */}
-      <div className="pt-28 sm:pt-36 pb-16 sm:pb-24 px-6 sm:px-12 lg:px-20 max-w-7xl mx-auto">
+      {/* Top Manifesto Quote (Matches sample site media_178932019030.png - NO border line) */}
+      <div className="pt-28 sm:pt-36 pb-16 sm:pb-24 px-6 sm:px-10 lg:px-14 max-w-7xl mx-auto">
         <ScrollIlluminatedText
           text={quoteText}
           className="max-w-5xl"
@@ -141,9 +174,8 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
       </div>
 
       {/* Pinned Two-Column Section: Label on Left, Sticky Copy + Scroll-Scrubbed Topics on Right */}
-      {/* (Matches sample site media_1789312030809.png and media_1789312044678.png) */}
       <div ref={pinTrackRef} className="relative h-[260vh]">
-        <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-center px-6 sm:px-12 lg:px-20">
+        <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-center px-6 sm:px-10 lg:px-14">
           <div className="max-w-7xl mx-auto w-full flex flex-col lg:flex-row justify-between items-start gap-8 lg:gap-16">
             {/* Left Column: Label */}
             <div className="shrink-0 pt-2">
@@ -215,31 +247,35 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
         </div>
       </div>
 
-      {/* Full-Width White Horizontal Pen Showcase (Matches sample site media_1789312059287.png) */}
+      {/* Pinned Pen Flight Section: curved trajectory, 0->1 entrance, 1->0 exit, seamless handoff to SmartPaper */}
       <div
         ref={penSectionRef}
-        className="w-full bg-white py-24 sm:py-32 lg:py-40 flex items-center justify-center overflow-hidden relative"
+        className="relative h-[150vh] bg-white pointer-events-none"
       >
-        <motion.div
-          style={
-            shouldReduceMotion
-              ? {}
-              : {
-                  scale: penScale,
-                  y: penY,
-                  x: penX,
-                  opacity: penOpacity,
-                }
-          }
-          className="w-full max-w-5xl px-4 flex items-center justify-center will-change-transform"
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/nota_horizontal_pen.png"
-            alt="Nōta Smart Pen horizontal showcase"
-            className="w-full max-w-4xl h-auto object-contain select-none pointer-events-none"
-          />
-        </motion.div>
+        <div className="sticky top-0 h-screen w-full flex items-center justify-center overflow-hidden">
+          <motion.div
+            style={
+              shouldReduceMotion
+                ? {}
+                : {
+                    scale: penScale,
+                    x: penX,
+                    y: penY,
+                    rotate: penRotate,
+                    opacity: penOpacity,
+                  }
+            }
+            className="w-full max-w-5xl px-4 flex items-center justify-center will-change-transform select-none"
+          >
+            {/* Only the pen graphic itself — zero guide lines, SVG paths, or strokes */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/nota_horizontal_pen.png"
+              alt="Nōta Smart Pen horizontal showcase"
+              className="w-full max-w-4xl h-auto object-contain select-none pointer-events-none"
+            />
+          </motion.div>
+        </div>
       </div>
     </section>
   );
