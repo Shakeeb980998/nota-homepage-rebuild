@@ -1,7 +1,7 @@
 "use client";
 
-import React from "react";
-import { motion } from "framer-motion";
+import React, { useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 
 interface HeroProps {
   titleLine1: string;
@@ -19,79 +19,84 @@ export const Hero: React.FC<HeroProps> = ({
   badge = "Writing Infrastructure",
   subtitle = "Combines a precision smart pen, intelligent paper, and seamless digital sync. For those who think better by hand.",
   ctaText = "Order Nota One",
-  price = "$300",
+  price = "$600",
   onOpenOrder,
 }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end start"],
+  });
+
+  const penY = useTransform(scrollYProgress, [0, 1], [0, 60]);
+  const penRotate = useTransform(scrollYProgress, [0, 1], [-2, 4]);
+
   return (
-    <section className="relative min-h-[90vh] flex flex-col justify-center items-center text-center px-6 pt-24 overflow-hidden bg-radial from-neutral-900 via-neutral-950 to-black">
-      {/* Background ambient glow */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-neutral-800/20 via-transparent to-transparent pointer-events-none" />
+    <section
+      ref={containerRef}
+      className="relative min-h-screen flex flex-col justify-between pt-32 pb-16 px-6 overflow-hidden bg-gradient-to-b from-[#2e3035] via-[#212226] to-[#121315]"
+    >
+      {/* Top subtle vignette lighting */}
+      <div className="absolute top-0 inset-x-0 h-96 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-white/10 via-transparent to-transparent pointer-events-none" />
 
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-        className="relative z-10 max-w-4xl mx-auto space-y-6"
-      >
-        <span className="inline-block px-4 py-1.5 rounded-full border border-neutral-800 bg-neutral-900/60 backdrop-blur-sm text-neutral-400 text-xs font-mono uppercase tracking-widest">
-          {badge}
-        </span>
-
-        <h1 className="text-5xl sm:text-7xl md:text-8xl font-serif font-light tracking-tight text-white leading-[1.05]">
-          <span className="block italic">{titleLine1}</span>
-          <span className="block font-normal">{titleLine2}</span>
-        </h1>
-
-        <p className="max-w-xl mx-auto text-neutral-400 text-base sm:text-lg font-light leading-relaxed">
-          {subtitle}
-        </p>
-
-        <div className="pt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
-          <button
-            onClick={onOpenOrder}
-            className="w-full sm:w-auto px-8 py-4 bg-white text-black font-medium rounded-full hover:bg-neutral-200 transition-all text-sm font-mono uppercase shadow-lg shadow-white/5"
+      {/* Main Content Area */}
+      <div className="max-w-7xl mx-auto w-full relative z-10 flex flex-col justify-between flex-1">
+        {/* Horizontal Studio Pen Render */}
+        <div className="relative w-full my-auto py-8 flex items-center justify-center">
+          <motion.div
+            style={{ y: penY, rotate: penRotate }}
+            animate={{
+              y: [-6, 6, -6],
+            }}
+            transition={{
+              repeat: Infinity,
+              duration: 7,
+              ease: "easeInOut",
+            }}
+            className="relative w-full max-w-4xl flex items-center justify-center filter drop-shadow-[0_25px_45px_rgba(0,0,0,0.5)]"
           >
-            {ctaText} • {price}
-          </button>
-          <a
-            href="#specifications"
-            className="w-full sm:w-auto px-8 py-4 bg-neutral-900/80 hover:bg-neutral-800 border border-neutral-800 text-neutral-300 rounded-full transition-all text-sm font-mono uppercase"
-          >
-            Explore Specs
-          </a>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="https://nota.uprock.pro/thumb/2/zOzK4LBsVJn0W98Pf5CalQ/364r1526/d/library_image-14634-symbol-is6ru9kkd-nota_hero_image_adaptive_866220.png"
+              alt="Nōta Smart Pen"
+              className="w-full max-h-[380px] object-contain transform -rotate-12 hover:scale-[1.02] transition-transform duration-700 pointer-events-auto cursor-pointer"
+            />
+          </motion.div>
         </div>
-      </motion.div>
 
-      {/* Floating 3D Pen Graphic with ambient glow */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9, y: 40 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ duration: 1.2, delay: 0.3 }}
-        className="relative mt-8 sm:mt-16 w-full max-w-3xl flex items-center justify-center pointer-events-none"
-      >
-        {/* Ambient Backlight Glow */}
-        <div className="absolute w-72 sm:w-96 h-36 bg-gradient-to-r from-blue-500/15 via-white/20 to-amber-500/15 blur-3xl rounded-full pointer-events-none" />
+        {/* Bottom Headline & Call To Action from reference */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-end pt-8">
+          <div className="md:col-span-7 space-y-4">
+            <span className="inline-block text-xs font-mono uppercase tracking-widest text-neutral-400">
+              {badge}
+            </span>
+            <h1 className="text-5xl sm:text-7xl lg:text-8xl font-serif font-normal text-white leading-[1.02] tracking-tight">
+              <span className="block italic">{titleLine1}</span>
+              <span className="block">{titleLine2}</span>
+            </h1>
+          </div>
 
-        <motion.div
-          animate={{
-            y: [-10, 10, -10],
-            rotate: [-2, 2, -2],
-          }}
-          transition={{
-            repeat: Infinity,
-            duration: 6,
-            ease: "easeInOut",
-          }}
-          className="relative z-10 w-full max-w-xl px-4 flex justify-center drop-shadow-[0_25px_35px_rgba(255,255,255,0.08)]"
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="https://nota.uprock.pro/thumb/2/zOzK4LBsVJn0W98Pf5CalQ/364r1526/d/library_image-14634-symbol-is6ru9kkd-nota_hero_image_adaptive_866220.png"
-            alt="NŌTA Precision Smart Pen"
-            className="w-full max-h-72 object-contain transform -rotate-6 hover:scale-105 transition-transform duration-700 pointer-events-auto cursor-pointer"
-          />
-        </motion.div>
-      </motion.div>
+          <div className="md:col-span-5 space-y-6">
+            <p className="text-neutral-300 text-sm sm:text-base font-light leading-relaxed">
+              {subtitle}
+            </p>
+            <div className="flex flex-wrap items-center gap-4">
+              <button
+                onClick={onOpenOrder}
+                className="px-8 py-3.5 bg-white text-black font-semibold rounded-2xl hover:bg-neutral-200 transition-all text-sm tracking-tight shadow-xl"
+              >
+                {ctaText} • {price}
+              </button>
+              <a
+                href="#specifications"
+                className="px-6 py-3.5 rounded-2xl border border-white/20 text-white hover:bg-white/10 transition-all text-sm font-medium"
+              >
+                Specifications
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
   );
 };

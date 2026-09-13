@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { SpecCard } from "@/types/cms";
-import { Check } from "lucide-react";
+import { motion } from "framer-motion";
 
 interface SpecsProps {
   badge?: string;
@@ -18,85 +18,65 @@ export const Specs: React.FC<SpecsProps> = ({
   const [activeTab, setActiveTab] = useState(0);
 
   return (
-    <section id="specifications" className="py-24 px-6 max-w-7xl mx-auto">
-      <div className="text-center max-w-2xl mx-auto space-y-3 mb-16">
-        <span className="text-neutral-400 font-mono text-xs uppercase tracking-widest">
-          {badge}
-        </span>
-        <h2 className="text-4xl sm:text-5xl font-serif font-light tracking-tight text-white">
-          {title}
-        </h2>
-      </div>
+    <section id="specifications" className="py-28 px-6 bg-[#f7f7f8] text-[#111111] transition-colors">
+      <div className="max-w-7xl mx-auto">
+        {/* Title Header matching Image 2 */}
+        <div className="text-center max-w-3xl mx-auto space-y-2 mb-20">
+          <p className="font-serif text-3xl sm:text-4xl text-neutral-500 font-light italic">
+            {badge}
+          </p>
+          <h2 className="text-6xl sm:text-7xl md:text-8xl font-serif font-normal text-black tracking-tight leading-none">
+            {title}
+          </h2>
+        </div>
 
-      {/* Interactive Tabs */}
-      <div className="flex justify-center gap-2 mb-12 flex-wrap">
-        {cards.map((card, idx) => (
-          <button
-            key={card.title}
-            onClick={() => setActiveTab(idx)}
-            className={`px-5 py-2.5 rounded-full text-xs font-mono uppercase tracking-wider transition-all ${
-              activeTab === idx
-                ? "bg-white text-black font-semibold shadow-md"
-                : "bg-neutral-900 border border-neutral-800 text-neutral-400 hover:text-white"
-            }`}
-          >
-            {card.title}
-          </button>
-        ))}
-      </div>
+        {/* 3 Spec Cards matching Image 2 */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start relative max-w-6xl mx-auto">
+          {cards.map((card, idx) => {
+            const isMiddle = idx === 1;
 
-      {/* Spec details grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {cards.map((card, idx) => {
-          const isActive = activeTab === idx;
-          const images = [
-            "https://nota.uprock.pro/thumb/2/hkWO_0PdjAnQD0OeUgMd8g/1920r1080/d/nota_scene_4_img_01.jpg",
-            "https://nota.uprock.pro/thumb/2/7YfwgKVakw18X4hnPZia0Q/1920r1080/d/nota_scene_4_img_02.jpg",
-            "https://nota.uprock.pro/thumb/2/5RXD9D7cr-Ez9A9KxlC5hw/1920r1080/d/nota_scene_4_img_03.jpg",
-          ];
-          const imgUrl = images[idx % images.length];
+            return (
+              <motion.div
+                key={card.title}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: idx * 0.15 }}
+                className={`relative bg-white rounded-3xl p-8 shadow-[0_10px_35px_rgba(0,0,0,0.04)] border border-neutral-200/80 hover:shadow-[0_15px_45px_rgba(0,0,0,0.08)] transition-all ${
+                  isMiddle ? "md:-translate-y-2 z-10" : ""
+                }`}
+              >
+                <h3 className="text-2xl font-serif font-normal text-black mb-8">
+                  {card.title}
+                </h3>
 
-          return (
-            <div
-              key={card.title}
-              onClick={() => setActiveTab(idx)}
-              className={`rounded-3xl p-6 border transition-all duration-500 cursor-pointer overflow-hidden group ${
-                isActive
-                  ? "bg-neutral-900/90 border-white/30 shadow-[0_15px_40px_rgba(255,255,255,0.06)] scale-[1.02]"
-                  : "bg-neutral-950/60 border-neutral-800/80 opacity-80 hover:opacity-100 hover:border-neutral-700"
-              }`}
-            >
-              {/* Feature Image Banner */}
-              <div className="w-full h-44 rounded-2xl overflow-hidden mb-6 relative bg-neutral-900">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={imgUrl}
-                  alt={card.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                <span className="absolute bottom-3 right-3 text-neutral-400 font-mono text-xs px-2.5 py-1 rounded-md bg-black/60 backdrop-blur-md">
-                  0{idx + 1}
-                </span>
-              </div>
+                <div className="divide-y divide-neutral-100">
+                  {card.features.map((feature, fIdx) => (
+                    <div
+                      key={fIdx}
+                      className="py-4 flex items-center justify-between gap-4 text-sm sm:text-base text-neutral-700 font-light"
+                    >
+                      <span>{feature}</span>
+                      <span className="w-2 h-2 rounded-full bg-neutral-300 shrink-0" />
+                    </div>
+                  ))}
+                </div>
 
-              <div className="flex items-center justify-between mb-6 pb-3 border-b border-neutral-800">
-                <h3 className="text-xl font-serif text-white font-medium">{card.title}</h3>
-              </div>
-
-              <ul className="space-y-3">
-                {card.features.map((feature, fIdx) => (
-                  <li key={fIdx} className="flex items-start gap-3 text-sm text-neutral-300">
-                    <span className="p-0.5 rounded-full bg-neutral-800 text-neutral-400 mt-0.5 group-hover:bg-white group-hover:text-black transition-colors">
-                      <Check size={12} />
-                    </span>
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          );
-        })}
+                {/* Vertical Pen body emerging below middle card */}
+                {isMiddle && (
+                  <div className="hidden md:flex absolute -bottom-36 inset-x-0 justify-center pointer-events-none -z-10 opacity-70">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src="https://nota.uprock.pro/thumb/2/zOzK4LBsVJn0W98Pf5CalQ/364r1526/d/library_image-14634-symbol-is6ru9kkd-nota_hero_image_adaptive_866220.png"
+                      alt="Pen detail"
+                      className="w-24 object-contain transform rotate-90"
+                    />
+                  </div>
+                )}
+              </motion.div>
+            );
+          })}
+        </div>
       </div>
     </section>
   );

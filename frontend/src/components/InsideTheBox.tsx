@@ -34,51 +34,66 @@ export const InsideTheBox: React.FC<InsideTheBoxProps> = ({
           </p>
         </div>
 
-        {/* Shutter / Accordion Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Curved Bento Pill Capsules matching Image 4 */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+          {/* Large Nib Capsule with floating pill badge */}
+          <div className="lg:col-span-8 relative rounded-[40px] md:rounded-[56px] overflow-hidden bg-neutral-900 border border-neutral-800 min-h-[380px] group flex items-center justify-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="https://nota.uprock.pro/thumb/2/7YfwgKVakw18X4hnPZia0Q/1920r1080/d/nota_scene_4_img_02.jpg"
+              alt="Nota Pen Durable Metal Nib"
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+            />
+            {/* Floating Badge Pill from Image 4 */}
+            <div className="absolute bottom-8 inset-x-0 flex justify-center px-4">
+              <span className="px-6 py-3 rounded-full backdrop-blur-xl bg-black/70 border border-white/15 text-white text-xs sm:text-sm font-medium tracking-tight shadow-xl">
+                Durable metal nib, low-profile control button
+              </span>
+            </div>
+          </div>
+
+          {/* Right Capsule */}
+          <div className="lg:col-span-4 relative rounded-[40px] md:rounded-[56px] overflow-hidden bg-neutral-900 border border-neutral-800 min-h-[380px] group">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="https://nota.uprock.pro/thumb/2/hkWO_0PdjAnQD0OeUgMd8g/1920r1080/d/nota_scene_4_img_01.jpg"
+              alt="Nota Pen Anodized Finish"
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+            />
+          </div>
+        </div>
+
+        {/* 3 Box Items Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6">
           {items.map((item, idx) => {
             const Icon = icons[idx % icons.length];
             const isHovered = hoveredIdx === idx;
-            const boxImages = [
-              "https://nota.uprock.pro/thumb/2/NdNsA4zjgwV803LVWQCIkg/1276r2108/d/41_block.jpg",
-              "https://nota.uprock.pro/thumb/2/V-Pld1tdphvc6bqPvkKsvw/1276r2108/d/42_block.jpg",
-              "https://nota.uprock.pro/thumb/2/uY0WbSXhbz5r3fxyMekPng/1276r2108/d/43_block.jpg",
-            ];
-            const boxImg = boxImages[idx % boxImages.length];
 
             return (
               <div
                 key={item.title}
                 onMouseEnter={() => setHoveredIdx(idx)}
                 onMouseLeave={() => setHoveredIdx(null)}
-                className={`rounded-3xl p-6 border transition-all duration-500 flex flex-col justify-between overflow-hidden group ${
+                className={`rounded-3xl p-8 border transition-all duration-500 flex flex-col justify-between ${
                   isHovered
                     ? "bg-neutral-900 border-white/30 shadow-[0_20px_40px_rgba(255,255,255,0.06)]"
                     : "bg-neutral-900/40 border-neutral-800/80"
                 }`}
               >
-                {/* Visual Image */}
-                <div className="w-full h-56 rounded-2xl overflow-hidden mb-6 relative bg-neutral-900">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={boxImg}
-                    alt={item.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                  <div className="absolute top-3 left-3 w-10 h-10 rounded-xl bg-black/60 backdrop-blur-md flex items-center justify-center text-white">
-                    <Icon size={18} />
+                <div className="flex items-center justify-between mb-8">
+                  <div className="w-12 h-12 rounded-2xl bg-neutral-800 flex items-center justify-center text-white">
+                    <Icon size={20} />
                   </div>
-                  <span className="absolute top-3 right-3 font-mono text-xs text-neutral-400 px-2.5 py-1 rounded-md bg-black/60 backdrop-blur-md">
+                  <span className="font-mono text-xs text-neutral-400 px-3 py-1.5 rounded-full bg-neutral-800/80">
                     {item.badge || `0${idx + 1}`}
                   </span>
                 </div>
 
-                <div className="space-y-2">
-                  <h3 className="text-xl font-serif text-white font-medium">
+                <div className="space-y-3">
+                  <h3 className="text-2xl font-serif text-white font-normal">
                     {item.title}
                   </h3>
-                  <p className="text-neutral-400 text-sm leading-relaxed">
+                  <p className="text-neutral-400 text-sm leading-relaxed font-light">
                     {item.description}
                   </p>
                 </div>

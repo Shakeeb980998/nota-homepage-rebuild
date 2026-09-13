@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { SmartPaperFeature } from "@/types/cms";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface SmartPaperProps {
   badge: string;
@@ -11,87 +11,89 @@ interface SmartPaperProps {
 }
 
 export const SmartPaper: React.FC<SmartPaperProps> = ({ badge, title, slides }) => {
-  const [currentSlide, setCurrentSlide] = useState(0);
+  const [currentSlide, setCurrentSlide] = useState(2); // Slide 3 as shown in reference Image 3
 
-  const next = () => setCurrentSlide((prev) => (prev + 1) % slides.length);
-  const prev = () => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+  const notebookImages = [
+    "https://nota.uprock.pro/thumb/2/NdNsA4zjgwV803LVWQCIkg/1276r2108/d/41_block.jpg",
+    "https://nota.uprock.pro/thumb/2/V-Pld1tdphvc6bqPvkKsvw/1276r2108/d/42_block.jpg",
+    "https://nota.uprock.pro/thumb/2/uY0WbSXhbz5r3fxyMekPng/1276r2108/d/43_block.jpg",
+    "https://nota.uprock.pro/thumb/2/ctuI-vbcqn2J7cCUXnBXig/1276r2108/d/41_block1212.png",
+  ];
+
+  const active = slides[currentSlide % slides.length];
+  const activeImage = notebookImages[currentSlide % notebookImages.length];
 
   return (
-    <section id="about" className="py-24 px-6 max-w-7xl mx-auto">
-      <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
-        <div>
-          <span className="text-neutral-500 font-mono text-xs uppercase tracking-widest">
-            {badge}
-          </span>
-          <h2 className="text-4xl sm:text-5xl font-serif text-white font-light mt-2">
-            {title}
+    <section id="about" className="py-32 px-6 bg-black text-white overflow-hidden relative">
+      <div className="max-w-7xl mx-auto space-y-16">
+        {/* Big Editorial Headline from Image 3 */}
+        <div className="max-w-3xl space-y-3">
+          <p className="text-xs font-mono uppercase tracking-widest text-neutral-500">
+            {badge} {title}
+          </p>
+          <h2 className="text-5xl sm:text-6xl md:text-7xl font-serif font-light tracking-tight leading-[1.05] text-white">
+            <span className="block">No delays. No glitches.</span>
+            <span className="block italic text-neutral-400">No random effects.</span>
           </h2>
         </div>
 
-        {/* Carousel controls */}
-        <div className="flex items-center gap-4">
-          <span className="font-mono text-xs text-neutral-500">
-            0{currentSlide + 1} / 0{slides.length}
-          </span>
-          <button
-            onClick={prev}
-            aria-label="Previous Slide"
-            className="w-10 h-10 rounded-full border border-neutral-800 bg-neutral-900 text-neutral-300 hover:text-white hover:bg-neutral-800 flex items-center justify-center transition-colors"
-          >
-            <ChevronLeft size={18} />
-          </button>
-          <button
-            onClick={next}
-            aria-label="Next Slide"
-            className="w-10 h-10 rounded-full border border-neutral-800 bg-neutral-900 text-neutral-300 hover:text-white hover:bg-neutral-800 flex items-center justify-center transition-colors"
-          >
-            <ChevronRight size={18} />
-          </button>
-        </div>
-      </div>
+        {/* Center Stage: Open Notebook + Floating Glassmorphic Card */}
+        <div className="relative min-h-[520px] flex items-center justify-center">
+          {/* Ambient Lighting Glow */}
+          <div className="absolute w-[600px] h-[400px] bg-white/[0.04] blur-[120px] rounded-full pointer-events-none" />
 
-      <div className="bg-neutral-900 border border-neutral-800 rounded-3xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 min-h-[480px]">
-        {/* Left text pane */}
-        <div className="lg:col-span-6 p-8 sm:p-14 flex flex-col justify-between space-y-8">
-          <div className="space-y-4">
-            <span className="text-xs font-mono text-neutral-500 uppercase tracking-widest">
-              {slides[currentSlide].subTitle}
-            </span>
-            <h3 className="text-2xl sm:text-3xl font-serif text-white font-normal leading-snug">
-              {slides[currentSlide].title}
+          {/* Open Notebook Mockup */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentSlide}
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.98 }}
+              transition={{ duration: 0.5 }}
+              className="relative z-10 w-full max-w-3xl rounded-3xl overflow-hidden shadow-2xl drop-shadow-[0_20px_50px_rgba(0,0,0,0.8)]"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={activeImage}
+                alt="Nota Open Smart Paper Notebook"
+                className="w-full h-auto object-contain max-h-[480px] mx-auto rounded-3xl"
+              />
+            </motion.div>
+          </AnimatePresence>
+
+          {/* Floating Glassmorphic Card from Image 3 */}
+          <motion.div
+            key={`glass-${currentSlide}`}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="absolute bottom-4 right-4 md:bottom-12 md:right-8 z-20 max-w-sm backdrop-blur-2xl bg-neutral-900/80 border border-white/10 rounded-3xl p-6 sm:p-8 text-white shadow-2xl"
+          >
+            <h3 className="text-lg sm:text-xl font-medium mb-3 tracking-tight">
+              {active.subTitle || "AI-powered structure"}
             </h3>
-            <p className="text-neutral-400 text-sm sm:text-base leading-relaxed pt-2">
-              {slides[currentSlide].text}
+            <p className="text-xs sm:text-sm text-neutral-300 font-light leading-relaxed">
+              {active.text}
             </p>
-          </div>
+          </motion.div>
+        </div>
 
-          <div className="flex gap-2">
-            {slides.map((_, idx) => (
-              <button
-                key={idx}
-                onClick={() => setCurrentSlide(idx)}
-                aria-label={`Go to slide ${idx + 1}`}
-                className={`h-1.5 rounded-full transition-all ${
-                  currentSlide === idx ? "w-8 bg-white" : "w-2 bg-neutral-700"
+        {/* 4-Segment Progress Bar Slider from Image 3 */}
+        <div className="flex justify-center items-center gap-3 max-w-md mx-auto pt-6">
+          {slides.slice(0, 4).map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => setCurrentSlide(idx)}
+              aria-label={`Slide ${idx + 1}`}
+              className="group py-3 flex-1 cursor-pointer focus:outline-none"
+            >
+              <div
+                className={`h-1 rounded-full transition-all duration-300 ${
+                  currentSlide === idx ? "bg-white" : "bg-neutral-800 group-hover:bg-neutral-600"
                 }`}
               />
-            ))}
-          </div>
-        </div>
-
-        {/* Right illustration / graphic pane */}
-        <div className="lg:col-span-6 bg-gradient-to-br from-neutral-900 via-neutral-950 to-black p-8 sm:p-12 flex items-center justify-center relative overflow-hidden border-t lg:border-t-0 lg:border-l border-neutral-800">
-          <div className="relative w-full max-w-md aspect-[4/3] rounded-2xl overflow-hidden flex items-center justify-center">
-            {/* Ambient backlight */}
-            <div className="absolute w-64 h-64 bg-white/5 blur-3xl rounded-full pointer-events-none" />
-            
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="https://nota.uprock.pro/thumb/2/E_-dKzAg6YZhD4xJJ6rAMA/233r734/d/library_image-14700-symbol-iw3g92519-nota_scene_2_img.png"
-              alt="Nota Smart Paper & Pen"
-              className="relative z-10 max-h-72 object-contain hover:scale-105 transition-transform duration-700 drop-shadow-[0_20px_40px_rgba(255,255,255,0.06)]"
-            />
-          </div>
+            </button>
+          ))}
         </div>
       </div>
     </section>
