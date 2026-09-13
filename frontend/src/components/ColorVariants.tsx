@@ -184,21 +184,26 @@ export const ColorVariants: React.FC<ColorVariantsProps> = ({ variants, onOpenOr
 
         {/* Bottom Swatches + Order CTA */}
         <div className="max-w-7xl mx-auto w-full flex flex-col sm:flex-row items-center justify-between gap-6 pt-6 border-t border-neutral-900">
-          <div className="flex items-center gap-4">
-            {variants.map((v, idx) => {
-              const isSelected = selectedIdx === idx;
-              return (
-                <button
-                  key={v.id || idx}
-                  onClick={() => handleSwatchClick(idx)}
-                  className={`w-7 h-7 rounded-full transition-all border ${
-                    isSelected ? "ring-2 ring-white ring-offset-2 ring-offset-black scale-125" : "opacity-60 hover:opacity-100"
-                  }`}
-                  style={{ backgroundColor: v.hexColor }}
-                  aria-label={`Select ${v.name}`}
-                />
-              );
-            })}
+          <div className="flex items-center gap-5">
+            <span className="font-mono text-xs text-neutral-400 tabular-nums">
+              {selectedIdx + 1} / {variants.length}
+            </span>
+            <div className="flex items-center gap-3">
+              {variants.map((v, idx) => {
+                const isSelected = selectedIdx === idx;
+                return (
+                  <button
+                    key={v.id || idx}
+                    onClick={() => handleSwatchClick(idx)}
+                    className={`w-7 h-7 rounded-full transition-all border ${
+                      isSelected ? "ring-2 ring-white ring-offset-2 ring-offset-black scale-125" : "opacity-60 hover:opacity-100"
+                    }`}
+                    style={{ backgroundColor: v.hexColor }}
+                    aria-label={`Select ${v.name}`}
+                  />
+                );
+              })}
+            </div>
           </div>
 
           <button

@@ -170,25 +170,30 @@ export const InsideTheBox: React.FC<InsideTheBoxProps> = ({
             </div>
           </div>
 
-          {/* Segmented progress bar — dark segments on off-white background */}
+          {/* Segmented progress bar & counter — dark segments on off-white background */}
           <div className="max-w-7xl mx-auto w-full pt-4">
-            <div className="flex items-center gap-3 max-w-xs mx-auto">
-              {Array.from({ length: stepCount }).map((_, idx) => {
-                const isActive = activeStep === idx;
-                const isPassed = activeStep > idx;
-                return (
-                  <div
-                    key={idx}
-                    className="h-1 flex-1 rounded-full overflow-hidden bg-[#d4d4d0] transition-colors"
-                  >
+            <div className="flex items-center justify-center gap-4 max-w-sm mx-auto">
+              <span className="font-mono text-xs text-[#888888] tabular-nums">
+                {activeStep + 1} / {stepCount}
+              </span>
+              <div className="flex items-center gap-2 flex-1">
+                {Array.from({ length: stepCount }).map((_, idx) => {
+                  const isActive = activeStep === idx;
+                  const isPassed = activeStep > idx;
+                  return (
                     <div
-                      className={`h-full transition-all duration-300 ${
-                        isActive || isPassed ? "w-full bg-[#1a1a1a]" : "w-0"
-                      }`}
-                    />
-                  </div>
-                );
-              })}
+                      key={idx}
+                      className="h-1 flex-1 rounded-full overflow-hidden bg-[#d4d4d0] transition-colors"
+                    >
+                      <div
+                        className={`h-full transition-all duration-300 ${
+                          isActive || isPassed ? "w-full bg-[#1a1a1a]" : "w-0"
+                        }`}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </motion.div>

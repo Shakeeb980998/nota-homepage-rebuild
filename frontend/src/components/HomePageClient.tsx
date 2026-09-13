@@ -78,14 +78,14 @@ export const HomePageClient: React.FC<HomePageClientProps> = ({ initialData }) =
         items={initialData.insideTheBox.items}
       />
 
+      {/* Bento Detail Gallery Section */}
+      <BentoGallery />
+
       {/* Color Variants Slider / Switcher */}
       <ColorVariants
         variants={initialData.colorVariants}
         onOpenOrder={() => setIsOrderOpen(true)}
       />
-
-      {/* Bento Detail Gallery Section */}
-      <BentoGallery />
 
       {/* Footer */}
       <Footer
