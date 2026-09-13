@@ -66,22 +66,20 @@ export const SmartPaper: React.FC<SmartPaperProps> = ({ badge, title, slides }) 
 
         {/* Center Stage: Two-Column Sticky Layout */}
         <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center my-auto">
-          {/* Left Column: Carousel Image Panel bg #131313 */}
-          <div className="lg:col-span-7 flex justify-center items-center relative min-h-[360px] sm:min-h-[440px] bg-[#131313] border border-neutral-800/80 rounded-[20px] p-6 sm:p-10 shadow-2xl">
-            <div className="absolute w-[450px] h-[300px] bg-white/[0.03] blur-[100px] rounded-full pointer-events-none" />
-
+          {/* Left Column: Un-boxed large image directly on section background (~60-70% width) */}
+          <div className="lg:col-span-7 flex justify-center items-center relative min-h-[360px] sm:min-h-[440px]">
             <motion.div
               key={`img-${activeStep}`}
               initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, scale: 0.96 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.45, ease: "easeOut" }}
-              className="relative z-10 w-full max-w-xl flex justify-center items-center"
+              className="relative z-10 w-full flex justify-center items-center"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={activeImage}
                 alt={activeSlide?.title || "Nota Notebook"}
-                className="w-full h-auto max-h-[380px] object-contain mx-auto drop-shadow-[0_20px_40px_rgba(0,0,0,0.9)]"
+                className="w-full h-auto max-h-[480px] object-contain mx-auto"
               />
             </motion.div>
           </div>
