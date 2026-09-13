@@ -57,48 +57,57 @@ export const BentoGallery: React.FC = () => {
           </p>
         </div>
 
-        {/* Issue #7: Masked-image bento gallery with floating pill-shaped captions and staggered fade + scale (0.95 -> 1) */}
+        {/* Issue #7: Masked-image bento gallery with floating pill-shaped captions and staggered fade + scale (0.92 -> 1) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-          {bentoTiles.map((tile, idx) => (
-            <motion.div
-              key={idx}
-              initial={
-                shouldReduceMotion
-                  ? { opacity: 1, scale: 1 }
-                  : { opacity: 0, scale: 0.95 }
-              }
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{
-                duration: 0.6,
-                delay: idx * 0.12, // Staggered entry
-                ease: "easeOut",
-              }}
-              className={`${tile.span} ${tile.aspect} relative rounded-[44px] md:rounded-[56px] overflow-hidden bg-neutral-900 border border-neutral-800 group shadow-2xl will-change-transform`}
-            >
-              {/* Image */}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={tile.image}
-                alt={tile.label}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 brightness-90 group-hover:brightness-100"
-              />
+          {bentoTiles.map((tile, idx) => {
+            const shapeRadius =
+              idx === 1
+                ? "rounded-[32px] md:rounded-[100px]"
+                : idx === 3
+                ? "rounded-[32px] md:rounded-[48px]"
+                : "rounded-[32px]";
 
-              {/* Gradient Vignette */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
+            return (
+              <motion.div
+                key={idx}
+                initial={
+                  shouldReduceMotion
+                    ? { opacity: 1, scale: 1 }
+                    : { opacity: 0, scale: 0.92 }
+                }
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{
+                  duration: 0.7,
+                  delay: idx * 0.1, // Staggered entry 0.1s
+                  ease: [0.25, 1, 0.5, 1],
+                }}
+                className={`${tile.span} ${tile.aspect} relative ${shapeRadius} overflow-hidden bg-neutral-900 border border-neutral-800 group shadow-2xl will-change-transform`}
+              >
+                {/* Image */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={tile.image}
+                  alt={tile.label}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 brightness-90 group-hover:brightness-100"
+                />
 
-              {/* Floating Pill-Shaped Caption Badge */}
-              <div className="absolute bottom-6 inset-x-6 flex items-center justify-between pointer-events-none">
-                <span className="px-5 py-2.5 rounded-full backdrop-blur-xl bg-black/75 border border-white/15 text-white text-xs sm:text-sm font-medium tracking-tight shadow-xl">
-                  {tile.label}
-                </span>
+                {/* Gradient Vignette */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
 
-                <span className="font-mono text-xs text-neutral-400 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/10">
-                  {tile.badge}
-                </span>
-              </div>
-            </motion.div>
-          ))}
+                {/* Floating Dark Pill-Shaped Caption Badge (bg #1f1f1f) */}
+                <div className="absolute bottom-6 inset-x-6 flex items-center justify-between pointer-events-none">
+                  <span className="px-5 py-2.5 rounded-[999px] backdrop-blur-xl bg-[#1f1f1f]/90 border border-white/15 text-white text-xs sm:text-sm font-medium tracking-tight shadow-xl">
+                    {tile.label}
+                  </span>
+
+                  <span className="font-mono text-xs text-neutral-400 px-3 py-1.5 rounded-[999px] bg-[#1f1f1f]/90 backdrop-blur-md border border-white/10">
+                    {tile.badge}
+                  </span>
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
       </div>
     </section>

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef } from "react";
-import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
+import { motion, useScroll, useTransform, useSpring, useReducedMotion } from "framer-motion";
 
 interface TextInkRevealProps {
   badge?: string;
@@ -26,10 +26,17 @@ export const TextInkReveal: React.FC<TextInkRevealProps> = ({
     offset: ["start 85%", "end 25%"],
   });
 
-  // Ink fill percentage: 0% (light gray) to 100% (filled)
-  const inkPercent = useTransform(scrollYProgress, [0, 1], [0, 100]);
+  // Smooth scrub with easeInOut feel
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 120,
+    damping: 28,
+    restDelta: 0.001,
+  });
 
-  const baseColor = theme === "light" ? "#b3b3b3" : "#52525b";
+  // Ink fill percentage: 0% (light gray #b8b8b8) to 100% (filled #111111)
+  const inkPercent = useTransform(smoothProgress, [0, 1], [0, 100]);
+
+  const baseColor = theme === "light" ? "#b8b8b8" : "#444444";
   const fillColor = theme === "light" ? "#111111" : "#ffffff";
 
   return (

@@ -34,7 +34,7 @@ export const Specs: React.FC<SpecsProps> = ({
     <section
       id="specifications"
       ref={sectionRef}
-      className="relative py-28 px-6 bg-[#f7f7f8] text-[#111111] overflow-hidden"
+      className="relative py-36 px-6 bg-[#ffffff] text-[#111111] overflow-hidden"
     >
       <div className="max-w-7xl mx-auto">
         {/* Text Ink-Fill Reveal for Section Headline */}
@@ -75,19 +75,19 @@ export const Specs: React.FC<SpecsProps> = ({
               return (
                 <motion.div
                   key={card.title}
-                  initial={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                  initial={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-50px" }}
                   transition={{
                     duration: 0.6,
-                    delay: idx * 0.14,
-                    ease: "easeOut",
+                    delay: idx * 0.1,
+                    ease: [0.22, 1, 0.36, 1], // power3.out
                   }}
-                  className={`relative bg-white rounded-3xl p-8 shadow-[0_10px_35px_rgba(0,0,0,0.04)] border border-neutral-200/80 hover:shadow-[0_15px_45px_rgba(0,0,0,0.08)] transition-all z-10 ${
+                  className={`relative bg-[#f2f2f2] rounded-[20px] p-8 shadow-[0_10px_35px_rgba(0,0,0,0.04)] border border-neutral-200/60 hover:shadow-[0_15px_45px_rgba(0,0,0,0.08)] transition-all z-10 ${
                     isMiddle ? "md:-translate-y-2" : ""
                   }`}
                 >
-                  <h3 className="text-2xl font-serif font-normal text-black mb-8">
+                  <h3 className="text-2xl font-serif font-normal text-[#111111] mb-8">
                     {card.title}
                   </h3>
 

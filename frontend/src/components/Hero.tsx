@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef } from "react";
-import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
+import { motion, useScroll, useTransform, useSpring, useReducedMotion } from "framer-motion";
 
 interface HeroProps {
   titleLine1: string;
@@ -31,16 +31,28 @@ export const Hero: React.FC<HeroProps> = ({
     offset: ["start start", "end end"],
   });
 
-  // Issue #1: Interpolate product image transform: scale(1 -> 1.4) and translateY within pin
-  const penScale = useTransform(scrollYProgress, [0, 0.85], [1, 1.4]);
-  const penTranslateY = useTransform(scrollYProgress, [0, 0.85], [0, 110]);
-  const penRotate = useTransform(scrollYProgress, [0, 0.85], [-4, 6]);
+  // Motion Token: Scroll-scrub smoothing (scrub: 0.5 equivalent via useSpring)
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001,
+  });
+
+  // Motion Token: Hero pin-zoom scale 1.0 -> 1.35 over 100vh pin
+  const penScale = useTransform(smoothProgress, [0, 0.85], [1, 1.35]);
+  const penTranslateY = useTransform(smoothProgress, [0, 0.85], [0, 100]);
+  const penRotate = useTransform(smoothProgress, [0, 0.85], [-4, 5]);
 
   return (
     // Outer pinned scroll section (pin for ~100vh of scroll)
     <div ref={pinContainerRef} className="relative h-[200vh] bg-black">
       {/* Sticky Viewport pinned firmly for ~100vh */}
-      <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between pt-28 pb-12 px-6 bg-gradient-to-b from-[#2e3035] via-[#212226] to-[#121315]">
+      <div
+        className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between pt-28 pb-12 px-6"
+        style={{
+          background: "linear-gradient(160deg, #545861 0%, #2c2e34 100%)",
+        }}
+      >
         {/* Ambient Top Vignette Glow */}
         <div className="absolute top-0 inset-x-0 h-96 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-white/10 via-transparent to-transparent pointer-events-none" />
 
@@ -71,7 +83,7 @@ export const Hero: React.FC<HeroProps> = ({
           {/* Fixed Headline & CTA layer (stays fixed in place, unaffected by pen zoom) */}
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-end relative z-20">
             <div className="md:col-span-7 space-y-3">
-              <span className="inline-block text-xs font-mono uppercase tracking-widest text-neutral-400">
+              <span className="inline-block text-[11px] font-sans uppercase tracking-[0.12em] text-[#8a8a8a]">
                 {badge}
               </span>
               <h1 className="text-5xl sm:text-7xl lg:text-8xl font-serif font-normal text-white leading-[1.02] tracking-tight">
@@ -87,13 +99,13 @@ export const Hero: React.FC<HeroProps> = ({
               <div className="flex flex-wrap items-center gap-4">
                 <button
                   onClick={onOpenOrder}
-                  className="px-8 py-3.5 bg-white text-black font-semibold rounded-2xl hover:bg-neutral-200 transition-all text-sm tracking-tight shadow-xl"
+                  className="px-8 py-3.5 bg-[#ffffff] text-[#000000] font-semibold rounded-[999px] hover:bg-neutral-200 transition-all text-sm tracking-tight shadow-xl"
                 >
                   {ctaText} • {price}
                 </button>
                 <a
                   href="#specifications"
-                  className="px-6 py-3.5 rounded-2xl border border-white/20 text-white hover:bg-white/10 transition-all text-sm font-medium"
+                  className="px-6 py-3.5 rounded-[999px] border border-white/20 text-white hover:bg-white/10 transition-all text-sm font-medium"
                 >
                   Specifications
                 </a>

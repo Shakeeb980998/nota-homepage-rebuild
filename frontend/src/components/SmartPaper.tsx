@@ -30,11 +30,11 @@ export const SmartPaper: React.FC<SmartPaperProps> = ({ badge, title, slides }) 
 
   const slideCount = Math.min(slides.length, notebookImages.length);
 
-  // Issue #5 Fix: Map steps across [0, 0.75] so the final slide reaches full progress = 1 well before unpinning
+  // Pin release buffer: Map steps across [0, 0.80] so the final slide holds firmly for the remaining 20% before unpinning
   const stepIndex = useTransform(scrollYProgress, (v) => {
     if (v < 0.22) return 0;
-    if (v < 0.48) return 1;
-    if (v < 0.72) return 2;
+    if (v < 0.45) return 1;
+    if (v < 0.68) return 2;
     return 3;
   });
 
@@ -65,46 +65,48 @@ export const SmartPaper: React.FC<SmartPaperProps> = ({ badge, title, slides }) 
         </div>
 
         {/* Center Stage: Two-Column Sticky Layout */}
-        <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center my-auto">
-          {/* Left Column: Crossfading Open Notebook Mockup */}
-          <div className="lg:col-span-7 flex justify-center items-center relative min-h-[360px] sm:min-h-[440px]">
-            <div className="absolute w-[500px] h-[350px] bg-white/[0.04] blur-[120px] rounded-full pointer-events-none" />
+        <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center my-auto">
+          {/* Left Column: Carousel Image Panel bg #131313 */}
+          <div className="lg:col-span-7 flex justify-center items-center relative min-h-[360px] sm:min-h-[440px] bg-[#131313] border border-neutral-800/80 rounded-[20px] p-6 sm:p-10 shadow-2xl">
+            <div className="absolute w-[450px] h-[300px] bg-white/[0.03] blur-[100px] rounded-full pointer-events-none" />
 
             <motion.div
               key={`img-${activeStep}`}
               initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, scale: 0.96 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.45, ease: "easeOut" }}
-              className="relative z-10 w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl drop-shadow-[0_20px_50px_rgba(0,0,0,0.85)] border border-neutral-800/80"
+              className="relative z-10 w-full max-w-xl flex justify-center items-center"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={activeImage}
                 alt={activeSlide?.title || "Nota Notebook"}
-                className="w-full h-auto max-h-[420px] object-contain mx-auto"
+                className="w-full h-auto max-h-[380px] object-contain mx-auto drop-shadow-[0_20px_40px_rgba(0,0,0,0.9)]"
               />
             </motion.div>
           </div>
 
-          {/* Right Column: Discrete Crossfade Headline & Copy */}
+          {/* Right Column: Floating Dark Pill / Card bg #1f1f1f rounded-[16px] */}
           <div className="lg:col-span-5 relative min-h-[260px] flex flex-col justify-center">
-            <motion.div
-              key={`text-${activeStep}`}
-              initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.45, ease: "easeOut" }}
-              className="space-y-6"
-            >
-              <span className="text-xs font-mono uppercase tracking-widest text-neutral-400">
-                0{activeStep + 1} — {activeSlide?.subTitle || "Intelligent Layer"}
-              </span>
-              <h3 className="text-3xl sm:text-4xl font-serif font-normal text-white leading-snug">
-                {activeSlide?.title}
-              </h3>
-              <p className="text-neutral-300 text-sm sm:text-base font-light leading-relaxed">
-                {activeSlide?.text}
-              </p>
-            </motion.div>
+            <div className="bg-[#1f1f1f] border border-neutral-800/80 rounded-[16px] p-8 shadow-2xl">
+              <motion.div
+                key={`text-${activeStep}`}
+                initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.45, ease: "easeOut" }}
+                className="space-y-6"
+              >
+                <span className="text-[11px] font-sans uppercase tracking-[0.12em] text-[#8a8a8a]">
+                  0{activeStep + 1} — {activeSlide?.subTitle || "Intelligent Layer"}
+                </span>
+                <h3 className="text-3xl sm:text-4xl font-serif font-normal text-white leading-snug">
+                  {activeSlide?.title}
+                </h3>
+                <p className="text-neutral-300 text-sm sm:text-base font-light leading-relaxed">
+                  {activeSlide?.text}
+                </p>
+              </motion.div>
+            </div>
           </div>
         </div>
 

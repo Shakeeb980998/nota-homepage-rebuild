@@ -26,19 +26,24 @@ export const Footer: React.FC<FooterProps> = ({ siteName = "Nōta", copyright, l
 
   return (
     <div>
-      {/* Primitive #9: Product Image on Vertical Gradient (dark -> warm orange/red) */}
-      <section className="relative pt-32 pb-24 px-6 overflow-hidden bg-gradient-to-b from-[#101012] via-[#2d140e] to-[#7c2d12] text-white text-center">
+      {/* Primitive #9: Product Image on Vertical Gradient (pen-tip section: #7a2f1a -> #b3521f -> #d17a3a) */}
+      <section
+        className="relative pt-36 pb-28 px-6 overflow-hidden text-white text-center"
+        style={{
+          background: "linear-gradient(180deg, #7a2f1a 0%, #b3521f 50%, #d17a3a 100%)",
+        }}
+      >
         {/* Ambient Top Glow */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,_var(--tw-gradient-stops))] from-amber-500/20 via-transparent to-transparent pointer-events-none" />
 
         <div className="max-w-4xl mx-auto space-y-8 relative z-10">
-          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-mono uppercase tracking-widest text-amber-200">
+          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-[999px] bg-white/10 backdrop-blur-md border border-white/20 text-[11px] font-sans uppercase tracking-[0.12em] text-white">
             <Sparkles size={13} /> Writing Infrastructure
           </span>
 
           <h2 className="text-5xl sm:text-6xl md:text-7xl font-serif font-light tracking-tight leading-tight">
             Designed for those who <br />
-            <span className="italic text-amber-100">think better by hand.</span>
+            <span className="italic text-white">think better by hand.</span>
           </h2>
 
           <div className="relative w-full max-w-xl mx-auto py-6 flex justify-center drop-shadow-[0_30px_50px_rgba(0,0,0,0.7)]">
@@ -52,13 +57,13 @@ export const Footer: React.FC<FooterProps> = ({ siteName = "Nōta", copyright, l
         </div>
       </section>
 
-      {/* Abrupt Transition to Solid Black Footer with 3-Column Layout */}
-      <footer className="bg-black py-20 px-6 text-neutral-400 border-t border-neutral-900">
+      {/* Abrupt Transition to Solid Black (#000000) Footer with 3-Column Layout */}
+      <footer className="bg-[#000000] py-24 px-6 text-neutral-400">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-12 pb-16 border-b border-neutral-900">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-12 pb-16 border-b border-neutral-800">
             {/* Column 1: Brand Blurb */}
             <div className="md:col-span-5 space-y-4">
-              <span className="font-sans text-2xl tracking-tight text-white font-bold">
+              <span className="font-serif text-3xl tracking-tight text-white font-normal block">
                 {siteName}
               </span>
               <p className="text-sm text-neutral-400 max-w-sm font-light leading-relaxed">
@@ -68,7 +73,7 @@ export const Footer: React.FC<FooterProps> = ({ siteName = "Nōta", copyright, l
 
             {/* Column 2: Navigation Links */}
             <div className="md:col-span-4 space-y-4">
-              <h4 className="text-xs font-mono uppercase tracking-widest text-neutral-500">Navigation</h4>
+              <h4 className="text-[11px] font-sans uppercase tracking-[0.12em] text-[#8a8a8a]">Navigation</h4>
               <nav className="flex flex-col space-y-3 text-sm font-light">
                 {links.map((link) => (
                   <a
@@ -84,7 +89,7 @@ export const Footer: React.FC<FooterProps> = ({ siteName = "Nōta", copyright, l
 
             {/* Column 3: Credits & Reviewer Info */}
             <div className="md:col-span-3 space-y-4">
-              <h4 className="text-xs font-mono uppercase tracking-widest text-neutral-500">Credits & Administration</h4>
+              <h4 className="text-[11px] font-sans uppercase tracking-[0.12em] text-[#8a8a8a]">Credits & Administration</h4>
               <div className="space-y-3 text-sm font-light">
                 <button
                   onClick={() => setTeamPopupOpen(true)}

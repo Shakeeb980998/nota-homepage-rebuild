@@ -23,19 +23,34 @@ export const Header: React.FC<HeaderProps> = ({
   links,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  React.useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 40);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-40 bg-transparent transition-all duration-300 pointer-events-none">
-      <div className="max-w-7xl mx-auto px-6 h-24 flex items-center justify-between pointer-events-auto">
-        {/* Logo */}
+    <header
+      className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 pointer-events-none h-20 flex items-center ${
+        scrolled
+          ? "bg-[#2c2e34]/80 backdrop-blur-xl border-b border-white/10"
+          : "bg-transparent"
+      }`}
+    >
+      <div className="max-w-7xl mx-auto px-6 w-full flex items-center justify-between pointer-events-auto">
+        {/* Wordmark "Nōta": Same serif family as headlines */}
         <a href="#" className="flex items-center gap-2 group">
-          <span className="font-sans text-2xl tracking-tight text-white font-bold">
+          <span className="font-serif text-3xl tracking-normal text-white font-normal">
             {siteName}
           </span>
         </a>
 
-        {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-9 text-sm font-medium tracking-normal text-neutral-300">
+        {/* Desktop Nav: uppercase, letter-spacing 0.12em, ~11-12px, muted gray #8a8a8a */}
+        <nav className="hidden md:flex items-center gap-8 text-[11px] font-sans font-medium uppercase tracking-[0.12em] text-[#8a8a8a]">
           {links.map((link) => (
             <a
               key={link.label}
@@ -47,13 +62,14 @@ export const Header: React.FC<HeaderProps> = ({
           ))}
         </nav>
 
-        {/* Floating White Pill CTA from reference */}
+        {/* CTA Pill Button (bg #ffffff, text #000000, rounded-full) */}
         <div className="flex items-center gap-3">
-          <div className="hidden sm:flex items-center bg-white text-black rounded-2xl p-1.5 pl-4 shadow-2xl gap-5 border border-white/20">
+          <div className="hidden sm:flex items-center bg-[#ffffff] text-[#000000] rounded-[999px] p-1.5 pl-4 shadow-2xl gap-4 border border-white/20">
             <CloverIcon />
+            {/* Order Button: bg #000000, text #ffffff, rounded-full */}
             <button
               onClick={onOpenOrder}
-              className="bg-black hover:bg-neutral-800 text-white px-5 py-2.5 rounded-xl font-medium text-xs tracking-tight transition-all"
+              className="bg-[#000000] hover:bg-neutral-800 text-[#ffffff] px-5 py-2 rounded-[999px] font-sans font-medium text-xs tracking-tight transition-all"
             >
               Order <span className="text-neutral-400">Nota One</span> • {price}
             </button>
@@ -61,7 +77,7 @@ export const Header: React.FC<HeaderProps> = ({
 
           <button
             onClick={onOpenOrder}
-            className="sm:hidden bg-white text-black px-4 py-2 rounded-xl text-xs font-semibold"
+            className="sm:hidden bg-[#ffffff] text-[#000000] px-4 py-2 rounded-[999px] text-xs font-semibold"
           >
             {price}
           </button>

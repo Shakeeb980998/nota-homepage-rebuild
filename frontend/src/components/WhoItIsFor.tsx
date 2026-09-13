@@ -2,7 +2,7 @@
 
 import React, { useRef } from "react";
 import { AudienceCard } from "@/types/cms";
-import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
+import { motion, useScroll, useTransform, useSpring, useReducedMotion } from "framer-motion";
 import { WordScrollHighlight } from "@/components/WordScrollHighlight";
 import { TextInkReveal } from "@/components/TextInkReveal";
 import { GraduationCap, Palette, Briefcase } from "lucide-react";
@@ -31,17 +31,24 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
     offset: ["start start", "end end"],
   });
 
+  // Motion Token: Scrub smoothing equivalent to scrub: 0.5
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001,
+  });
+
   // Cards start off-screen right (translateX: 100%+) and animate to translateX(0) with scroll-scrubbed stagger
-  const card1X = useTransform(scrollYProgress, [0.05, 0.55], ["100vw", "0vw"]);
-  const card2X = useTransform(scrollYProgress, [0.18, 0.72], ["130vw", "0vw"]);
-  const card3X = useTransform(scrollYProgress, [0.30, 0.88], ["160vw", "0vw"]);
+  const card1X = useTransform(smoothProgress, [0.05, 0.55], ["100vw", "0vw"]);
+  const card2X = useTransform(smoothProgress, [0.18, 0.72], ["130vw", "0vw"]);
+  const card3X = useTransform(smoothProgress, [0.30, 0.88], ["160vw", "0vw"]);
 
   const cardTransforms = [card1X, card2X, card3X];
 
   return (
-    <section id="who-it-is-for" className="bg-black text-white">
+    <section id="who-it-is-for" className="bg-[#000000] text-white">
       {/* Upper Section: Word-by-Word Scroll Highlight */}
-      <div className="py-28 px-6 max-w-5xl mx-auto space-y-12">
+      <div className="py-36 px-6 max-w-5xl mx-auto space-y-12">
         <TextInkReveal
           badge="Philosophy"
           titleLine1="Some thoughts need time,"
@@ -59,7 +66,7 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
         {/* Sticky Viewport pinned during scroll */}
         <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-center px-6">
           <div className="max-w-7xl mx-auto w-full mb-12">
-            <span className="text-xs font-mono uppercase tracking-widest text-neutral-500">
+            <span className="text-[11px] font-sans uppercase tracking-[0.12em] text-[#8a8a8a]">
               Tailored Systems
             </span>
             <h3 className="text-3xl sm:text-5xl font-serif text-white font-light mt-2">
@@ -78,7 +85,7 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
                   <motion.div
                     key={aud.title}
                     style={shouldReduceMotion ? {} : { x: cardX }}
-                    className="bg-neutral-900/90 backdrop-blur-md border border-neutral-800 rounded-[36px] p-8 sm:p-10 flex flex-col justify-between shadow-2xl hover:border-neutral-700 transition-colors will-change-transform min-h-[380px]"
+                    className="bg-[#131313] border border-neutral-800/80 rounded-[20px] p-8 sm:p-10 flex flex-col justify-between shadow-2xl hover:border-neutral-700 transition-colors will-change-transform min-h-[380px]"
                   >
                     <div className="space-y-6">
                       <div className="flex items-center justify-between">

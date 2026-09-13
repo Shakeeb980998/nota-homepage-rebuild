@@ -14,8 +14,8 @@ const Word: React.FC<{
   progress: any;
   shouldReduceMotion: boolean | null;
 }> = ({ word, range, progress, shouldReduceMotion }) => {
-  const opacity = useTransform(progress, range, [0.35, 1]);
-  const color = useTransform(progress, range, ["#71717a", "#ffffff"]);
+  const opacity = useTransform(progress, range, [0.43, 1]);
+  const color = useTransform(progress, range, ["#6e6e6e", "#ffffff"]);
 
   if (shouldReduceMotion) {
     return <span className="text-white mr-2.5 inline-block">{word}</span>;

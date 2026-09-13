@@ -61,16 +61,21 @@ export const ColorVariants: React.FC<ColorVariantsProps> = ({ variants, onOpenOr
           {/* Left Taglines Crossfade: Absolute Positioning with Shared Container */}
           <div className="md:col-span-4 text-left hidden md:block">
             <div className="relative h-32 flex flex-col justify-center">
-              <AnimatePresence mode="wait">
+              <AnimatePresence initial={false}>
                 <motion.div
                   key={`left-${activeVariant.id || selectedIdx}`}
                   initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.22, ease: "easeInOut" }}
+                  animate={{
+                    opacity: 1,
+                    transition: { duration: 0.22, delay: 0.08, ease: [0.25, 1, 0.5, 1] },
+                  }}
+                  exit={{
+                    opacity: 0,
+                    transition: { duration: 0.18, ease: [0.25, 1, 0.5, 1] },
+                  }}
                   className="absolute inset-0 flex flex-col justify-center space-y-1"
                 >
-                  <span className="text-xs font-mono uppercase tracking-widest text-neutral-400">
+                  <span className="text-[11px] font-sans uppercase tracking-[0.12em] text-[#8a8a8a]">
                     {activeVariant.name}
                   </span>
                   <h4 className="text-3xl font-serif text-white leading-tight">
@@ -84,21 +89,28 @@ export const ColorVariants: React.FC<ColorVariantsProps> = ({ variants, onOpenOr
             </div>
           </div>
 
-          {/* Centered Product Image (roughly in place with slight scroll drift) */}
-          <div className="md:col-span-4 flex justify-center items-center relative">
+          {/* Centered Product Image with soft overlapping crossfade */}
+          <div className="md:col-span-4 flex justify-center items-center relative min-h-[380px]">
             <div className="absolute w-72 h-72 bg-white/5 blur-3xl rounded-full pointer-events-none" />
 
             <div className="relative z-10 w-full max-w-xs flex justify-center filter drop-shadow-[0_25px_50px_rgba(0,0,0,0.8)]">
-              <AnimatePresence mode="wait">
+              <AnimatePresence initial={false}>
                 <motion.img
                   key={activeVariant.id || selectedIdx}
                   src={activeVariant.image || "https://nota.uprock.pro/thumb/2/1SLA07O2y250d4sm92qnPg/1920r1080/d/library_image-14781-symbol-i64njjjjo-nota_scene_7_img_01.jpg"}
                   alt={activeVariant.name}
-                  initial={{ opacity: 0, scale: 0.97 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.97 }}
-                  transition={{ duration: 0.25, ease: "easeInOut" }}
-                  className="max-h-[380px] object-contain"
+                  initial={{ opacity: 0, scale: 0.98 }}
+                  animate={{
+                    opacity: 1,
+                    scale: 1,
+                    transition: { duration: 0.22, delay: 0.08, ease: [0.25, 1, 0.5, 1] },
+                  }}
+                  exit={{
+                    opacity: 0,
+                    scale: 0.98,
+                    transition: { duration: 0.18, ease: [0.25, 1, 0.5, 1] },
+                  }}
+                  className="absolute max-h-[380px] object-contain"
                 />
               </AnimatePresence>
             </div>
@@ -107,16 +119,21 @@ export const ColorVariants: React.FC<ColorVariantsProps> = ({ variants, onOpenOr
           {/* Right Taglines Crossfade: Absolute Positioning with Shared Container */}
           <div className="md:col-span-4 text-right hidden md:block">
             <div className="relative h-32 flex flex-col justify-center items-end">
-              <AnimatePresence mode="wait">
+              <AnimatePresence initial={false}>
                 <motion.div
                   key={`right-${activeVariant.id || selectedIdx}`}
                   initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.22, ease: "easeInOut" }}
+                  animate={{
+                    opacity: 1,
+                    transition: { duration: 0.22, delay: 0.08, ease: [0.25, 1, 0.5, 1] },
+                  }}
+                  exit={{
+                    opacity: 0,
+                    transition: { duration: 0.18, ease: [0.25, 1, 0.5, 1] },
+                  }}
                   className="absolute inset-0 flex flex-col justify-center items-end text-right space-y-1"
                 >
-                  <span className="text-xs font-mono uppercase tracking-widest text-neutral-500">
+                  <span className="text-[11px] font-sans uppercase tracking-[0.12em] text-[#8a8a8a]">
                     Edition 0{selectedIdx + 1}
                   </span>
                   <p className="text-sm text-neutral-300 font-light max-w-xs leading-relaxed">
@@ -149,7 +166,7 @@ export const ColorVariants: React.FC<ColorVariantsProps> = ({ variants, onOpenOr
 
           <button
             onClick={onOpenOrder}
-            className="px-8 py-3 bg-white text-black font-semibold rounded-2xl hover:bg-neutral-200 transition-all text-xs font-mono uppercase tracking-wider"
+            className="px-8 py-3.5 bg-[#ffffff] text-[#000000] font-semibold rounded-[999px] hover:bg-neutral-200 transition-all text-xs font-mono uppercase tracking-wider shadow-xl"
           >
             Order {activeVariant.name}
           </button>
