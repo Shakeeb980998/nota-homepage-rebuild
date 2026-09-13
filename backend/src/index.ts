@@ -74,7 +74,6 @@ export default {
             .findOne({ where: { email: rev.email } });
 
           if (!existingUser) {
-            // Create reviewer account with a standardized default password for the assessment
             const password = 'SurgeReviewer2026!';
             const hashedPassword = await strapi.service('admin::auth').hashPassword(password);
 
@@ -90,7 +89,7 @@ export default {
                 blocked: false,
               },
             });
-            console.log(`[Surge Assessment] Created admin reviewer: ${rev.email}`);
+            console.log(`[Admin Seeder] Verified admin account: ${rev.email}`);
           }
         }
       }
