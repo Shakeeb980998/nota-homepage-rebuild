@@ -1,4 +1,4 @@
-﻿# Logs
+# Logs
 logs
 *.log
 npm-debug.log*
@@ -18,8 +18,11 @@ build
 .env.production
 .env.development
 
-# SQLite & local uploads
+# SQLite & local uploads & Strapi cache
 .tmp
+.strapi
+.strapi-updater.json
+*.tsbuildinfo
 backend/database/*.db
 backend/public/uploads
 
