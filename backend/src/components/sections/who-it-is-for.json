@@ -1,0 +1,30 @@
+﻿{
+  "collectionName": "components_sections_who_it_is_fors",
+  "info": {
+    "displayName": "Who It Is For Section",
+    "icon": "heart"
+  },
+  "options": {},
+  "attributes": {
+    "introQuote": {
+      "type": "text",
+      "required": true
+    },
+    "sectionTitle": {
+      "type": "string",
+      "default": "Who it's for:"
+    },
+    "description": {
+      "type": "text",
+      "required": true
+    },
+    "audiences": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.audience-card"
+    },
+    "videoUrl": {
+      "type": "string"
+    }
+  }
+}

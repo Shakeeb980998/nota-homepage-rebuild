@@ -1,0 +1,27 @@
+﻿{
+  "collectionName": "components_sections_inside_the_boxes",
+  "info": {
+    "displayName": "Inside The Box Section",
+    "icon": "archive"
+  },
+  "options": {},
+  "attributes": {
+    "titleLine1": {
+      "type": "string",
+      "default": "Inside"
+    },
+    "titleLine2": {
+      "type": "string",
+      "default": "the box"
+    },
+    "leadText": {
+      "type": "text",
+      "required": true
+    },
+    "items": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.box-item"
+    }
+  }
+}

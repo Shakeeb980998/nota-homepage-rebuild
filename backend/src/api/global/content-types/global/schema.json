@@ -1,0 +1,41 @@
+﻿{
+  "kind": "singleType",
+  "collectionName": "globals",
+  "info": {
+    "singularName": "global",
+    "pluralName": "globals",
+    "displayName": "Global Settings"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "siteName": {
+      "type": "string",
+      "default": "NŌTA"
+    },
+    "tagline": {
+      "type": "string",
+      "default": "Writing Infrastructure for Modern Thinking"
+    },
+    "navLinks": {
+      "type": "json",
+      "required": true
+    },
+    "orderButtonText": {
+      "type": "string",
+      "default": "Order Nota One"
+    },
+    "productPrice": {
+      "type": "string",
+      "default": "$300"
+    },
+    "footerCopyright": {
+      "type": "string",
+      "default": "@2026 Nōta Team"
+    },
+    "footerDescription": {
+      "type": "text"
+    }
+  }
+}

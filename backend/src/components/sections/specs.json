@@ -1,0 +1,29 @@
+﻿{
+  "collectionName": "components_sections_specs",
+  "info": {
+    "displayName": "Specs Section",
+    "icon": "cog"
+  },
+  "options": {},
+  "attributes": {
+    "badge": {
+      "type": "string",
+      "default": "Nota pen"
+    },
+    "title": {
+      "type": "string",
+      "default": "Specifications"
+    },
+    "penImage": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "cards": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.spec-card"
+    }
+  }
+}

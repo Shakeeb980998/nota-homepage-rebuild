@@ -1,0 +1,32 @@
+﻿{
+  "collectionName": "components_sections_heroes",
+  "info": {
+    "displayName": "Hero Section",
+    "icon": "star"
+  },
+  "options": {},
+  "attributes": {
+    "titleLine1": {
+      "type": "string",
+      "required": true
+    },
+    "titleLine2": {
+      "type": "string",
+      "required": true
+    },
+    "ctaText": {
+      "type": "string",
+      "default": "Order Nota One"
+    },
+    "price": {
+      "type": "string",
+      "default": "$300"
+    },
+    "heroImage": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    }
+  }
+}

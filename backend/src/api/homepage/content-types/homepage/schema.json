@@ -1,0 +1,32 @@
+﻿{
+  "kind": "singleType",
+  "collectionName": "homepages",
+  "info": {
+    "singularName": "homepage",
+    "pluralName": "homepages",
+    "displayName": "Homepage",
+    "description": "NŌTA Homepage content"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "seo": {
+      "type": "component",
+      "repeatable": false,
+      "component": "shared.seo"
+    },
+    "sections": {
+      "type": "dynamiczone",
+      "components": [
+        "sections.hero",
+        "sections.specs",
+        "sections.who-it-is-for",
+        "sections.smart-paper",
+        "sections.inside-the-box",
+        "sections.color-variants"
+      ]
+    }
+  }
+}

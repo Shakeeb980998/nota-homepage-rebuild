@@ -1,0 +1,15 @@
+﻿{
+  "collectionName": "components_sections_color_variants_sections",
+  "info": {
+    "displayName": "Color Variants Section",
+    "icon": "brush"
+  },
+  "options": {},
+  "attributes": {
+    "variants": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.color-variant"
+    }
+  }
+}

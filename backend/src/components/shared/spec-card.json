@@ -1,0 +1,18 @@
+﻿{
+  "collectionName": "components_shared_spec_cards",
+  "info": {
+    "displayName": "Spec Card",
+    "icon": "bulletList"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "features": {
+      "type": "json",
+      "required": true
+    }
+  }
+}

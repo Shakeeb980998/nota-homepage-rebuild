@@ -1,0 +1,22 @@
+﻿{
+  "collectionName": "components_sections_smart_papers",
+  "info": {
+    "displayName": "Smart Paper Section",
+    "icon": "file"
+  },
+  "options": {},
+  "attributes": {
+    "badge": {
+      "type": "string",
+      "default": "Works with"
+    },
+    "title": {
+      "type": "string",
+      "default": "smart paper"
+    },
+    "features": {
+      "type": "json",
+      "required": true
+    }
+  }
+}

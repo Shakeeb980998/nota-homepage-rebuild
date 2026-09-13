@@ -1,0 +1,36 @@
+﻿{
+  "kind": "collectionType",
+  "collectionName": "form_submissions",
+  "info": {
+    "singularName": "form-submission",
+    "pluralName": "form-submissions",
+    "displayName": "Form Submissions",
+    "description": "Pre-orders and newsletter registrations"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "email": {
+      "type": "email",
+      "required": true
+    },
+    "type": {
+      "type": "enumeration",
+      "enum": ["preorder", "newsletter", "contact"],
+      "default": "preorder"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": ["new", "contacted", "fulfilled"],
+      "default": "new"
+    },
+    "product": {
+      "type": "string",
+      "default": "Nota One"
+    },
+    "notes": {
+      "type": "text"
+    }
+  }
+}
