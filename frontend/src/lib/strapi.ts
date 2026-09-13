@@ -1,4 +1,4 @@
-﻿import { HomepageData } from "@/types/cms";
+import { HomepageData } from "@/types/cms";
 
 export const defaultHomepageData: HomepageData = {
   seo: {
@@ -190,39 +190,69 @@ export const defaultHomepageData: HomepageData = {
   ],
 };
 
-const STRAPI_API_URL = process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337";
+const STRAPI_API_URL =
+  process.env.NEXT_PUBLIC_STRAPI_URL ||
+  process.env.STRAPI_URL ||
+  "https://nota-homepage-rebuild-production-efde.up.railway.app";
 
 export async function getHomepageData(): Promise<HomepageData> {
   try {
-    const res = await fetch(`${STRAPI_API_URL}/api/homepage?populate=deep,4`, {
-      next: { tags: ["homepage"] },
-      headers: {
-        Accept: "application/json",
-      },
-    });
+    const [homeRes, globalRes] = await Promise.allSettled([
+      fetch(`${STRAPI_API_URL}/api/homepage?populate=deep,4`, {
+        cache: "no-store",
+        headers: {
+          Accept: "application/json",
+        },
+      }),
+      fetch(`${STRAPI_API_URL}/api/global`, {
+        cache: "no-store",
+        headers: {
+          Accept: "application/json",
+        },
+      }),
+    ]);
 
-    if (!res.ok) {
-      return defaultHomepageData;
+    let mergedData: HomepageData = JSON.parse(JSON.stringify(defaultHomepageData));
+
+    if (globalRes.status === "fulfilled" && globalRes.value.ok) {
+      const gData = await globalRes.value.json();
+      if (gData?.data) {
+        const g = gData.data;
+        mergedData.global = {
+          ...mergedData.global,
+          siteName: g.siteName || mergedData.global.siteName,
+          productPrice: g.productPrice || mergedData.global.productPrice,
+          orderBadge: g.orderButtonText || mergedData.global.orderBadge,
+          footerCopyright: g.footerCopyright || mergedData.global.footerCopyright,
+          navLinks: Array.isArray(g.navLinks) && g.navLinks.length > 0 ? g.navLinks : mergedData.global.navLinks,
+        };
+        if (g.productPrice) {
+          mergedData.hero.price = g.productPrice;
+        }
+      }
     }
 
-    const data = await res.json();
-    if (!data || !data.data) {
-      return defaultHomepageData;
+    if (homeRes.status === "fulfilled" && homeRes.value.ok) {
+      const hData = await homeRes.value.json();
+      if (hData?.data) {
+        mergedData = {
+          ...mergedData,
+          ...hData.data,
+          global: {
+            ...mergedData.global,
+            ...(hData.data.global || {}),
+          },
+          seo: {
+            ...mergedData.seo,
+            ...(hData.data.seo || {}),
+          },
+        };
+      }
     }
 
-    return {
-      ...defaultHomepageData,
-      ...data.data,
-      global: {
-        ...defaultHomepageData.global,
-        ...(data.data.global || {}),
-      },
-      seo: {
-        ...defaultHomepageData.seo,
-        ...(data.data.seo || {}),
-      },
-    };
-  } catch {
+    return mergedData;
+  } catch (err) {
+    console.error("Error fetching Strapi data:", err);
     return defaultHomepageData;
   }
 }

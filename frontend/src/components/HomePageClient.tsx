@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState } from "react";
 import { HomepageData } from "@/types/cms";
@@ -32,7 +32,7 @@ export const HomePageClient: React.FC<HomePageClientProps> = ({ initialData }) =
       <Hero
         titleLine1={initialData.hero.titleLine1}
         titleLine2={initialData.hero.titleLine2}
-        price={initialData.hero.price}
+        price={initialData.global.productPrice || initialData.hero.price}
         onOpenOrder={() => setIsOrderOpen(true)}
       />
 
