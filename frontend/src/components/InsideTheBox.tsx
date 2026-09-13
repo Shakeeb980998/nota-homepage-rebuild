@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState } from "react";
 import { BoxItem } from "@/types/cms";
@@ -39,34 +39,49 @@ export const InsideTheBox: React.FC<InsideTheBoxProps> = ({
           {items.map((item, idx) => {
             const Icon = icons[idx % icons.length];
             const isHovered = hoveredIdx === idx;
+            const boxImages = [
+              "https://nota.uprock.pro/thumb/2/NdNsA4zjgwV803LVWQCIkg/1276r2108/d/41_block.jpg",
+              "https://nota.uprock.pro/thumb/2/V-Pld1tdphvc6bqPvkKsvw/1276r2108/d/42_block.jpg",
+              "https://nota.uprock.pro/thumb/2/uY0WbSXhbz5r3fxyMekPng/1276r2108/d/43_block.jpg",
+            ];
+            const boxImg = boxImages[idx % boxImages.length];
+
             return (
               <div
                 key={item.title}
                 onMouseEnter={() => setHoveredIdx(idx)}
                 onMouseLeave={() => setHoveredIdx(null)}
-                className={`rounded-3xl p-8 border transition-all duration-300 flex flex-col justify-between min-h-[300px] ${
+                className={`rounded-3xl p-6 border transition-all duration-500 flex flex-col justify-between overflow-hidden group ${
                   isHovered
-                    ? "bg-neutral-900 border-white/20 shadow-xl"
-                    : "bg-neutral-900/40 border-neutral-800"
+                    ? "bg-neutral-900 border-white/30 shadow-[0_20px_40px_rgba(255,255,255,0.06)]"
+                    : "bg-neutral-900/40 border-neutral-800/80"
                 }`}
               >
-                <div className="space-y-6">
-                  <div className="flex justify-between items-center">
-                    <div className="w-12 h-12 rounded-2xl bg-neutral-800 flex items-center justify-center text-white">
-                      <Icon size={20} />
-                    </div>
-                    <span className="font-mono text-xs text-neutral-500">
-                      {item.badge || `0${idx + 1}`}
-                    </span>
+                {/* Visual Image */}
+                <div className="w-full h-56 rounded-2xl overflow-hidden mb-6 relative bg-neutral-900">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={boxImg}
+                    alt={item.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                  <div className="absolute top-3 left-3 w-10 h-10 rounded-xl bg-black/60 backdrop-blur-md flex items-center justify-center text-white">
+                    <Icon size={18} />
                   </div>
+                  <span className="absolute top-3 right-3 font-mono text-xs text-neutral-400 px-2.5 py-1 rounded-md bg-black/60 backdrop-blur-md">
+                    {item.badge || `0${idx + 1}`}
+                  </span>
+                </div>
+
+                <div className="space-y-2">
                   <h3 className="text-xl font-serif text-white font-medium">
                     {item.title}
                   </h3>
+                  <p className="text-neutral-400 text-sm leading-relaxed">
+                    {item.description}
+                  </p>
                 </div>
-
-                <p className="text-neutral-400 text-sm leading-relaxed mt-6">
-                  {item.description}
-                </p>
               </div>
             );
           })}

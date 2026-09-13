@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React from "react";
 import { motion } from "framer-motion";
@@ -56,18 +56,35 @@ export const Hero: React.FC<HeroProps> = ({
         </div>
       </motion.div>
 
-      {/* Floating 3D Pen Graphic Placeholder / Image */}
+      {/* Floating 3D Pen Graphic with ambient glow */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 1.2, delay: 0.2 }}
-        className="relative mt-12 w-full max-w-2xl h-64 sm:h-80 flex items-center justify-center"
+        initial={{ opacity: 0, scale: 0.9, y: 40 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 1.2, delay: 0.3 }}
+        className="relative mt-8 sm:mt-16 w-full max-w-3xl flex items-center justify-center pointer-events-none"
       >
-        <div className="relative w-72 h-10 bg-gradient-to-r from-neutral-300 via-neutral-100 to-neutral-400 rounded-full shadow-[0_20px_50px_rgba(255,255,255,0.15)] transform -rotate-12 border border-white/40 flex items-center justify-between px-6">
-          <div className="w-4 h-4 rounded-full bg-neutral-900 border border-neutral-700" />
-          <div className="h-1 flex-1 mx-4 bg-neutral-200/40 rounded-full" />
-          <div className="w-6 h-2 rounded-sm bg-neutral-800" />
-        </div>
+        {/* Ambient Backlight Glow */}
+        <div className="absolute w-72 sm:w-96 h-36 bg-gradient-to-r from-blue-500/15 via-white/20 to-amber-500/15 blur-3xl rounded-full pointer-events-none" />
+
+        <motion.div
+          animate={{
+            y: [-10, 10, -10],
+            rotate: [-2, 2, -2],
+          }}
+          transition={{
+            repeat: Infinity,
+            duration: 6,
+            ease: "easeInOut",
+          }}
+          className="relative z-10 w-full max-w-xl px-4 flex justify-center drop-shadow-[0_25px_35px_rgba(255,255,255,0.08)]"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="https://nota.uprock.pro/thumb/2/zOzK4LBsVJn0W98Pf5CalQ/364r1526/d/library_image-14634-symbol-is6ru9kkd-nota_hero_image_adaptive_866220.png"
+            alt="NŌTA Precision Smart Pen"
+            className="w-full max-h-72 object-contain transform -rotate-6 hover:scale-105 transition-transform duration-700 pointer-events-auto cursor-pointer"
+          />
+        </motion.div>
       </motion.div>
     </section>
   );

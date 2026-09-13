@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState } from "react";
 import { SpecCard } from "@/types/cms";
@@ -49,24 +49,45 @@ export const Specs: React.FC<SpecsProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {cards.map((card, idx) => {
           const isActive = activeTab === idx;
+          const images = [
+            "https://nota.uprock.pro/thumb/2/hkWO_0PdjAnQD0OeUgMd8g/1920r1080/d/nota_scene_4_img_01.jpg",
+            "https://nota.uprock.pro/thumb/2/7YfwgKVakw18X4hnPZia0Q/1920r1080/d/nota_scene_4_img_02.jpg",
+            "https://nota.uprock.pro/thumb/2/5RXD9D7cr-Ez9A9KxlC5hw/1920r1080/d/nota_scene_4_img_03.jpg",
+          ];
+          const imgUrl = images[idx % images.length];
+
           return (
             <div
               key={card.title}
-              className={`rounded-3xl p-8 border transition-all duration-300 ${
+              onClick={() => setActiveTab(idx)}
+              className={`rounded-3xl p-6 border transition-all duration-500 cursor-pointer overflow-hidden group ${
                 isActive
-                  ? "bg-neutral-900/90 border-white/20 shadow-2xl scale-[1.02]"
-                  : "bg-neutral-950/60 border-neutral-800/80 opacity-75 hover:opacity-100"
+                  ? "bg-neutral-900/90 border-white/30 shadow-[0_15px_40px_rgba(255,255,255,0.06)] scale-[1.02]"
+                  : "bg-neutral-950/60 border-neutral-800/80 opacity-80 hover:opacity-100 hover:border-neutral-700"
               }`}
             >
-              <div className="flex items-center justify-between mb-8 pb-4 border-b border-neutral-800">
-                <h3 className="text-xl font-serif text-white font-medium">{card.title}</h3>
-                <span className="text-neutral-500 font-mono text-xs">0{idx + 1}</span>
+              {/* Feature Image Banner */}
+              <div className="w-full h-44 rounded-2xl overflow-hidden mb-6 relative bg-neutral-900">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={imgUrl}
+                  alt={card.title}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                <span className="absolute bottom-3 right-3 text-neutral-400 font-mono text-xs px-2.5 py-1 rounded-md bg-black/60 backdrop-blur-md">
+                  0{idx + 1}
+                </span>
               </div>
 
-              <ul className="space-y-4">
+              <div className="flex items-center justify-between mb-6 pb-3 border-b border-neutral-800">
+                <h3 className="text-xl font-serif text-white font-medium">{card.title}</h3>
+              </div>
+
+              <ul className="space-y-3">
                 {card.features.map((feature, fIdx) => (
                   <li key={fIdx} className="flex items-start gap-3 text-sm text-neutral-300">
-                    <span className="p-0.5 rounded-full bg-neutral-800 text-neutral-400 mt-0.5">
+                    <span className="p-0.5 rounded-full bg-neutral-800 text-neutral-400 mt-0.5 group-hover:bg-white group-hover:text-black transition-colors">
                       <Check size={12} />
                     </span>
                     <span>{feature}</span>

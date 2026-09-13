@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState } from "react";
 import { X, CheckCircle, Loader2 } from "lucide-react";
@@ -79,13 +79,23 @@ export const OrderModal: React.FC<OrderModalProps> = ({
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Modal Product Image */}
+            <div className="w-full h-36 rounded-2xl overflow-hidden mb-4 relative bg-neutral-950 flex items-center justify-center">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="https://nota.uprock.pro/thumb/2/48v7oqZUAYG0LHOJ-CgFqA/1472r1008/d/library_image-14639-symbol-ibp1e2m59-popup_order-img.png"
+                alt="Nota One Reservation"
+                className="w-full h-full object-contain p-2"
+              />
+            </div>
+
             <div className="space-y-2">
               <span className="inline-block text-xs uppercase tracking-widest text-neutral-500 font-mono">
                 Reservation • {productPrice}
               </span>
-              <h2 className="text-3xl font-serif tracking-tight font-medium text-white">
+              <h3 className="text-3xl font-serif tracking-tight font-light text-white">
                 Stay ahead
-              </h2>
+              </h3>
               <p className="text-neutral-400 text-sm">
                 Launching soon. Get early access and insider updates.
               </p>

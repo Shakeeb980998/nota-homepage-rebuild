@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState } from "react";
 import { SmartPaperFeature } from "@/types/cms";
@@ -80,20 +80,17 @@ export const SmartPaper: React.FC<SmartPaperProps> = ({ badge, title, slides }) 
         </div>
 
         {/* Right illustration / graphic pane */}
-        <div className="lg:col-span-6 bg-neutral-950 p-8 sm:p-12 flex items-center justify-center relative overflow-hidden">
-          <div className="w-full max-w-sm aspect-[4/3] rounded-2xl bg-neutral-900 border border-neutral-800 p-6 flex flex-col justify-between shadow-inner">
-            <div className="flex justify-between items-center text-xs font-mono text-neutral-600">
-              <span>CANVAS_LAYER // 0{currentSlide + 1}</span>
-              <span>SYNCHRONIZED</span>
-            </div>
-            <div className="space-y-2">
-              <div className="h-2 w-3/4 bg-neutral-800 rounded-full" />
-              <div className="h-2 w-1/2 bg-neutral-800 rounded-full" />
-              <div className="h-2 w-5/6 bg-neutral-800 rounded-full" />
-            </div>
-            <div className="text-xs font-mono text-neutral-500 text-right">
-              LATENCY &lt; 8ms
-            </div>
+        <div className="lg:col-span-6 bg-gradient-to-br from-neutral-900 via-neutral-950 to-black p-8 sm:p-12 flex items-center justify-center relative overflow-hidden border-t lg:border-t-0 lg:border-l border-neutral-800">
+          <div className="relative w-full max-w-md aspect-[4/3] rounded-2xl overflow-hidden flex items-center justify-center">
+            {/* Ambient backlight */}
+            <div className="absolute w-64 h-64 bg-white/5 blur-3xl rounded-full pointer-events-none" />
+            
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="https://nota.uprock.pro/thumb/2/E_-dKzAg6YZhD4xJJ6rAMA/233r734/d/library_image-14700-symbol-iw3g92519-nota_scene_2_img.png"
+              alt="Nota Smart Paper & Pen"
+              className="relative z-10 max-h-72 object-contain hover:scale-105 transition-transform duration-700 drop-shadow-[0_20px_40px_rgba(255,255,255,0.06)]"
+            />
           </div>
         </div>
       </div>

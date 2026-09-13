@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState } from "react";
 import { ColorVariant } from "@/types/cms";
@@ -78,31 +78,43 @@ export const ColorVariants: React.FC<ColorVariantsProps> = ({ variants, onOpenOr
           </div>
         </div>
 
-        {/* Right Pen Visual Representation */}
-        <div className="lg:col-span-6 flex items-center justify-center p-6">
-          <motion.div
-            key={activeVariant.id}
-            initial={{ scale: 0.95, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.4 }}
-            className="w-full max-w-sm h-72 rounded-3xl flex items-center justify-center border border-white/10 shadow-2xl relative overflow-hidden"
-            style={{
-              background: `radial-gradient(circle at center, ${activeVariant.hexColor}22 0%, #000000 85%)`,
-            }}
-          >
-            <div
-              className="w-64 h-8 rounded-full shadow-2xl transform -rotate-12 border border-white/20 flex items-center justify-between px-4 transition-all duration-500"
-              style={{
-                backgroundColor: activeVariant.hexColor,
-              }}
+        {/* Right Pen Visual Representation with real photography */}
+        <div className="lg:col-span-6 flex items-center justify-center p-2 sm:p-6">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeVariant.id}
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              transition={{ duration: 0.5 }}
+              className="w-full h-72 sm:h-96 rounded-3xl flex items-center justify-center border border-white/10 shadow-2xl relative overflow-hidden bg-black"
             >
-              <div className="w-3 h-3 rounded-full bg-neutral-900/60" />
-              <span className="text-[9px] font-mono tracking-widest uppercase text-black/50 font-bold">
-                NŌTA ONE
-              </span>
-              <div className="w-4 h-2 rounded-sm bg-neutral-900/70" />
-            </div>
-          </motion.div>
+              {/* Dynamic ambient color glow */}
+              <div
+                className="absolute inset-0 opacity-30 transition-colors duration-700"
+                style={{
+                  background: `radial-gradient(circle at center, ${activeVariant.hexColor} 0%, transparent 70%)`,
+                }}
+              />
+
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={
+                  selectedIdx === 0
+                    ? "https://nota.uprock.pro/thumb/2/1SLA07O2y250d4sm92qnPg/1920r1080/d/library_image-14781-symbol-i64njjjjo-nota_scene_7_img_01.jpg"
+                    : selectedIdx === 1
+                    ? "https://nota.uprock.pro/thumb/2/s3CSLofcpmb3mJNh_0AxHg/1920r1080/d/library_image-14782-symbol-icmdrs40h-nota_scene_7_img_01.jpg"
+                    : "https://nota.uprock.pro/thumb/2/TYFFgx_5tk3Z54ItqSDO4w/1920r1080/d/library_image-14781-symbol-i64njjjjo-nota_scene_7_img_02.jpg"
+                }
+                alt={activeVariant.name}
+                className="relative z-10 w-full h-full object-cover"
+              />
+
+              <div className="absolute bottom-4 left-4 z-20 px-3 py-1 rounded-md bg-black/60 backdrop-blur-md text-[11px] font-mono uppercase tracking-widest text-neutral-300">
+                {activeVariant.name} Finish
+              </div>
+            </motion.div>
+          </AnimatePresence>
         </div>
       </div>
     </section>
