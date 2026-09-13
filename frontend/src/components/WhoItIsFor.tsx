@@ -2,7 +2,7 @@
 
 import React, { useRef } from "react";
 import { AudienceCard } from "@/types/cms";
-import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
+import { motion, useScroll, useTransform, useSpring, useReducedMotion } from "framer-motion";
 
 interface WhoItIsForProps {
   introQuote: string;
@@ -79,6 +79,29 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
   description,
   audiences,
 }) => {
+  const pinTrackRef = useRef<HTMLDivElement>(null);
+  const shouldReduceMotion = useReducedMotion();
+
+  // Track pinned scroll scrub across topics reveal
+  const { scrollYProgress } = useScroll({
+    target: pinTrackRef,
+    offset: ["start start", "end end"],
+  });
+
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 140,
+    damping: 26,
+    restDelta: 0.001,
+  });
+
+  // Staggered horizontal slide-in from right (110% -> 0%) matching sample site keyframes
+  // Topic 1: start 0.08, end 0.40
+  // Topic 2: start 0.26, end 0.58
+  // Topic 3: start 0.44, end 0.76
+  const topic1X = useTransform(smoothProgress, [0.08, 0.40], ["110%", "0%"]);
+  const topic2X = useTransform(smoothProgress, [0.26, 0.58], ["110%", "0%"]);
+  const topic3X = useTransform(smoothProgress, [0.44, 0.76], ["110%", "0%"]);
+
   const quoteText =
     introQuote ||
     "Some thoughts need time, space, and a physical trace to exist. Writing by hand creates focus, presence, and a deeper connection with ideas. This tool is built around that simple truth.";
@@ -96,84 +119,96 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
     : [descText];
 
   return (
-    <section
-      id="who-it-is-for"
-      className="bg-black text-white py-24 sm:py-32 lg:py-40 px-6 sm:px-12 lg:px-20 relative z-20"
-    >
-      <div className="max-w-7xl mx-auto">
-        {/* Top Manifesto Quote (Matches sample site media_1789310058176.png) */}
-        <div className="pb-20 sm:pb-28 lg:pb-36 border-b border-neutral-900">
-          <ScrollIlluminatedText
-            text={quoteText}
-            className="max-w-5xl"
-            wordClassName="text-3xl sm:text-4xl md:text-5xl lg:text-[52px] font-serif font-normal leading-[1.14] tracking-tight"
-          />
-        </div>
+    <section id="who-it-is-for" className="bg-black text-white relative z-20">
+      {/* Top Manifesto Quote (Matches sample site media_1789310058176.png) */}
+      <div className="pt-24 sm:pt-36 pb-20 sm:pb-28 px-6 sm:px-12 lg:px-20 max-w-7xl mx-auto border-b border-neutral-900">
+        <ScrollIlluminatedText
+          text={quoteText}
+          className="max-w-5xl"
+          wordClassName="text-3xl sm:text-4xl md:text-5xl lg:text-[52px] font-serif font-normal leading-[1.14] tracking-tight"
+        />
+      </div>
 
-        {/* Two-Column Section: "WHO IT'S FOR:" on Left, Highlight Copy + Audience Theses on Right */}
-        {/* (Matches sample site media_1789310075808.png, media_1789310100961.png, media_1789310115566.png) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 pt-16 sm:pt-24 lg:pt-32">
-          {/* Left Column: Label */}
-          <div className="lg:col-span-3">
-            <div className="sticky top-28">
-              <span className="text-xs sm:text-sm font-mono uppercase tracking-[0.15em] text-[#8a8a8a]">
+      {/* Pinned Two-Column Section: Sticky Text on Left, Scroll-Scrubbed 3 Topics on Right */}
+      {/* (Matches sample site media_1789311216589.png and media_1789311319692.png) */}
+      <div ref={pinTrackRef} className="relative h-[280vh]">
+        <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-center px-6 sm:px-12 lg:px-20">
+          <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-center">
+            {/* Left Column: Label + Illuminated Headline Copy */}
+            <div className="lg:col-span-5 space-y-8">
+              <span className="text-xs sm:text-sm font-mono uppercase tracking-[0.15em] text-[#8a8a8a] block">
                 {sectionTitle || "WHO IT'S FOR:"}
               </span>
+              <div className="space-y-6">
+                {descParagraphs.map((para, pIdx) => (
+                  <ScrollIlluminatedText
+                    key={pIdx}
+                    text={para}
+                    wordClassName="text-2xl sm:text-3xl md:text-[34px] font-normal leading-[1.28] tracking-tight"
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Right Column: 3 Audience Topics Sliding in from off-screen Right (110% -> 0%) */}
+            <div className="lg:col-span-7 flex flex-col items-end space-y-10 sm:space-y-14 overflow-hidden py-4">
+              {/* Topic 1: Students & Learners */}
+              <motion.div
+                style={shouldReduceMotion ? { x: "0%" } : { x: topic1X }}
+                className="w-full max-w-xl flex flex-col items-start will-change-transform"
+              >
+                <h3 className="text-2xl sm:text-3xl lg:text-[32px] font-normal text-white mb-2 tracking-tight">
+                  {audiences[0]?.title || "Students & Learners"}
+                </h3>
+                <p className="text-base sm:text-lg text-[#a3a3a3] font-light leading-relaxed">
+                  {audiences[0]?.description ||
+                    "Handwritten notes stay personal and intuitive, but become searchable, organized, and easy to study. Lectures, ideas, and revisions are captured as they are — then supported by AI summaries, text recognition, and quick navigation when it matters most."}
+                </p>
+              </motion.div>
+
+              {/* Topic 2: Creators, Designers & Architects */}
+              <motion.div
+                style={shouldReduceMotion ? { x: "0%" } : { x: topic2X }}
+                className="w-full max-w-xl flex flex-col items-start will-change-transform"
+              >
+                <h3 className="text-2xl sm:text-3xl lg:text-[32px] font-normal text-white mb-2 tracking-tight">
+                  {audiences[1]?.title || "Creators, Designers & Architects"}
+                </h3>
+                <p className="text-base sm:text-lg text-[#a3a3a3] font-light leading-relaxed">
+                  {audiences[1]?.description ||
+                    "Sketches, diagrams, concepts, and fragments of ideas belong on paper. This tool makes sure they don’t disappear. Everything drawn or written is safely stored, easy to revisit, and ready to evolve into something bigger — without interrupting the creative flow."}
+                </p>
+              </motion.div>
+
+              {/* Topic 3: Managers & Product Thinkers */}
+              <motion.div
+                style={shouldReduceMotion ? { x: "0%" } : { x: topic3X }}
+                className="w-full max-w-xl flex flex-col items-start will-change-transform"
+              >
+                <h3 className="text-2xl sm:text-3xl lg:text-[32px] font-normal text-white mb-2 tracking-tight">
+                  {audiences[2]?.title || "Managers & Product Thinkers"}
+                </h3>
+                <p className="text-base sm:text-lg text-[#a3a3a3] font-light leading-relaxed">
+                  {audiences[2]?.description ||
+                    "Meetings start on paper and end with structure. Notes turn into clear summaries, tasks, and follow-ups. The pen captures everything quietly, while the app helps organize decisions without pulling attention away from the room."}
+                </p>
+              </motion.div>
             </div>
           </div>
+        </div>
+      </div>
 
-          {/* Right Column: Dynamic Word-Illuminated Body + Audience List + Pen Video Card */}
-          <div className="lg:col-span-9 space-y-20 sm:space-y-28">
-            {/* Word-by-Word Scroll Illuminated Paragraphs */}
-            <div className="space-y-8 max-w-3xl">
-              {descParagraphs.map((para, pIdx) => (
-                <ScrollIlluminatedText
-                  key={pIdx}
-                  text={para}
-                  wordClassName="text-2xl sm:text-3xl md:text-4xl font-normal leading-[1.28] tracking-tight"
-                />
-              ))}
-            </div>
-
-            {/* Audience Theses List (Students & Learners, Creators, Managers) */}
-            <div className="space-y-16 sm:space-y-20 pt-8 max-w-3xl">
-              {audiences.map((aud) => (
-                <motion.div
-                  key={aud.title}
-                  initial={{ opacity: 0, y: 24 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-80px" }}
-                  transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                  className="space-y-3"
-                >
-                  <h3 className="text-2xl sm:text-3xl lg:text-[32px] font-normal text-white tracking-tight">
-                    {aud.title}
-                  </h3>
-                  <p className="text-base sm:text-lg text-[#9e9e9e] font-light leading-relaxed">
-                    {aud.description}
-                  </p>
-                </motion.div>
-              ))}
-            </div>
-
-            {/* Horizontal Pen Video Showcase Card (Matches sample site media_1789310115566.png) */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-60px" }}
-              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-              className="bg-white rounded-[24px] sm:rounded-[32px] p-6 sm:p-10 shadow-2xl overflow-hidden flex items-center justify-center max-w-4xl"
-            >
-              <video
-                src="/who_pen_video.mp4"
-                autoPlay
-                loop
-                muted
-                playsInline
-                className="w-full h-auto max-h-[280px] object-contain select-none pointer-events-none"
-              />
-            </motion.div>
-          </div>
+      {/* Horizontal Pen Video Showcase Card (Matches sample site media_1789310115566.png) */}
+      <div className="pb-32 px-6 sm:px-12 lg:px-20 max-w-7xl mx-auto flex justify-center">
+        <div className="bg-white rounded-[24px] sm:rounded-[32px] p-6 sm:p-10 shadow-2xl overflow-hidden flex items-center justify-center w-full max-w-4xl">
+          <video
+            src="/who_pen_video.mp4"
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-auto max-h-[280px] object-contain select-none pointer-events-none"
+          />
         </div>
       </div>
     </section>

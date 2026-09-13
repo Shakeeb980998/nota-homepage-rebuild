@@ -51,26 +51,25 @@ export const Specs: React.FC<SpecsProps> = ({
     { y: card3Y, opacity: card3Opacity },
   ];
 
-  // 8-Column Staggered Black Curtain Exit Wipe (Pyramid shape matching sample site media_1789310041665.png)
-  // Center columns (3 & 4) reach top first, followed symmetrically by inner (2 & 5), outer (1 & 6), and flanks (0 & 7)
+  // 7-Column Staggered Black Curtain Exit Wipe (Pyramid shape matching sample site media_1789310041665.png)
+  // Center column (col 3) is a single solid block spanning across the 50% midpoint (36% - 64%) to eliminate any center seam
+  // Outer columns stagger symmetrically: center reaches top first, then inner, then outer, then flanks
   const curtainCol0 = useTransform(smoothProgress, [0.77, 1.00], ["100%", "0%"]);
   const curtainCol1 = useTransform(smoothProgress, [0.73, 0.96], ["100%", "0%"]);
   const curtainCol2 = useTransform(smoothProgress, [0.69, 0.92], ["100%", "0%"]);
   const curtainCol3 = useTransform(smoothProgress, [0.65, 0.88], ["100%", "0%"]);
-  const curtainCol4 = useTransform(smoothProgress, [0.65, 0.88], ["100%", "0%"]);
-  const curtainCol5 = useTransform(smoothProgress, [0.69, 0.92], ["100%", "0%"]);
-  const curtainCol6 = useTransform(smoothProgress, [0.73, 0.96], ["100%", "0%"]);
-  const curtainCol7 = useTransform(smoothProgress, [0.77, 1.00], ["100%", "0%"]);
+  const curtainCol4 = useTransform(smoothProgress, [0.69, 0.92], ["100%", "0%"]);
+  const curtainCol5 = useTransform(smoothProgress, [0.73, 0.96], ["100%", "0%"]);
+  const curtainCol6 = useTransform(smoothProgress, [0.77, 1.00], ["100%", "0%"]);
 
-  const curtainTransforms = [
-    curtainCol0,
-    curtainCol1,
-    curtainCol2,
-    curtainCol3,
-    curtainCol4,
-    curtainCol5,
-    curtainCol6,
-    curtainCol7,
+  const curtainColumns = [
+    { y: curtainCol0, left: "0%", width: "15%" },
+    { y: curtainCol1, left: "13.5%", width: "15%" },
+    { y: curtainCol2, left: "27%", width: "15%" },
+    { y: curtainCol3, left: "36%", width: "28%" }, // Solid center block spanning across 50% center
+    { y: curtainCol4, left: "58%", width: "15%" },
+    { y: curtainCol5, left: "71.5%", width: "15%" },
+    { y: curtainCol6, left: "85%", width: "15%" },
   ];
 
   return (
@@ -156,13 +155,17 @@ export const Specs: React.FC<SpecsProps> = ({
           </div>
         </div>
 
-        {/* 8-Column Staggered Black Curtain Wipe Exit into Who-It-Is-For (Matches sample site media_1789310041665.png) */}
-        <div className="absolute inset-0 z-30 pointer-events-none grid grid-cols-8 h-full w-full overflow-hidden">
-          {curtainTransforms.map((curtainY, idx) => (
+        {/* Seamless 7-Column Black Curtain Wipe Exit into Who-It-Is-For (Center spans 50% midpoint, zero lines) */}
+        <div className="absolute inset-0 z-30 pointer-events-none h-full w-full overflow-hidden">
+          {curtainColumns.map((col, idx) => (
             <motion.div
               key={idx}
-              style={shouldReduceMotion ? { y: "100%" } : { y: curtainY }}
-              className="bg-black h-full w-full will-change-transform"
+              style={
+                shouldReduceMotion
+                  ? { y: "100%", left: col.left, width: col.width }
+                  : { y: col.y, left: col.left, width: col.width }
+              }
+              className="absolute top-0 bottom-0 bg-black will-change-transform ring-1 ring-black"
             />
           ))}
         </div>
