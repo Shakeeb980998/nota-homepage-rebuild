@@ -1,4 +1,6 @@
-﻿import { Metadata } from "next";
+// Homepage Rebuild - Surge Global Senior Web Developer Assessment
+// Fully integrated with Strapi CMS & Next.js On-Demand ISR
+import { Metadata } from "next";
 import { getHomepageData } from "@/lib/strapi";
 import { HomePageClient } from "@/components/HomePageClient";
 
