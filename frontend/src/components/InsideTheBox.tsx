@@ -1,10 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { BoxItem } from "@/types/cms";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
 import { TextInkReveal } from "@/components/TextInkReveal";
-import { Package, Zap, ShieldCheck } from "lucide-react";
 
 interface InsideTheBoxProps {
   titleLine1: string;
@@ -13,115 +12,149 @@ interface InsideTheBoxProps {
   items: BoxItem[];
 }
 
-const icons = [Package, Zap, ShieldCheck];
-
 export const InsideTheBox: React.FC<InsideTheBoxProps> = ({
   titleLine1,
   titleLine2,
   leadText,
   items,
 }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
   const shouldReduceMotion = useReducedMotion();
 
-  const galleryTiles = [
+  // Pin section for step carousel
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end end"],
+  });
+
+  // Verified high-res box photography assets
+  const boxAssets = [
     {
-      span: "lg:col-span-8",
-      aspect: "min-h-[380px] sm:min-h-[440px]",
-      image: "https://nota.uprock.pro/thumb/2/7YfwgKVakw18X4hnPZia0Q/1920r1080/d/nota_scene_4_img_02.jpg",
-      label: "Durable metal nib, low-profile control button",
       badge: "01",
-      title: items[0]?.title || "Precision Writing Nib",
-      description: items[0]?.description || "Machined aluminum with replaceable cartridge",
+      title: items[0]?.title || "A complete, ready-to-use set",
+      description:
+        items[0]?.description ||
+        "Smart pen, Smartpaper notepad, charging cable, and instructions — carefully packaged for a hassle-free start.",
+      image: "https://nota.uprock.pro/thumb/2/NdNsA4zjgwV803LVWQCIkg/1276r2108/d/41_block.jpg",
     },
     {
-      span: "lg:col-span-4",
-      aspect: "min-h-[380px] sm:min-h-[440px]",
-      image: "https://nota.uprock.pro/thumb/2/hkWO_0PdjAnQD0OeUgMd8g/1920r1080/d/nota_scene_4_img_01.jpg",
-      label: "Anodized Body & Bluetooth",
       badge: "02",
       title: items[1]?.title || "The NŌTA Smart Pen",
-      description: items[1]?.description || "Balanced ergonomics for everyday writing",
+      description:
+        items[1]?.description ||
+        "Aluminum body, USB-C charging, physical control button, and Bluetooth connectivity. Up to 8 hours of active use.",
+      image: "https://nota.uprock.pro/thumb/2/V-Pld1tdphvc6bqPvkKsvw/1276r2108/d/42_block.jpg",
     },
     {
-      span: "lg:col-span-4",
-      aspect: "min-h-[320px]",
-      image: "https://nota.uprock.pro/thumb/2/5RXD9D7cr-Ez9A9KxlC5hw/1920r1080/d/nota_scene_4_img_03.jpg",
-      label: "USB-C Safe Charging Dock",
       badge: "03",
       title: items[2]?.title || "Charging Adapter",
-      description: items[2]?.description || "Stable power delivery with minimal heat",
-    },
-    {
-      span: "lg:col-span-8",
-      aspect: "min-h-[320px]",
-      image: "https://nota.uprock.pro/thumb/2/NdNsA4zjgwV803LVWQCIkg/1276r2108/d/41_block.jpg",
-      label: "Intelligent Coordinate Paper Notepad",
-      badge: "04",
-      title: "Smartpaper Notepad Set",
-      description: "Specialized dot-matrix paper for instant optical stroke tracking",
+      description:
+        items[2]?.description ||
+        "Compact USB-C power adapter with stable output for everyday charging. Designed for safe, efficient power delivery.",
+      image: "https://nota.uprock.pro/thumb/2/uY0WbSXhbz5r3fxyMekPng/1276r2108/d/43_block.jpg",
     },
   ];
 
+  const stepCount = boxAssets.length;
+  const stepIndex = useTransform(scrollYProgress, (v) => {
+    if (v < 0.33) return 0;
+    if (v < 0.66) return 1;
+    return 2;
+  });
+
+  const [activeStep, setActiveStep] = useState(0);
+
+  useEffect(() => {
+    const unsubscribe = stepIndex.on("change", (latest) => {
+      setActiveStep(latest);
+    });
+    return () => unsubscribe();
+  }, [stepIndex]);
+
+  const currentItem = boxAssets[activeStep] || boxAssets[0];
+
   return (
-    <section id="inside-the-box" className="py-32 px-6 bg-black text-white border-t border-neutral-900">
-      <div className="max-w-7xl mx-auto space-y-16">
-        {/* Header with Text Ink-Fill Reveal */}
-        <div className="max-w-3xl space-y-4">
+    <div ref={containerRef} id="inside-the-box" className="relative h-[250vh] bg-black text-white border-t border-neutral-900">
+      {/* Sticky Viewport */}
+      <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between py-20 px-6 z-10">
+        <div className="max-w-7xl mx-auto w-full">
           <TextInkReveal
-            badge="Packaging & Contents"
+            badge="Unboxing & Packaging"
             titleLine1={titleLine1 || "Inside"}
             titleLine2={titleLine2 || "the box"}
             theme="dark"
           />
-          <p className="text-neutral-400 text-sm sm:text-base leading-relaxed font-light pt-2">
+          <p className="text-neutral-400 text-sm sm:text-base font-light leading-relaxed max-w-2xl pt-2">
             {leadText}
           </p>
         </div>
 
-        {/* Primitive #8: Bento Image Gallery with Mixed Aspect Ratios & Floating Labels */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-          {galleryTiles.map((tile, idx) => (
+        {/* Center Stage: Sticky Two-Column Step Layout */}
+        <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center my-auto">
+          {/* Left Column: Crossfading High-Res Unboxing Asset */}
+          <div className="lg:col-span-7 flex justify-center items-center relative min-h-[340px] sm:min-h-[420px]">
+            <div className="absolute w-[500px] h-[350px] bg-white/[0.03] blur-[120px] rounded-full pointer-events-none" />
+
             <motion.div
-              key={idx}
-              initial={
-                shouldReduceMotion
-                  ? { opacity: 1, scale: 1 }
-                  : { opacity: 0, scale: 0.95 }
-              }
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true, margin: "-40px" }}
-              transition={{
-                duration: 0.6,
-                delay: idx * 0.12, // Staggered entry
-                ease: "easeOut",
-              }}
-              className={`${tile.span} ${tile.aspect} relative rounded-[44px] md:rounded-[56px] overflow-hidden bg-neutral-900 border border-neutral-800 group shadow-xl`}
+              key={`box-img-${activeStep}`}
+              initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.45, ease: "easeOut" }}
+              className="relative z-10 w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl drop-shadow-[0_20px_50px_rgba(0,0,0,0.85)] border border-neutral-800"
             >
-              {/* Image */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={tile.image}
-                alt={tile.label}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 brightness-90 group-hover:brightness-100"
+                src={currentItem.image}
+                alt={currentItem.title}
+                className="w-full h-auto max-h-[400px] object-cover mx-auto"
               />
-
-              {/* Gradient Vignette */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
-
-              {/* Primitive #8: Floating Pill-Shaped Label (dark rounded rect, white text) */}
-              <div className="absolute bottom-6 inset-x-6 flex items-center justify-between pointer-events-none">
-                <span className="px-5 py-2.5 rounded-full backdrop-blur-xl bg-black/75 border border-white/15 text-white text-xs sm:text-sm font-medium tracking-tight shadow-xl">
-                  {tile.label}
-                </span>
-
-                <span className="font-mono text-xs text-neutral-400 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/10">
-                  {tile.badge}
-                </span>
-              </div>
             </motion.div>
-          ))}
+          </div>
+
+          {/* Right Column: Discrete Crossfade Title & Description (Standard Gray/White, no teal/green tint) */}
+          <div className="lg:col-span-5 relative min-h-[240px] flex flex-col justify-center">
+            <motion.div
+              key={`box-text-${activeStep}`}
+              initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, ease: "easeOut" }}
+              className="space-y-6"
+            >
+              <span className="text-xs font-mono uppercase tracking-widest text-neutral-400">
+                Item {currentItem.badge} of 03
+              </span>
+              <h3 className="text-3xl sm:text-4xl font-serif font-normal text-white leading-snug">
+                {currentItem.title}
+              </h3>
+              <p className="text-neutral-300 text-sm sm:text-base font-light leading-relaxed">
+                {currentItem.description}
+              </p>
+            </motion.div>
+          </div>
+        </div>
+
+        {/* Issue #4: Segmented Horizontal Progress Bar advancing in sync with active step */}
+        <div className="max-w-7xl mx-auto w-full pt-4">
+          <div className="flex items-center gap-3 max-w-xs mx-auto">
+            {Array.from({ length: stepCount }).map((_, idx) => {
+              const isActive = activeStep === idx;
+              const isPassed = activeStep > idx;
+              return (
+                <div
+                  key={idx}
+                  className="h-1 flex-1 rounded-full overflow-hidden bg-neutral-800 transition-colors"
+                >
+                  <div
+                    className={`h-full transition-all duration-300 ${
+                      isActive || isPassed ? "w-full bg-white" : "w-0 bg-neutral-600"
+                    }`}
+                  />
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
-    </section>
+    </div>
   );
 };

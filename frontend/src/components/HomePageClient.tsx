@@ -9,6 +9,7 @@ import { WhoItIsFor } from "@/components/WhoItIsFor";
 import { SmartPaper } from "@/components/SmartPaper";
 import { InsideTheBox } from "@/components/InsideTheBox";
 import { ColorVariants } from "@/components/ColorVariants";
+import { BentoGallery } from "@/components/BentoGallery";
 import { Footer } from "@/components/Footer";
 import { OrderModal } from "@/components/OrderModal";
 
@@ -75,6 +76,9 @@ export const HomePageClient: React.FC<HomePageClientProps> = ({ initialData }) =
         variants={initialData.colorVariants}
         onOpenOrder={() => setIsOrderOpen(true)}
       />
+
+      {/* Bento Detail Gallery Section */}
+      <BentoGallery />
 
       {/* Footer */}
       <Footer

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { SmartPaperFeature } from "@/types/cms";
 import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
 import { TextInkReveal } from "@/components/TextInkReveal";
@@ -15,7 +15,7 @@ export const SmartPaper: React.FC<SmartPaperProps> = ({ badge, title, slides }) 
   const containerRef = useRef<HTMLDivElement>(null);
   const shouldReduceMotion = useReducedMotion();
 
-  // Primitive #6: Pin section for scroll duration (~300vh)
+  // Pin section for ~300vh
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end end"],
@@ -28,29 +28,33 @@ export const SmartPaper: React.FC<SmartPaperProps> = ({ badge, title, slides }) 
     "https://nota.uprock.pro/thumb/2/ctuI-vbcqn2J7cCUXnBXig/1276r2108/d/41_block1212.png",
   ];
 
-  // Discrete step index: 0, 1, 2, 3 based on scroll progress
   const slideCount = Math.min(slides.length, notebookImages.length);
-  const stepProgress = useTransform(scrollYProgress, (v) => {
-    const step = Math.min(Math.floor(v * slideCount), slideCount - 1);
-    return Math.max(0, step);
+
+  // Issue #5 Fix: Map steps across [0, 0.75] so the final slide reaches full progress = 1 well before unpinning
+  const stepIndex = useTransform(scrollYProgress, (v) => {
+    if (v < 0.22) return 0;
+    if (v < 0.48) return 1;
+    if (v < 0.72) return 2;
+    return 3;
   });
 
-  const [activeStep, setActiveStep] = React.useState(0);
+  const [activeStep, setActiveStep] = useState(0);
 
-  React.useEffect(() => {
-    const unsubscribe = stepProgress.on("change", (v) => {
-      setActiveStep(v);
+  useEffect(() => {
+    const unsubscribe = stepIndex.on("change", (latest) => {
+      setActiveStep(latest);
     });
     return () => unsubscribe();
-  }, [stepProgress]);
+  }, [stepIndex]);
 
   const activeSlide = slides[activeStep] || slides[0];
   const activeImage = notebookImages[activeStep] || notebookImages[0];
 
   return (
+    // Pinned container with clean unpin release buffer
     <div ref={containerRef} className="relative h-[300vh] bg-black text-white">
-      {/* Primitive #6: Two-Column Sticky Layout (image left, headline+copy right) */}
-      <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between py-24 px-6">
+      {/* Sticky Viewport */}
+      <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between pt-24 pb-12 px-6 z-10">
         <div className="max-w-7xl mx-auto w-full">
           <TextInkReveal
             badge={`${badge} ${title}`}
@@ -60,9 +64,9 @@ export const SmartPaper: React.FC<SmartPaperProps> = ({ badge, title, slides }) 
           />
         </div>
 
-        {/* Center Stage: Two-Column Sticky Content */}
+        {/* Center Stage: Two-Column Sticky Layout */}
         <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center my-auto">
-          {/* Left Column: Crossfading Product / Open Notebook Mockup */}
+          {/* Left Column: Crossfading Open Notebook Mockup */}
           <div className="lg:col-span-7 flex justify-center items-center relative min-h-[360px] sm:min-h-[440px]">
             <div className="absolute w-[500px] h-[350px] bg-white/[0.04] blur-[120px] rounded-full pointer-events-none" />
 
@@ -70,7 +74,7 @@ export const SmartPaper: React.FC<SmartPaperProps> = ({ badge, title, slides }) 
               key={`img-${activeStep}`}
               initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, scale: 0.96 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, ease: "easeOut" }}
+              transition={{ duration: 0.45, ease: "easeOut" }}
               className="relative z-10 w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl drop-shadow-[0_20px_50px_rgba(0,0,0,0.85)] border border-neutral-800/80"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -88,10 +92,10 @@ export const SmartPaper: React.FC<SmartPaperProps> = ({ badge, title, slides }) 
               key={`text-${activeStep}`}
               initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, ease: "easeOut" }}
+              transition={{ duration: 0.45, ease: "easeOut" }}
               className="space-y-6"
             >
-              <span className="text-xs font-mono uppercase tracking-widest text-neutral-500">
+              <span className="text-xs font-mono uppercase tracking-widest text-neutral-400">
                 0{activeStep + 1} — {activeSlide?.subTitle || "Intelligent Layer"}
               </span>
               <h3 className="text-3xl sm:text-4xl font-serif font-normal text-white leading-snug">
@@ -104,11 +108,12 @@ export const SmartPaper: React.FC<SmartPaperProps> = ({ badge, title, slides }) 
           </div>
         </div>
 
-        {/* Segmented Horizontal Progress Bar advancing in sync with scroll */}
+        {/* Issue #4: Segmented Horizontal Progress Bar advancing in sync with scroll */}
         <div className="max-w-7xl mx-auto w-full pt-4">
           <div className="flex items-center gap-3 max-w-sm mx-auto">
             {Array.from({ length: slideCount }).map((_, idx) => {
               const isActive = activeStep === idx;
+              const isPassed = activeStep > idx;
               return (
                 <div
                   key={idx}
@@ -116,7 +121,7 @@ export const SmartPaper: React.FC<SmartPaperProps> = ({ badge, title, slides }) 
                 >
                   <div
                     className={`h-full transition-all duration-300 ${
-                      isActive ? "w-full bg-white" : "w-0 bg-neutral-600"
+                      isActive || isPassed ? "w-full bg-white" : "w-0 bg-neutral-600"
                     }`}
                   />
                 </div>
