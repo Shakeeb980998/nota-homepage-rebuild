@@ -2,12 +2,14 @@
 
 import React, { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
+import { ScrambleText } from "@/components/ScrambleText";
 
 interface HeaderProps {
   siteName?: string;
   onOpenOrder: () => void;
   price?: string;
   links: Array<{ label: string; href: string }>;
+  isRevealed?: boolean;
 }
 
 // Official Didone serif NŌTA logo SVG vector from nota.uprock.pro
@@ -33,6 +35,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenOrder,
   price = "$300",
   links,
+  isRevealed = false,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
@@ -111,13 +114,18 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Desktop Nav: Title/sentence case, text-sm, clean white */}
           <nav className="hidden md:flex items-center gap-8 text-sm font-sans font-normal text-white/90">
-            {links.map((link) => (
+            {links.map((link, idx) => (
               <a
                 key={link.label}
                 href={link.href}
                 className="hover:text-white transition-colors duration-200"
               >
-                {link.label}
+                <ScrambleText
+                  text={link.label}
+                  trigger={isRevealed}
+                  delay={idx * 60}
+                  duration={480}
+                />
               </a>
             ))}
           </nav>

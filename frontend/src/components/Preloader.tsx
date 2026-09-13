@@ -1,157 +1,157 @@
 ﻿"use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 
-// ── Nota wordmark SVG ─────────────────────────────────────────────────────────
-const NotaWordmark: React.FC<{ className?: string }> = ({
-  className = "h-8 w-auto text-white",
-}) => (
-  <svg
-    width="71"
-    height="26"
-    viewBox="0 0 71 26"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    className={className}
-    aria-label="Nota"
-  >
-    <path
-      d="M4.26969 7.45499H3.91969V24.99H-0.000313967V0.55999H5.63469L12.0397 18.095H12.3897V0.55999H16.3097V24.99H10.6747L4.26969 7.45499ZM20.776 -1.13845e-05H31.206V3.21999H20.776V-1.13845e-05ZM25.991 25.41C24.6143 25.41 23.3777 25.1883 22.281 24.745C21.2077 24.3017 20.286 23.6717 19.516 22.855C18.7693 22.0383 18.186 21.0467 17.766 19.88C17.3693 18.7133 17.171 17.4067 17.171 15.96C17.171 14.5133 17.3693 13.2067 17.766 12.04C18.186 10.8733 18.7693 9.88166 19.516 9.06499C20.286 8.24832 21.2077 7.61832 22.281 7.17499C23.3777 6.73166 24.6143 6.50999 25.991 6.50999C27.3443 6.50999 28.5693 6.73166 29.666 7.17499C30.7627 7.61832 31.6843 8.24832 32.431 9.06499C33.201 9.88166 33.7843 10.8733 34.181 12.04C34.601 13.2067 34.811 14.5133 34.811 15.96C34.811 17.4067 34.601 18.7133 34.181 19.88C33.7843 21.0467 33.201 22.0383 32.431 22.855C31.6843 23.6717 30.7627 24.3017 29.666 24.745C28.5693 25.1883 27.3443 25.41 25.991 25.41ZM25.991 21.98C27.2743 21.98 28.2893 21.595 29.036 20.825C29.7827 20.0317 30.156 18.8767 30.156 17.36V14.56C30.156 13.0433 29.7827 11.9 29.036 11.13C28.2893 10.3367 27.2743 9.93999 25.991 9.93999C24.7077 9.93999 23.6927 10.3367 22.946 11.13C22.1993 11.9 21.826 13.0433 21.826 14.56V17.36C21.826 18.8767 22.1993 20.0317 22.946 20.825C23.6927 21.595 24.7077 21.98 25.991 21.98ZM45.0523 24.99C43.3257 24.99 42.054 24.535 41.2373 23.625C40.4207 22.715 40.0123 21.5367 40.0123 20.09V10.465H34.7623V6.92999H38.3323C39.0557 6.92999 39.569 6.78999 39.8723 6.50999C40.1757 6.20666 40.3273 5.68166 40.3273 4.93499V0.55999H44.4923V6.92999H51.8423V10.465H44.4923V21.455H51.8423V24.99H45.0523ZM68.3137 24.99C67.217 24.99 66.3653 24.7217 65.7587 24.185C65.1753 23.625 64.8253 22.855 64.7087 21.875H64.5337C64.207 22.995 63.5653 23.87 62.6087 24.5C61.652 25.1067 60.4737 25.41 59.0737 25.41C57.2537 25.41 55.807 24.9317 54.7337 23.975C53.6603 23.0183 53.1237 21.6883 53.1237 19.985C53.1237 16.345 55.7953 14.525 61.1387 14.525H64.3237V13.335C64.3237 12.1917 64.0437 11.3283 63.4837 10.745C62.9237 10.1617 62.0137 9.86999 60.7537 9.86999C59.6103 9.86999 58.6887 10.0917 57.9887 10.535C57.2887 10.9783 56.6937 11.55 56.2037 12.25L53.6487 10.08C54.2087 9.07666 55.107 8.23666 56.3437 7.55999C57.6037 6.85999 59.2253 6.50999 61.2087 6.50999C63.5887 6.50999 65.4437 7.06999 66.7737 8.18999C68.127 9.28666 68.8037 10.9317 68.8037 13.125V21.63H70.9387V24.99H68.3137ZM60.5787 22.33C61.652 22.33 62.5387 22.085 63.2387 21.595C63.962 21.0817 64.3237 20.3933 64.3237 19.53V17.115H61.2437C58.7937 17.115 57.5687 17.885 57.5687 19.425V20.125C57.5687 20.8483 57.837 21.3967 58.3737 21.77C58.9103 22.1433 59.6453 22.33 60.5787 22.33Z"
-      fill="currentColor"
-    />
-  </svg>
-);
+interface PreloaderProps {
+  /** Fired the instant counter reaches 100% (concurrently with overlay fade-out) */
+  onRevealStart?: () => void;
+}
 
 /**
- * PAGE LOAD PRELOADER OVERLAY
- *
- * State machine (single `phase` string — no race conditions):
- *   "showing"  → overlay visible, wordmark pulsing
- *   "fading"   → overlay transitioning opacity 1→0 (CSS transition, 500ms)
- *   "done"     → overlay removed from DOM (display:none via pointer-events-none + opacity-0)
- *
- * Readiness = Promise.race([
- *   Promise.all([fontsReady, heroImageLoaded, twoRafTicks]),
- *   3 000ms safety timeout
- * ])
- *
- * Wordmark pulse = CSS @keyframes on the SVG element (never touches React state,
- * never causes re-renders, and the animation-play-state is set to "paused" once
- * the overlay starts fading so it cleanly stops).
- *
- * prefers-reduced-motion: no pulse animation; same readiness/fade logic.
+ * EXACT PRELOADER FROM NOTA REFERENCE:
+ * 1. Full-viewport fixed overlay with slate-gray radial gradient (#6b6f78 -> #3a3d44).
+ * 2. Centered large serif percentage counter (0% -> 100%) with power2.out eased progression.
+ * 3. Soft motion-blur / crossfade digit ticking on each number change (~90ms).
+ * 4. Immediate handoff at 100%: cross-fades overlay out over ~0.4s and fires onRevealStart.
+ * 5. Complete unmount from DOM when fade finishes.
+ * 6. Hard safety timeout at 3000ms ensures it never hangs or loops.
  */
-export const Preloader: React.FC = () => {
+export const Preloader: React.FC<PreloaderProps> = ({ onRevealStart }) => {
   const shouldReduceMotion = useReducedMotion();
-  // "showing" | "fading" | "done"
-  const [phase, setPhase] = useState<"showing" | "fading" | "done">("showing");
-  const overlayRef = useRef<HTMLDivElement>(null);
+  const [pct, setPct] = useState(0);
+  const [isFadingOut, setIsFadingOut] = useState(false);
+  const [isDone, setIsDone] = useState(false);
+
+  const onRevealStartRef = useRef(onRevealStart);
+  useEffect(() => {
+    onRevealStartRef.current = onRevealStart;
+  }, [onRevealStart]);
 
   useEffect(() => {
-    let cancelled = false;
+    let isCancelled = false;
+    const startTime = Date.now();
+    const DURATION = 1700; // ~1.7s total duration
 
-    // ── 1. Fonts ready (with 500ms fallback if API unsupported) ──────────────
-    const fontsReady: Promise<void> =
+    // 1. Asset readiness checks (fonts + hero image + initial paints)
+    const fontsReady =
       typeof document !== "undefined" && "fonts" in document
         ? Promise.race([
-            document.fonts.ready.then(() => undefined as void),
-            new Promise<void>((r) => setTimeout(r, 500)),
+            document.fonts.ready.then(() => true),
+            new Promise((r) => setTimeout(r, 600)),
           ])
-        : Promise.resolve();
+        : Promise.resolve(true);
 
-    // ── 2. Hero pen image preload ─────────────────────────────────────────────
-    // The Lottie JSON path — we just check the pen PNG used in Specs/Who sections.
-    // If it loads from cache, img.complete is already true → resolve immediately.
-    const heroImageLoaded: Promise<void> = new Promise<void>((resolve) => {
+    const heroImageReady = new Promise((resolve) => {
       const img = new Image();
-      img.onload = () => resolve();
-      img.onerror = () => resolve(); // always resolve — never block on a network error
+      img.onload = () => resolve(true);
+      img.onerror = () => resolve(true);
       img.src = "/nota_horizontal_pen.png";
-      // If already in browser cache, .complete is true before onload ever fires
-      if (img.complete) resolve();
+      if (img.complete) resolve(true);
     });
 
-    // ── 3. Two rAF ticks — React has committed + browser has painted ──────────
-    const twoRafTicks: Promise<void> = new Promise<void>((resolve) => {
-      requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+    const twoRafTicks = new Promise((resolve) => {
+      requestAnimationFrame(() => requestAnimationFrame(() => resolve(true)));
     });
 
-    // ── Race: real readiness vs. 3 000ms hard safety timeout ─────────────────
-    const safetyTimeout: Promise<void> = new Promise<void>((resolve) =>
-      setTimeout(resolve, 3000)
-    );
+    let assetsLoaded = false;
+    Promise.all([fontsReady, heroImageReady, twoRafTicks]).then(() => {
+      assetsLoaded = true;
+    });
 
-    Promise.race([
-      Promise.all([fontsReady, heroImageLoaded, twoRafTicks]),
-      safetyTimeout,
-    ]).then(() => {
-      if (cancelled) return;
+    let lastPct = 0;
+    let completed = false;
 
-      // Begin CSS fade-out (opacity 1 → 0 in 500ms via inline transition)
-      setPhase("fading");
-
-      // After 520ms (transition + small buffer) remove overlay from DOM
+    const finish = () => {
+      if (completed) return;
+      completed = true;
+      setPct(100);
+      onRevealStartRef.current?.();
+      setIsFadingOut(true);
       setTimeout(() => {
-        if (!cancelled) setPhase("done");
-      }, 520);
-    });
+        if (!isCancelled) {
+          setIsDone(true);
+        }
+      }, 420);
+    };
+
+    const intervalId = setInterval(() => {
+      if (isCancelled || completed) return;
+
+      const elapsed = Date.now() - startTime;
+      const rawProgress = Math.min(1, elapsed / DURATION);
+
+      // Eased power2.out: 1 - (1 - t)^2
+      const easeProgress = 1 - Math.pow(1 - rawProgress, 2);
+      let targetPct = Math.round(easeProgress * 100);
+
+      // If assets haven't resolved yet and within safety window, hold at 98%
+      if (!assetsLoaded && elapsed < 2600 && targetPct >= 99) {
+        targetPct = 98;
+      }
+
+      if (targetPct !== lastPct) {
+        lastPct = targetPct;
+        setPct(targetPct);
+      }
+
+      if (targetPct >= 100) {
+        clearInterval(intervalId);
+        finish();
+      }
+    }, 45);
+
+    // Hard safety timeout at 3000ms
+    const safetyTimeout = setTimeout(() => {
+      if (!isCancelled && !completed) {
+        clearInterval(intervalId);
+        finish();
+      }
+    }, 3000);
 
     return () => {
-      cancelled = true;
+      isCancelled = true;
+      clearInterval(intervalId);
+      clearTimeout(safetyTimeout);
     };
-  }, []); // ← empty deps: run exactly once on mount
+  }, []);
 
-  // Fully done — remove from DOM entirely so it cannot block interaction
-  if (phase === "done") return null;
-
-  const isFading = phase === "fading";
+  if (isDone) return null;
 
   return (
     <div
-      ref={overlayRef}
       aria-label="Loading Nota"
       role="status"
       style={{
         position: "fixed",
         inset: 0,
         zIndex: 9999,
-        backgroundColor: "#000000",
+        background:
+          "radial-gradient(circle at center, #6b6f78 0%, #3a3d44 100%)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        // CSS transition drives the fade-out — no Framer Motion needed here,
-        // which avoids any AnimatePresence unmount timing issues.
-        opacity: isFading ? 0 : 1,
-        transition: isFading ? "opacity 0.5s ease" : "none",
-        // Once fading, prevent any accidental interaction bleed-through
-        pointerEvents: isFading ? "none" : "auto",
+        opacity: isFadingOut ? 0 : 1,
+        transition: isFadingOut ? "opacity 0.4s ease" : "none",
+        pointerEvents: isFadingOut ? "none" : "auto",
       }}
     >
-      {/* ── Wordmark pulse via CSS @keyframes ───────────────────────────────
-          We use a <style> tag scoped to this component rather than a Tailwind
-          animate-* class so the keyframes are guaranteed to be present even
-          before global CSS has fully hydrated, and they auto-stop when the
-          element is removed from the DOM.
-      ──────────────────────────────────────────────────────────────────────── */}
-      {!shouldReduceMotion && (
-        <style>{`
-          @keyframes nota-pulse {
-            0%,100% { opacity: 0.4; }
-            50%      { opacity: 1;   }
+      {/* Centered Large Serif Counter with Soft Digit Ticking */}
+      <div className="relative overflow-hidden flex items-center justify-center select-none">
+        <motion.span
+          key={pct}
+          initial={
+            shouldReduceMotion
+              ? false
+              : { opacity: 0.45, y: 6, filter: "blur(4px)" }
           }
-          .nota-preloader-wordmark {
-            animation: nota-pulse 1.2s ease-in-out infinite;
-            animation-play-state: ${isFading ? "paused" : "running"};
-          }
-        `}</style>
-      )}
-
-      <NotaWordmark
-        className={`h-10 w-auto text-white ${
-          shouldReduceMotion ? "opacity-70" : "nota-preloader-wordmark"
-        }`}
-      />
+          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          transition={{ duration: 0.09, ease: "easeOut" }}
+          className="font-serif text-7xl sm:text-8xl md:text-9xl text-white font-normal tabular-nums tracking-tight"
+        >
+          {pct}%
+        </motion.span>
+      </div>
     </div>
   );
 };

@@ -20,11 +20,12 @@ interface HomePageClientProps {
 
 export const HomePageClient: React.FC<HomePageClientProps> = ({ initialData }) => {
   const [isOrderOpen, setIsOrderOpen] = useState(false);
+  const [isRevealed, setIsRevealed] = useState(false);
 
   return (
     <main className="min-h-screen bg-black text-white selection:bg-neutral-800 selection:text-white">
-      {/* Preloader — overlays everything until fonts are ready, then fades out */}
-      <Preloader />
+      {/* Preloader — exact sequence matching reference (slate radial gradient + serif % counter + handoff) */}
+      <Preloader onRevealStart={() => setIsRevealed(true)} />
 
       {/* Header */}
       <Header
@@ -32,6 +33,7 @@ export const HomePageClient: React.FC<HomePageClientProps> = ({ initialData }) =
         links={initialData.global.navLinks}
         price={initialData.global.productPrice}
         onOpenOrder={() => setIsOrderOpen(true)}
+        isRevealed={isRevealed}
       />
 
       {/* Hero */}
@@ -43,6 +45,7 @@ export const HomePageClient: React.FC<HomePageClientProps> = ({ initialData }) =
         ctaText={initialData.hero.ctaText}
         price={initialData.global.productPrice || initialData.hero.price}
         onOpenOrder={() => setIsOrderOpen(true)}
+        isRevealed={isRevealed}
       />
 
       {/* Specifications */}

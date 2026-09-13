@@ -3,6 +3,7 @@
 import React, { useRef, useEffect } from "react";
 import { motion, useScroll, useTransform, useSpring, useReducedMotion } from "framer-motion";
 import type { AnimationItem } from "lottie-web";
+import { ScrambleText } from "@/components/ScrambleText";
 
 interface HeroProps {
   titleLine1: string;
@@ -12,11 +13,13 @@ interface HeroProps {
   ctaText?: string;
   price?: string;
   onOpenOrder: () => void;
+  isRevealed?: boolean;
 }
 
 export const Hero: React.FC<HeroProps> = ({
   titleLine1 = "Smart pen",
   titleLine2 = "for real thinking",
+  isRevealed = false,
 }) => {
   const pinContainerRef = useRef<HTMLDivElement>(null);
   const lottieContainerRef = useRef<HTMLDivElement>(null);
@@ -117,8 +120,22 @@ export const Hero: React.FC<HeroProps> = ({
         {/* Bottom-Left Big Headline (Matches sample site exactly: Smart pen / for real thinking) */}
         <div className="absolute bottom-10 sm:bottom-16 lg:bottom-20 left-6 sm:left-12 lg:left-20 z-20 pointer-events-none max-w-4xl">
           <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-[104px] font-serif font-normal text-white leading-[0.98] tracking-tight">
-            <span className="block">{titleLine1}</span>
-            <span className="block">{titleLine2}</span>
+            <span className="block">
+              <ScrambleText
+                text={titleLine1}
+                trigger={isRevealed}
+                delay={160}
+                duration={550}
+              />
+            </span>
+            <span className="block">
+              <ScrambleText
+                text={titleLine2}
+                trigger={isRevealed}
+                delay={260}
+                duration={550}
+              />
+            </span>
           </h1>
         </div>
 
