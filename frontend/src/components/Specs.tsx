@@ -24,25 +24,26 @@ export const Specs: React.FC<SpecsProps> = ({
     offset: ["start start", "end end"],
   });
 
+  // Crisp, responsive scroll scrub (high stiffness eliminates lag/delay)
   const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 26,
+    stiffness: 260,
+    damping: 32,
     restDelta: 0.001,
   });
 
-  // Phase 1 (0.05 to 0.42): Pen RISES UP to the top under headline BEFORE cards arrive
-  const penTravelY = useTransform(smoothProgress, [0.05, 0.42], [480, -25]);
-  const penOpacity = useTransform(smoothProgress, [0.02, 0.12], [0, 1]);
+  // Vertical pen rises UP from bottom into place under headline
+  const penTravelY = useTransform(smoothProgress, [0.02, 0.50], [360, -15]);
+  const penOpacity = useTransform(smoothProgress, [0.01, 0.15], [0.3, 1]);
 
-  // Phase 2 (0.42 to 0.82): Cards emerge and rise up staggered with scroll AFTER pen is at top
-  const card1Opacity = useTransform(smoothProgress, [0.42, 0.62], [0, 1]);
-  const card1Y = useTransform(smoothProgress, [0.42, 0.62], [60, 0]);
+  // Cards rise UP simultaneously with the pen in a fluid, continuous flow (no delay)
+  const card1Opacity = useTransform(smoothProgress, [0.06, 0.38], [0, 1]);
+  const card1Y = useTransform(smoothProgress, [0.06, 0.48], [110, 0]);
 
-  const card2Opacity = useTransform(smoothProgress, [0.48, 0.68], [0, 1]);
-  const card2Y = useTransform(smoothProgress, [0.48, 0.68], [60, 0]);
+  const card2Opacity = useTransform(smoothProgress, [0.10, 0.42], [0, 1]);
+  const card2Y = useTransform(smoothProgress, [0.10, 0.52], [110, 0]);
 
-  const card3Opacity = useTransform(smoothProgress, [0.54, 0.74], [0, 1]);
-  const card3Y = useTransform(smoothProgress, [0.54, 0.74], [60, 0]);
+  const card3Opacity = useTransform(smoothProgress, [0.14, 0.46], [0, 1]);
+  const card3Y = useTransform(smoothProgress, [0.14, 0.56], [110, 0]);
 
   const cardTransforms = [
     { y: card1Y, opacity: card1Opacity },
@@ -51,27 +52,27 @@ export const Specs: React.FC<SpecsProps> = ({
   ];
 
   return (
-    // Outer pinned scroll container (~240vh)
-    <div id="specifications" ref={pinContainerRef} className="relative h-[240vh] bg-white text-[#111111]">
-      {/* Sticky Viewport pinned during scroll */}
-      <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-center px-6 py-12">
-        <div className="max-w-7xl mx-auto w-full relative z-10 flex flex-col justify-center my-auto">
-          {/* Centered Large Didone Headline */}
-          <div className="text-center max-w-4xl mx-auto mb-10 sm:mb-14 relative z-20">
-            <h2 className="text-5xl sm:text-7xl md:text-8xl lg:text-[92px] font-serif font-normal leading-[0.98] tracking-tight">
-              <span className="block italic text-[#8a8a8a]">{badge}</span>
+    // Outer pinned scroll container (~180vh, tightened for immediate responsive flow)
+    <div id="specifications" ref={pinContainerRef} className="relative h-[180vh] bg-white text-[#111111]">
+      {/* Sticky Viewport with guaranteed top clearance beneath fixed 80px navbar */}
+      <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between pt-24 sm:pt-28 pb-8 px-6">
+        <div className="max-w-7xl mx-auto w-full relative z-10 flex flex-col justify-between h-full my-auto">
+          {/* Centered Large Didone Headline (Comfortably cleared below navbar) */}
+          <div className="text-center max-w-4xl mx-auto pt-2 sm:pt-4 mb-4 sm:mb-6 relative z-20">
+            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif font-normal leading-[1.0] tracking-tight">
+              <span className="block italic text-[#8a8a8a] text-2xl sm:text-3xl md:text-4xl mb-1">{badge}</span>
               <span className="block text-[#000000]">{title}</span>
             </h2>
           </div>
 
           {/* Relative Cards Grid Container with Pen behind cards (z-0) */}
-          <div className="relative max-w-6xl mx-auto w-full">
-            {/* Vertical Smart Pen (Rises UP to top first, stays behind cards at z-0) */}
+          <div className="relative max-w-6xl mx-auto w-full mb-auto pb-4">
+            {/* Vertical Smart Pen (Rises UP to top, stays strictly behind cards at z-0) */}
             <div className="absolute inset-x-0 top-0 pointer-events-none z-0 flex justify-center">
               <motion.div
                 style={
                   shouldReduceMotion
-                    ? { y: -25, opacity: 1 }
+                    ? { y: -15, opacity: 1 }
                     : {
                         y: penTravelY,
                         opacity: penOpacity,
@@ -83,13 +84,13 @@ export const Specs: React.FC<SpecsProps> = ({
                 <img
                   src="/nota_scene_2_img.png"
                   alt="Nōta Vertical Smart Pen"
-                  className="w-auto h-[400px] sm:h-[480px] object-contain select-none"
+                  className="w-auto h-[380px] sm:h-[460px] object-contain select-none"
                 />
               </motion.div>
             </div>
 
-            {/* Staggered Card Reveal (Revealed AFTER pen reaches top, z-10) */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 items-start relative z-10">
+            {/* Staggered Card Reveal (Smoothly rises in tandem with pen, z-10) */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 items-start relative z-10">
               {cards.map((card, idx) => {
                 const isMiddle = idx === 1;
                 const transform = cardTransforms[idx % cardTransforms.length];
@@ -105,11 +106,11 @@ export const Specs: React.FC<SpecsProps> = ({
                             y: transform.y,
                           }
                     }
-                    className={`relative bg-[#f4f4f5]/92 backdrop-blur-md rounded-[24px] p-7 sm:p-8 shadow-[0_10px_35px_rgba(0,0,0,0.04)] border border-neutral-200/80 hover:shadow-[0_20px_45px_rgba(0,0,0,0.08)] transition-all z-10 ${
+                    className={`relative bg-[#f4f4f5]/92 backdrop-blur-md rounded-[24px] p-6 sm:p-7 shadow-[0_10px_35px_rgba(0,0,0,0.04)] border border-neutral-200/80 hover:shadow-[0_20px_45px_rgba(0,0,0,0.08)] transition-all z-10 ${
                       isMiddle ? "md:-translate-y-2" : ""
                     }`}
                   >
-                    <h3 className="text-2xl sm:text-3xl font-serif font-normal text-[#111111] mb-6">
+                    <h3 className="text-xl sm:text-2xl font-serif font-normal text-[#111111] mb-5">
                       {card.title}
                     </h3>
 
@@ -117,7 +118,7 @@ export const Specs: React.FC<SpecsProps> = ({
                       {card.features.map((feature, fIdx) => (
                         <div
                           key={fIdx}
-                          className="py-3.5 flex items-center justify-between gap-4 text-sm sm:text-base text-neutral-800 font-light"
+                          className="py-3 flex items-center justify-between gap-3 text-xs sm:text-sm text-neutral-800 font-light"
                         >
                           <span>{feature}</span>
                           <div className="w-2 h-2 rounded-full bg-neutral-300 shrink-0" />
