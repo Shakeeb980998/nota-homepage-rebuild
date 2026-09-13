@@ -112,45 +112,45 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
     restDelta: 0.001,
   });
 
-  // Curved trajectory (X, Y, rotation, scale) - 1:1 scroll-scrubbed
-  const penX = useTransform(
-    smoothPenProgress,
-    [0, 0.25, 0.5, 0.75, 1.0],
-    ["18vw", "6vw", "0vw", "-6vw", "-18vw"]
-  );
-
-  const penY = useTransform(
-    smoothPenProgress,
-    [0, 0.25, 0.5, 0.75, 1.0],
-    ["-14vh", "-4vh", "0vh", "4vh", "14vh"]
-  );
-
-  const penRotate = useTransform(
-    smoothPenProgress,
-    [0, 0.25, 0.5, 0.75, 1.0],
-    ["-5deg", "-2deg", "0deg", "2deg", "5deg"]
-  );
-
-  const penScale = useTransform(
-    smoothPenProgress,
-    [0, 0.2, 0.8, 1.0],
-    [0.82, 1.0, 1.0, 0.82]
-  );
-
-  // Soft power1.inOut opacity: 0 -> 1 over first 20%, 1.0 in middle, 1 -> 0 over final 20%
-  const penOpacity = useTransform(smoothPenProgress, (v) => {
-    if (v <= 0) return 0;
-    if (v < 0.2) {
-      const t = v / 0.2;
-      return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+  // Container scale / crop via clipPath inset:
+  // 0% -> 35%: container expands from ~55% centered box to full-bleed (100vw x 100vh)
+  // 35% -> 55%: holds beat at full-bleed
+  // 55% -> 100%: shrinks back down and collapses to near-0 height
+  const clipInset = useTransform(smoothPenProgress, (v) => {
+    // 1. Entrance: 0% -> 35%
+    if (v <= 0.35) {
+      const t = Math.max(0, v / 0.35); // 0 -> 1
+      const tb = (1 - t) * 25; // 25% -> 0%
+      const lr = (1 - t) * 22.5; // 22.5% -> 0%
+      const radius = Math.round((1 - t) * 24); // 24px -> 0px
+      return `inset(${tb.toFixed(2)}% ${lr.toFixed(2)}% ${tb.toFixed(2)}% ${lr.toFixed(2)}% round ${radius}px)`;
     }
-    if (v <= 0.8) return 1;
-    if (v < 1.0) {
-      const t = (v - 0.8) / 0.2;
-      const fade = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
-      return 1 - fade;
+    // 2. Hold: 35% -> 55%
+    if (v <= 0.55) {
+      return "inset(0% 0% 0% 0% round 0px)";
     }
-    return 0;
+    // 3. Exit: 55% -> 100%
+    const t = Math.min(1, (v - 0.55) / 0.45); // 0 -> 1
+    const tb = t * 50; // collapses to 50% top and 50% bottom (0 height)
+    const lr = t * 25;
+    const radius = Math.round(t * 16);
+    return `inset(${tb.toFixed(2)}% ${lr.toFixed(2)}% ${tb.toFixed(2)}% ${lr.toFixed(2)}% round ${radius}px)`;
+  });
+
+  // Container opacity crossfade (1 -> 0 between 70% and 95%) with soft power1.inOut ease
+  const containerOpacity = useTransform(smoothPenProgress, (v) => {
+    if (v <= 0.70) return 1;
+    if (v >= 0.95) return 0;
+    const t = (v - 0.70) / 0.25;
+    return 1 - (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
+  });
+
+  // Next section title reveal on the black background behind the container (fades in 60% -> 90%)
+  const titleOpacity = useTransform(smoothPenProgress, (v) => {
+    if (v <= 0.60) return 0;
+    if (v >= 0.90) return 1;
+    const t = (v - 0.60) / 0.30;
+    return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
   });
 
   const quoteText =
@@ -247,33 +247,47 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
         </div>
       </div>
 
-      {/* Pinned Pen Flight Section: curved trajectory, 0->1 entrance, 1->0 exit, seamless handoff to SmartPaper */}
+      {/* Pinned Pen Scale/Crop Full-Bleed Transition (Reference sequence) */}
       <div
         ref={penSectionRef}
-        className="relative h-[150vh] bg-white pointer-events-none"
+        className="relative h-[180vh] bg-black text-white pointer-events-none"
       >
-        <div className="sticky top-0 h-screen w-full flex items-center justify-center overflow-hidden">
+        <div className="sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center">
+          {/* Background Behind Container: Next section title reveals starting around 60% progress */}
+          <motion.div
+            style={shouldReduceMotion ? { opacity: 1 } : { opacity: titleOpacity }}
+            className="absolute top-20 sm:top-24 left-6 sm:left-10 lg:left-14 z-10 max-w-7xl pointer-events-none"
+          >
+            <span className="block italic text-[#8a8a8a] text-xs sm:text-sm font-mono uppercase tracking-[0.15em] mb-2">
+              Works with smart paper
+            </span>
+            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif font-normal text-white leading-tight tracking-tight">
+              <span className="block">Looks like paper.</span>
+              <span className="block">Works like a system.</span>
+            </h2>
+          </motion.div>
+
+          {/* Pen Container: Scales from ~55% centered box up to 100vw x 100vh full-bleed, holds beat, then collapses and dissolves */}
           <motion.div
             style={
               shouldReduceMotion
-                ? {}
+                ? { opacity: containerOpacity }
                 : {
-                    scale: penScale,
-                    x: penX,
-                    y: penY,
-                    rotate: penRotate,
-                    opacity: penOpacity,
+                    clipPath: clipInset,
+                    opacity: containerOpacity,
+                    willChange: "clip-path, opacity",
                   }
             }
-            className="w-full max-w-5xl px-4 flex items-center justify-center will-change-transform select-none"
+            className="absolute inset-0 bg-white flex items-center justify-center overflow-hidden z-20 shadow-2xl"
           >
-            {/* Only the pen graphic itself — zero guide lines, SVG paths, or strokes */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/nota_horizontal_pen.png"
-              alt="Nōta Smart Pen horizontal showcase"
-              className="w-full max-w-4xl h-auto object-contain select-none pointer-events-none"
-            />
+            <div className="w-full max-w-5xl px-6 flex items-center justify-center select-none pointer-events-none">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/nota_horizontal_pen.png"
+                alt="Nōta Smart Pen full-bleed showcase"
+                className="w-full max-w-4xl h-auto object-contain select-none pointer-events-none drop-shadow-[0_20px_40px_rgba(0,0,0,0.12)]"
+              />
+            </div>
           </motion.div>
         </div>
       </div>
