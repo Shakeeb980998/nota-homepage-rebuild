@@ -80,6 +80,7 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
   audiences,
 }) => {
   const pinTrackRef = useRef<HTMLDivElement>(null);
+  const penSectionRef = useRef<HTMLDivElement>(null);
   const shouldReduceMotion = useReducedMotion();
 
   // Track pinned scroll scrub across topics reveal
@@ -98,6 +99,26 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
   const topic1X = useTransform(smoothProgress, [0.10, 0.40], ["110%", "0%"]);
   const topic2X = useTransform(smoothProgress, [0.30, 0.60], ["110%", "0%"]);
   const topic3X = useTransform(smoothProgress, [0.50, 0.80], ["110%", "0%"]);
+
+  // Track scroll scrub for the white pen showcase section (matches nota.uprock.pro SCROLL_TRANSFORM specs)
+  const { scrollYProgress: penScrollProgress } = useScroll({
+    target: penSectionRef,
+    offset: ["start end", "end start"],
+  });
+
+  const smoothPenProgress = useSpring(penScrollProgress, {
+    stiffness: 120,
+    damping: 24,
+    restDelta: 0.001,
+  });
+
+  // Official sample site keyframes:
+  // Keyframe 0-40: move y -12vh -> 0vh, scale 0.65 -> 1.0
+  // Keyframe 40-100: scale 1.0 -> 0.72, opacity 1.0 -> 0.25, move x 0vw -> -12vw, y 0vh -> 8vh
+  const penScale = useTransform(smoothPenProgress, [0.1, 0.45, 0.75, 1.0], [0.65, 1.0, 1.0, 0.72]);
+  const penY = useTransform(smoothPenProgress, [0.1, 0.45, 0.75, 1.0], ["-12vh", "0vh", "0vh", "8vh"]);
+  const penX = useTransform(smoothPenProgress, [0.5, 1.0], ["0vw", "-12vw"]);
+  const penOpacity = useTransform(smoothPenProgress, [0.65, 1.0], [1.0, 0.25]);
 
   const quoteText =
     introQuote ||
@@ -195,15 +216,30 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
       </div>
 
       {/* Full-Width White Horizontal Pen Showcase (Matches sample site media_1789312059287.png) */}
-      <div className="w-full bg-white py-16 sm:py-24 lg:py-32 flex items-center justify-center overflow-hidden">
-        <video
-          src="/who_pen_video.mp4"
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="w-full max-w-6xl h-auto max-h-[380px] object-contain select-none pointer-events-none"
-        />
+      <div
+        ref={penSectionRef}
+        className="w-full bg-white py-24 sm:py-32 lg:py-40 flex items-center justify-center overflow-hidden relative"
+      >
+        <motion.div
+          style={
+            shouldReduceMotion
+              ? {}
+              : {
+                  scale: penScale,
+                  y: penY,
+                  x: penX,
+                  opacity: penOpacity,
+                }
+          }
+          className="w-full max-w-5xl px-4 flex items-center justify-center will-change-transform"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/nota_horizontal_pen.png"
+            alt="Nōta Smart Pen horizontal showcase"
+            className="w-full max-w-4xl h-auto object-contain select-none pointer-events-none"
+          />
+        </motion.div>
       </div>
     </section>
   );
