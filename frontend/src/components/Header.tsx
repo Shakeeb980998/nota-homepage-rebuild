@@ -1,15 +1,21 @@
-﻿"use client";
+"use client";
 
 import React, { useState } from "react";
 import { Menu, X } from "lucide-react";
 
 interface HeaderProps {
+  siteName?: string;
   onOpenOrder: () => void;
   price?: string;
   links: Array<{ label: string; href: string }>;
 }
 
-export const Header: React.FC<HeaderProps> = ({ onOpenOrder, price = "$300", links }) => {
+export const Header: React.FC<HeaderProps> = ({
+  siteName = "NŌTA",
+  onOpenOrder,
+  price = "$300",
+  links,
+}) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
@@ -18,7 +24,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenOrder, price = "$300", lin
         {/* Logo */}
         <a href="#" className="flex items-center gap-3 group">
           <span className="font-serif text-2xl tracking-widest text-white font-semibold">
-            NŌTA
+            {siteName}
           </span>
         </a>
 

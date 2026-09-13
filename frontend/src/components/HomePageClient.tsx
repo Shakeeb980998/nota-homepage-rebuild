@@ -23,6 +23,7 @@ export const HomePageClient: React.FC<HomePageClientProps> = ({ initialData }) =
     <main className="min-h-screen bg-black text-white selection:bg-neutral-800 selection:text-white">
       {/* Header */}
       <Header
+        siteName={initialData.global.siteName}
         links={initialData.global.navLinks}
         price={initialData.global.productPrice}
         onOpenOrder={() => setIsOrderOpen(true)}
@@ -30,8 +31,11 @@ export const HomePageClient: React.FC<HomePageClientProps> = ({ initialData }) =
 
       {/* Hero */}
       <Hero
+        badge={initialData.hero.badge}
         titleLine1={initialData.hero.titleLine1}
         titleLine2={initialData.hero.titleLine2}
+        subtitle={initialData.hero.subtitle}
+        ctaText={initialData.hero.ctaText}
         price={initialData.global.productPrice || initialData.hero.price}
         onOpenOrder={() => setIsOrderOpen(true)}
       />
@@ -74,6 +78,7 @@ export const HomePageClient: React.FC<HomePageClientProps> = ({ initialData }) =
 
       {/* Footer */}
       <Footer
+        siteName={initialData.global.siteName}
         copyright={initialData.global.footerCopyright}
         links={initialData.global.navLinks}
       />

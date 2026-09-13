@@ -1,9 +1,10 @@
-﻿"use client";
+"use client";
 
 import React, { useState } from "react";
 import { X } from "lucide-react";
 
 interface FooterProps {
+  siteName?: string;
   copyright: string;
   links: Array<{ label: string; href: string }>;
 }
@@ -20,7 +21,7 @@ const teamMembers = [
   { name: "Anastasia Voronova", role: "Producer", link: "https://telegram.me/Anastasia_coin" },
 ];
 
-export const Footer: React.FC<FooterProps> = ({ copyright, links }) => {
+export const Footer: React.FC<FooterProps> = ({ siteName = "NŌTA", copyright, links }) => {
   const [teamPopupOpen, setTeamPopupOpen] = useState(false);
 
   return (
@@ -29,7 +30,7 @@ export const Footer: React.FC<FooterProps> = ({ copyright, links }) => {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
           <div className="space-y-2">
             <span className="font-serif text-2xl tracking-widest text-white font-semibold">
-              NŌTA
+              {siteName}
             </span>
             <p className="text-xs text-neutral-500 max-w-sm">
               Tools that respect the way people think and write. Natural handwriting, quietly connected to digital structure.

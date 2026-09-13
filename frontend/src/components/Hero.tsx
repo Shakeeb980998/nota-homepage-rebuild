@@ -6,6 +6,9 @@ import { motion } from "framer-motion";
 interface HeroProps {
   titleLine1: string;
   titleLine2: string;
+  badge?: string;
+  subtitle?: string;
+  ctaText?: string;
   price?: string;
   onOpenOrder: () => void;
 }
@@ -13,6 +16,9 @@ interface HeroProps {
 export const Hero: React.FC<HeroProps> = ({
   titleLine1,
   titleLine2,
+  badge = "Writing Infrastructure",
+  subtitle = "Combines a precision smart pen, intelligent paper, and seamless digital sync. For those who think better by hand.",
+  ctaText = "Order Nota One",
   price = "$300",
   onOpenOrder,
 }) => {
@@ -28,7 +34,7 @@ export const Hero: React.FC<HeroProps> = ({
         className="relative z-10 max-w-4xl mx-auto space-y-6"
       >
         <span className="inline-block px-4 py-1.5 rounded-full border border-neutral-800 bg-neutral-900/60 backdrop-blur-sm text-neutral-400 text-xs font-mono uppercase tracking-widest">
-          Writing Infrastructure
+          {badge}
         </span>
 
         <h1 className="text-5xl sm:text-7xl md:text-8xl font-serif font-light tracking-tight text-white leading-[1.05]">
@@ -37,7 +43,7 @@ export const Hero: React.FC<HeroProps> = ({
         </h1>
 
         <p className="max-w-xl mx-auto text-neutral-400 text-base sm:text-lg font-light leading-relaxed">
-          Combines a precision smart pen, intelligent paper, and seamless digital sync. For those who think better by hand.
+          {subtitle}
         </p>
 
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -45,7 +51,7 @@ export const Hero: React.FC<HeroProps> = ({
             onClick={onOpenOrder}
             className="w-full sm:w-auto px-8 py-4 bg-white text-black font-medium rounded-full hover:bg-neutral-200 transition-all text-sm font-mono uppercase shadow-lg shadow-white/5"
           >
-            Order Nota One • {price}
+            {ctaText} • {price}
           </button>
           <a
             href="#specifications"

@@ -1,4 +1,4 @@
-﻿export interface SeoData {
+export interface SeoData {
   metaTitle: string;
   metaDescription: string;
   keywords?: string;
@@ -54,8 +54,10 @@ export interface HomepageData {
     navLinks: Array<{ label: string; href: string }>;
   };
   hero: {
+    badge?: string;
     titleLine1: string;
     titleLine2: string;
+    subtitle?: string;
     ctaText: string;
     price: string;
     smartPenImage?: string;

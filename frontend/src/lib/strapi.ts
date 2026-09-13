@@ -23,8 +23,10 @@ export const defaultHomepageData: HomepageData = {
     ],
   },
   hero: {
+    badge: "Writing Infrastructure",
     titleLine1: "Smart pen",
     titleLine2: "for real thinking",
+    subtitle: "Combines a precision smart pen, intelligent paper, and seamless digital sync. For those who think better by hand.",
     ctaText: "Order Nota One",
     price: "$300",
   },
