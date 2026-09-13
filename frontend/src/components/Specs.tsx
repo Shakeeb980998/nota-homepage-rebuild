@@ -18,7 +18,7 @@ export const Specs: React.FC<SpecsProps> = ({
   const pinContainerRef = useRef<HTMLDivElement>(null);
   const shouldReduceMotion = useReducedMotion();
 
-  // Scroll scrub tracking across pinned section (~240vh of scroll)
+  // Scroll scrub tracking across pinned section (~220vh of scroll)
   const { scrollYProgress } = useScroll({
     target: pinContainerRef,
     offset: ["start start", "end end"],
@@ -51,9 +51,31 @@ export const Specs: React.FC<SpecsProps> = ({
     { y: card3Y, opacity: card3Opacity },
   ];
 
+  // 8-Column Staggered Black Curtain Exit Wipe (Pyramid shape matching sample site media_1789310041665.png)
+  // Center columns (3 & 4) reach top first, followed symmetrically by inner (2 & 5), outer (1 & 6), and flanks (0 & 7)
+  const curtainCol0 = useTransform(smoothProgress, [0.77, 1.00], ["100%", "0%"]);
+  const curtainCol1 = useTransform(smoothProgress, [0.73, 0.96], ["100%", "0%"]);
+  const curtainCol2 = useTransform(smoothProgress, [0.69, 0.92], ["100%", "0%"]);
+  const curtainCol3 = useTransform(smoothProgress, [0.65, 0.88], ["100%", "0%"]);
+  const curtainCol4 = useTransform(smoothProgress, [0.65, 0.88], ["100%", "0%"]);
+  const curtainCol5 = useTransform(smoothProgress, [0.69, 0.92], ["100%", "0%"]);
+  const curtainCol6 = useTransform(smoothProgress, [0.73, 0.96], ["100%", "0%"]);
+  const curtainCol7 = useTransform(smoothProgress, [0.77, 1.00], ["100%", "0%"]);
+
+  const curtainTransforms = [
+    curtainCol0,
+    curtainCol1,
+    curtainCol2,
+    curtainCol3,
+    curtainCol4,
+    curtainCol5,
+    curtainCol6,
+    curtainCol7,
+  ];
+
   return (
-    // Outer pinned scroll container (~180vh, tightened for immediate responsive flow)
-    <div id="specifications" ref={pinContainerRef} className="relative h-[180vh] bg-white text-[#111111]">
+    // Outer pinned scroll container (~220vh, allows comfortable hold + curtain wipe into next section)
+    <div id="specifications" ref={pinContainerRef} className="relative h-[220vh] bg-white text-[#111111]">
       {/* Sticky Viewport with guaranteed top clearance beneath fixed 80px navbar */}
       <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between pt-24 sm:pt-28 pb-8 px-6">
         <div className="max-w-7xl mx-auto w-full relative z-10 flex flex-col justify-between h-full my-auto">
@@ -132,6 +154,17 @@ export const Specs: React.FC<SpecsProps> = ({
               })}
             </div>
           </div>
+        </div>
+
+        {/* 8-Column Staggered Black Curtain Wipe Exit into Who-It-Is-For (Matches sample site media_1789310041665.png) */}
+        <div className="absolute inset-0 z-30 pointer-events-none grid grid-cols-8 h-full w-full overflow-hidden">
+          {curtainTransforms.map((curtainY, idx) => (
+            <motion.div
+              key={idx}
+              style={shouldReduceMotion ? { y: "100%" } : { y: curtainY }}
+              className="bg-black h-full w-full will-change-transform"
+            />
+          ))}
         </div>
       </div>
     </div>
