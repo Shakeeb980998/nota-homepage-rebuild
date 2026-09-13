@@ -42,42 +42,52 @@ export const Header: React.FC<HeaderProps> = ({
       }`}
     >
       <div className="max-w-7xl mx-auto px-6 w-full flex items-center justify-between pointer-events-auto">
-        {/* Wordmark "Nōta": Same serif family as headlines */}
-        <a href="#" className="flex items-center gap-2 group">
-          <span className="font-serif text-3xl tracking-normal text-white font-normal">
-            {siteName}
-          </span>
-        </a>
+        {/* Left Side: Wordmark + Desktop Nav grouped together */}
+        <div className="flex items-center gap-10 md:gap-14">
+          <a href="#" className="flex items-center gap-2 group">
+            <span className="font-serif text-3xl sm:text-4xl tracking-tight text-white font-normal">
+              {siteName}
+            </span>
+          </a>
 
-        {/* Desktop Nav: uppercase, letter-spacing 0.12em, ~11-12px, muted gray #8a8a8a */}
-        <nav className="hidden md:flex items-center gap-8 text-[11px] font-sans font-medium uppercase tracking-[0.12em] text-[#8a8a8a]">
-          {links.map((link) => (
-            <a
-              key={link.label}
-              href={link.href}
-              className="hover:text-white transition-colors duration-200"
-            >
-              {link.label}
-            </a>
-          ))}
-        </nav>
+          {/* Desktop Nav: Title/sentence case, text-sm, clean white */}
+          <nav className="hidden md:flex items-center gap-8 text-sm font-sans font-normal text-white/90">
+            {links.map((link) => (
+              <a
+                key={link.label}
+                href={link.href}
+                className="hover:text-white transition-colors duration-200"
+              >
+                {link.label}
+              </a>
+            ))}
+          </nav>
+        </div>
 
-        {/* CTA Pill Button (bg #ffffff, text #000000, rounded-full) */}
+        {/* Right Side: White rectangular card with flower logo & Order button */}
         <div className="flex items-center gap-3">
-          <div className="hidden sm:flex items-center bg-[#ffffff] text-[#000000] rounded-[999px] p-1.5 pl-4 shadow-2xl gap-4 border border-white/20">
-            <CloverIcon />
-            {/* Order Button: bg #000000, text #ffffff, rounded-full */}
+          <div className="hidden sm:flex items-center bg-[#ffffff] text-[#000000] rounded-2xl p-1.5 pl-3.5 pr-1.5 shadow-2xl gap-3 border border-white/20">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/nota-flower-logo.svg"
+              alt="Nōta Logo"
+              className="w-6 h-6 object-contain select-none"
+            />
+            {/* Order Button: bg #000000, text #ffffff, rounded-xl */}
             <button
               onClick={onOpenOrder}
-              className="bg-[#000000] hover:bg-neutral-800 text-[#ffffff] px-5 py-2 rounded-[999px] font-sans font-medium text-xs tracking-tight transition-all"
+              className="bg-[#000000] hover:bg-neutral-900 text-[#ffffff] px-6 py-2.5 rounded-xl font-sans font-medium text-xs sm:text-sm tracking-tight transition-all flex items-center gap-1.5"
             >
-              Order <span className="text-neutral-400">Nota One</span> • {price}
+              <span>Order</span>
+              <span className="text-neutral-400 font-normal">Nota One</span>
+              <span>•</span>
+              <span>{price}</span>
             </button>
           </div>
 
           <button
             onClick={onOpenOrder}
-            className="sm:hidden bg-[#ffffff] text-[#000000] px-4 py-2 rounded-[999px] text-xs font-semibold"
+            className="sm:hidden bg-[#ffffff] text-[#000000] px-4 py-2 rounded-xl text-xs font-semibold"
           >
             {price}
           </button>
