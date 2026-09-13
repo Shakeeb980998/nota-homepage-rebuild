@@ -51,26 +51,13 @@ export const Specs: React.FC<SpecsProps> = ({
     { y: card3Y, opacity: card3Opacity },
   ];
 
-  // 7-Column Staggered Black Curtain Exit Wipe (Pyramid shape matching sample site media_1789310041665.png)
-  // Center column (col 3) is a single solid block spanning across the 50% midpoint (36% - 64%) to eliminate any center seam
-  // Outer columns stagger symmetrically: center reaches top first, then inner, then outer, then flanks
-  const curtainCol0 = useTransform(smoothProgress, [0.77, 1.00], ["100%", "0%"]);
-  const curtainCol1 = useTransform(smoothProgress, [0.73, 0.96], ["100%", "0%"]);
-  const curtainCol2 = useTransform(smoothProgress, [0.69, 0.92], ["100%", "0%"]);
-  const curtainCol3 = useTransform(smoothProgress, [0.65, 0.88], ["100%", "0%"]);
-  const curtainCol4 = useTransform(smoothProgress, [0.69, 0.92], ["100%", "0%"]);
-  const curtainCol5 = useTransform(smoothProgress, [0.73, 0.96], ["100%", "0%"]);
-  const curtainCol6 = useTransform(smoothProgress, [0.77, 1.00], ["100%", "0%"]);
-
-  const curtainColumns = [
-    { y: curtainCol0, left: "0%", width: "15%" },
-    { y: curtainCol1, left: "13.5%", width: "15%" },
-    { y: curtainCol2, left: "27%", width: "15%" },
-    { y: curtainCol3, left: "36%", width: "28%" }, // Solid center block spanning across 50% center
-    { y: curtainCol4, left: "58%", width: "15%" },
-    { y: curtainCol5, left: "71.5%", width: "15%" },
-    { y: curtainCol6, left: "85%", width: "15%" },
-  ];
+  // 4 Horizontal Stepped Curtains expanding outward from center (Matches sample site nota.uprock.pro exactly)
+  // Grid layout: grid-template-rows: 1fr 2.625fr 2.625fr 2.625fr (top to bottom)
+  // Bottom row expands widest first, followed by row 3, row 2, and row 1 (top)
+  const curtainRow4Width = useTransform(smoothProgress, [0.60, 0.85], ["0%", "100%"]); // bottom
+  const curtainRow3Width = useTransform(smoothProgress, [0.65, 0.90], ["0%", "100%"]);
+  const curtainRow2Width = useTransform(smoothProgress, [0.70, 0.95], ["0%", "100%"]);
+  const curtainRow1Width = useTransform(smoothProgress, [0.75, 1.00], ["0%", "100%"]); // top
 
   return (
     // Outer pinned scroll container (~220vh, allows comfortable hold + curtain wipe into next section)
@@ -155,19 +142,42 @@ export const Specs: React.FC<SpecsProps> = ({
           </div>
         </div>
 
-        {/* Seamless 7-Column Black Curtain Wipe Exit into Who-It-Is-For (Center spans 50% midpoint, zero lines) */}
-        <div className="absolute inset-0 z-30 pointer-events-none h-full w-full overflow-hidden">
-          {curtainColumns.map((col, idx) => (
+        {/* Horizontal 4-Tier Centered Pyramid Curtains Expanding Outward (Exact replica of nota.uprock.pro) */}
+        <div
+          className="absolute inset-0 z-30 pointer-events-none h-full w-full overflow-hidden grid"
+          style={{ gridTemplateRows: "1fr 2.625fr 2.625fr 2.625fr" }}
+        >
+          {/* Row 1 (Top) */}
+          <div className="w-full h-full flex justify-center items-center">
             <motion.div
-              key={idx}
-              style={
-                shouldReduceMotion
-                  ? { y: "100%", left: col.left, width: col.width }
-                  : { y: col.y, left: col.left, width: col.width }
-              }
-              className="absolute top-0 bottom-0 bg-black will-change-transform ring-1 ring-black"
+              style={shouldReduceMotion ? { width: "100%" } : { width: curtainRow1Width }}
+              className="bg-black h-full will-change-[width]"
             />
-          ))}
+          </div>
+
+          {/* Row 2 (Upper Middle) */}
+          <div className="w-full h-full flex justify-center items-center">
+            <motion.div
+              style={shouldReduceMotion ? { width: "100%" } : { width: curtainRow2Width }}
+              className="bg-black h-full will-change-[width]"
+            />
+          </div>
+
+          {/* Row 3 (Lower Middle) */}
+          <div className="w-full h-full flex justify-center items-center">
+            <motion.div
+              style={shouldReduceMotion ? { width: "100%" } : { width: curtainRow3Width }}
+              className="bg-black h-full will-change-[width]"
+            />
+          </div>
+
+          {/* Row 4 (Bottom) */}
+          <div className="w-full h-full flex justify-center items-center">
+            <motion.div
+              style={shouldReduceMotion ? { width: "100%" } : { width: curtainRow4Width }}
+              className="bg-black h-full will-change-[width]"
+            />
+          </div>
         </div>
       </div>
     </div>
