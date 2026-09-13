@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef, useEffect } from "react";
-import { useScroll, useSpring, useReducedMotion } from "framer-motion";
+import { motion, useScroll, useTransform, useSpring, useReducedMotion } from "framer-motion";
 import type { AnimationItem } from "lottie-web";
 
 interface HeroProps {
@@ -69,14 +69,25 @@ export const Hero: React.FC<HeroProps> = ({
     };
   }, []);
 
-  // Scrub Lottie frames tied directly to scroll progress
+  // Staggered 6-curtain wipe transforms matching sample site transition
+  const curtain0Y = useTransform(smoothProgress, [0.62, 0.82], ["100%", "0%"]);
+  const curtain1Y = useTransform(smoothProgress, [0.65, 0.85], ["100%", "0%"]);
+  const curtain2Y = useTransform(smoothProgress, [0.68, 0.88], ["100%", "0%"]);
+  const curtain3Y = useTransform(smoothProgress, [0.71, 0.91], ["100%", "0%"]);
+  const curtain4Y = useTransform(smoothProgress, [0.74, 0.94], ["100%", "0%"]);
+  const curtain5Y = useTransform(smoothProgress, [0.77, 0.97], ["100%", "0%"]);
+
+  const curtainTransforms = [curtain0Y, curtain1Y, curtain2Y, curtain3Y, curtain4Y, curtain5Y];
+
+  // Scrub Lottie frames tied directly to scroll progress (0 to 0.70)
   useEffect(() => {
     if (shouldReduceMotion) return;
 
     const unsubscribe = smoothProgress.on("change", (latest) => {
       if (animRef.current) {
+        const penProgress = Math.min(Math.max(0, latest / 0.70), 1);
         const total = (animRef.current.totalFrames || 76) - 1;
-        const targetFrame = Math.min(Math.max(0, Math.round(latest * total)), total);
+        const targetFrame = Math.min(Math.max(0, Math.round(penProgress * total)), total);
         animRef.current.goToAndStop(targetFrame, true);
       }
     });
@@ -85,8 +96,8 @@ export const Hero: React.FC<HeroProps> = ({
   }, [smoothProgress, shouldReduceMotion]);
 
   return (
-    // Outer pinned scroll container (pinned for ~100vh of scroll)
-    <div ref={pinContainerRef} className="relative h-[200vh] bg-black">
+    // Outer pinned scroll container (pinned for ~150vh of scroll)
+    <div ref={pinContainerRef} className="relative h-[250vh] bg-black">
       {/* Sticky Viewport pinned firmly during scroll */}
       <div
         className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between"
@@ -109,6 +120,17 @@ export const Hero: React.FC<HeroProps> = ({
             <span className="block">{titleLine1}</span>
             <span className="block">{titleLine2}</span>
           </h1>
+        </div>
+
+        {/* Staggered 6-Curtain Wipe Transition into Specifications (Matches sample site exactly) */}
+        <div className="absolute inset-0 z-30 pointer-events-none grid grid-cols-6 h-full w-full overflow-hidden">
+          {curtainTransforms.map((curtainY, idx) => (
+            <motion.div
+              key={idx}
+              style={shouldReduceMotion ? { y: 0 } : { y: curtainY }}
+              className="bg-white h-full w-full will-change-transform shadow-[0_-15px_30px_rgba(0,0,0,0.15)]"
+            />
+          ))}
         </div>
       </div>
     </div>

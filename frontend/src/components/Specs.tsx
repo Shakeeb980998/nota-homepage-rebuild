@@ -2,8 +2,7 @@
 
 import React, { useRef } from "react";
 import { SpecCard } from "@/types/cms";
-import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
-import { TextInkReveal } from "@/components/TextInkReveal";
+import { motion, useScroll, useTransform, useSpring, useReducedMotion } from "framer-motion";
 
 interface SpecsProps {
   badge?: string;
@@ -20,99 +19,94 @@ export const Specs: React.FC<SpecsProps> = ({
   const cardsContainerRef = useRef<HTMLDivElement>(null);
   const shouldReduceMotion = useReducedMotion();
 
-  // Scroll scrub tracking for icon travel along fixed vertical axis
+  // Scroll scrub tracking for vertical pen descent
   const { scrollYProgress } = useScroll({
     target: sectionRef,
-    offset: ["start 65%", "end 85%"],
+    offset: ["start 80%", "end 40%"],
   });
 
-  // Issue #2: Fixed vertical axis translateY ONLY (no rotation, no diagonal drift)
-  const iconTravelY = useTransform(scrollYProgress, [0, 0.9], [0, 420]);
-  const iconOpacity = useTransform(scrollYProgress, [0, 0.1, 0.8, 0.95], [0, 1, 1, 0]);
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 120,
+    damping: 28,
+    restDelta: 0.001,
+  });
+
+  // Vertical pen translates strictly along vertical Y axis (no rotation, no diagonal drift)
+  const penTravelY = useTransform(smoothProgress, [0, 1], [-80, 520]);
+  const penOpacity = useTransform(smoothProgress, [0, 0.15, 0.85, 1], [0, 1, 1, 0.4]);
 
   return (
     <section
       id="specifications"
       ref={sectionRef}
-      className="relative py-36 px-6 bg-[#ffffff] text-[#111111] overflow-hidden"
+      className="relative py-32 sm:py-40 px-6 bg-[#ffffff] text-[#111111] overflow-hidden"
     >
-      <div className="max-w-7xl mx-auto">
-        {/* Text Ink-Fill Reveal for Section Headline */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <TextInkReveal
-            badge={badge}
-            titleLine1={badge}
-            titleLine2={title}
-            theme="light"
-            className="text-center"
-          />
+      <div className="max-w-7xl mx-auto relative z-10">
+        {/* Centered Large Didone Headline (Matches media_1789308003808.png) */}
+        <div className="text-center max-w-4xl mx-auto mb-20 sm:mb-28 relative z-20">
+          <h2 className="text-5xl sm:text-7xl md:text-8xl lg:text-[96px] font-serif font-normal leading-[0.98] tracking-tight">
+            <span className="block italic text-[#8a8a8a]">{badge}</span>
+            <span className="block text-[#000000]">{title}</span>
+          </h2>
         </div>
 
-        {/* Relative Cards Grid Container with Traveling Icon behind cards (z-0) */}
+        {/* Relative Cards Grid Container with Traveling Vertical Pen strictly BEHIND cards (z-0) */}
         <div ref={cardsContainerRef} className="relative max-w-6xl mx-auto">
-          {/* Issue #2: Traveling pen-nib icon behind card content (z-0) */}
+          {/* Vertical Smart Pen (strictly behind cards at z-0, translateY only) */}
           {!shouldReduceMotion && (
-            <div className="absolute inset-0 pointer-events-none z-0 flex justify-center">
+            <div className="absolute inset-x-0 top-0 pointer-events-none z-0 flex justify-center">
               <motion.div
                 style={{
-                  y: iconTravelY,
-                  opacity: iconOpacity,
+                  y: penTravelY,
+                  opacity: penOpacity,
                 }}
-                className="w-8 h-8 rounded-full bg-neutral-900 text-white flex items-center justify-center shadow-lg"
+                className="w-auto flex justify-center will-change-transform filter drop-shadow-[0_20px_40px_rgba(0,0,0,0.18)]"
               >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M12 2v20M17 17l-5 5-5-5" />
-                </svg>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/nota_scene_2_img.png"
+                  alt="Nōta Vertical Smart Pen"
+                  className="w-auto h-[380px] sm:h-[480px] object-contain select-none"
+                />
               </motion.div>
             </div>
           )}
 
-          {/* Staggered Card Reveal (Higher z-index z-10 so icon stays strictly behind cards) */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start relative z-10">
+          {/* Staggered Card Reveal (z-10 with frosted glass so pen travels smoothly behind middle card) */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 items-start relative z-10">
             {cards.map((card, idx) => {
               const isMiddle = idx === 1;
 
               return (
                 <motion.div
                   key={card.title}
-                  initial={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
+                  initial={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-50px" }}
+                  viewport={{ once: true, margin: "-60px" }}
                   transition={{
-                    duration: 0.6,
+                    duration: 0.65,
                     delay: idx * 0.1,
                     ease: [0.22, 1, 0.36, 1], // power3.out
                   }}
-                  className={`relative bg-[#f2f2f2] rounded-[20px] p-8 shadow-[0_10px_35px_rgba(0,0,0,0.04)] border border-neutral-200/60 hover:shadow-[0_15px_45px_rgba(0,0,0,0.08)] transition-all z-10 ${
+                  className={`relative bg-[#f4f4f5]/90 backdrop-blur-md rounded-[24px] p-7 sm:p-8 shadow-[0_10px_35px_rgba(0,0,0,0.04)] border border-neutral-200/80 hover:shadow-[0_20px_45px_rgba(0,0,0,0.08)] transition-all z-10 ${
                     isMiddle ? "md:-translate-y-2" : ""
                   }`}
                 >
-                  <h3 className="text-2xl font-serif font-normal text-[#111111] mb-8">
+                  <h3 className="text-2xl sm:text-3xl font-serif font-normal text-[#111111] mb-8">
                     {card.title}
                   </h3>
 
-                  <div className="divide-y divide-neutral-100">
+                  <div className="divide-y divide-neutral-200/60">
                     {card.features.map((feature, fIdx) => (
                       <div
                         key={fIdx}
-                        className="py-4 flex items-center justify-between gap-4 text-sm sm:text-base text-neutral-700 font-light"
+                        className="py-4 flex items-center justify-between gap-4 text-sm sm:text-base text-neutral-800 font-light"
                       >
                         <span>{feature}</span>
-                        <span className="w-2 h-2 rounded-full bg-neutral-300 shrink-0" />
+                        <div className="w-2 h-2 rounded-full bg-neutral-300 shrink-0" />
                       </div>
                     ))}
                   </div>
-
-                  {isMiddle && (
-                    <div className="hidden md:flex absolute -bottom-36 inset-x-0 justify-center pointer-events-none -z-10 opacity-70">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src="https://nota.uprock.pro/thumb/2/zOzK4LBsVJn0W98Pf5CalQ/364r1526/d/library_image-14634-symbol-is6ru9kkd-nota_hero_image_adaptive_866220.png"
-                        alt="Pen detail"
-                        className="w-24 object-contain transform rotate-90"
-                      />
-                    </div>
-                  )}
                 </motion.div>
               );
             })}
