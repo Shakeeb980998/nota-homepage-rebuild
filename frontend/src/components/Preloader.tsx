@@ -1,10 +1,12 @@
 ﻿"use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { useReducedMotion } from "framer-motion";
 
-// Inline the same Nota wordmark SVG used in the header
-const NotaWordmark: React.FC<{ className?: string }> = ({ className = "h-8 w-auto text-white" }) => (
+// ── Nota wordmark SVG ─────────────────────────────────────────────────────────
+const NotaWordmark: React.FC<{ className?: string }> = ({
+  className = "h-8 w-auto text-white",
+}) => (
   <svg
     width="71"
     height="26"
@@ -21,94 +23,135 @@ const NotaWordmark: React.FC<{ className?: string }> = ({ className = "h-8 w-aut
   </svg>
 );
 
-interface PreloaderProps {
-  /** Called when the preloader has fully faded out (use to signal page is ready) */
-  onReady?: () => void;
-}
-
 /**
- * Page-load preloader overlay.
+ * PAGE LOAD PRELOADER OVERLAY
  *
- * Waits for:
- *   1. document.fonts.ready  — all web fonts parsed & loaded
- *   2. 2x requestAnimationFrame — React has fully painted the first frame
+ * State machine (single `phase` string — no race conditions):
+ *   "showing"  → overlay visible, wordmark pulsing
+ *   "fading"   → overlay transitioning opacity 1→0 (CSS transition, 500ms)
+ *   "done"     → overlay removed from DOM (display:none via pointer-events-none + opacity-0)
  *
- * Then fades out opacity 1->0 over 500ms and calls onReady().
+ * Readiness = Promise.race([
+ *   Promise.all([fontsReady, heroImageLoaded, twoRafTicks]),
+ *   3 000ms safety timeout
+ * ])
  *
- * Shows the Nota wordmark with a subtle opacity pulse while waiting.
- * prefers-reduced-motion: static wordmark (no pulse), same wait logic.
+ * Wordmark pulse = CSS @keyframes on the SVG element (never touches React state,
+ * never causes re-renders, and the animation-play-state is set to "paused" once
+ * the overlay starts fading so it cleanly stops).
+ *
+ * prefers-reduced-motion: no pulse animation; same readiness/fade logic.
  */
-export const Preloader: React.FC<PreloaderProps> = ({ onReady }) => {
+export const Preloader: React.FC = () => {
   const shouldReduceMotion = useReducedMotion();
-  const [visible, setVisible] = useState(true);
-  const [exiting, setExiting] = useState(false);
+  // "showing" | "fading" | "done"
+  const [phase, setPhase] = useState<"showing" | "fading" | "done">("showing");
+  const overlayRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let cancelled = false;
 
-    const waitForReady = async () => {
-      // 1. Wait for all web fonts
-      await document.fonts.ready;
+    // ── 1. Fonts ready (with 500ms fallback if API unsupported) ──────────────
+    const fontsReady: Promise<void> =
+      typeof document !== "undefined" && "fonts" in document
+        ? Promise.race([
+            document.fonts.ready.then(() => undefined as void),
+            new Promise<void>((r) => setTimeout(r, 500)),
+          ])
+        : Promise.resolve();
 
+    // ── 2. Hero pen image preload ─────────────────────────────────────────────
+    // The Lottie JSON path — we just check the pen PNG used in Specs/Who sections.
+    // If it loads from cache, img.complete is already true → resolve immediately.
+    const heroImageLoaded: Promise<void> = new Promise<void>((resolve) => {
+      const img = new Image();
+      img.onload = () => resolve();
+      img.onerror = () => resolve(); // always resolve — never block on a network error
+      img.src = "/nota_horizontal_pen.png";
+      // If already in browser cache, .complete is true before onload ever fires
+      if (img.complete) resolve();
+    });
+
+    // ── 3. Two rAF ticks — React has committed + browser has painted ──────────
+    const twoRafTicks: Promise<void> = new Promise<void>((resolve) => {
+      requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+    });
+
+    // ── Race: real readiness vs. 3 000ms hard safety timeout ─────────────────
+    const safetyTimeout: Promise<void> = new Promise<void>((resolve) =>
+      setTimeout(resolve, 3000)
+    );
+
+    Promise.race([
+      Promise.all([fontsReady, heroImageLoaded, twoRafTicks]),
+      safetyTimeout,
+    ]).then(() => {
       if (cancelled) return;
 
-      // 2. Two rAF ticks — guarantees React committed & browser painted the hero
-      await new Promise<void>((resolve) => {
-        requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
-      });
+      // Begin CSS fade-out (opacity 1 → 0 in 500ms via inline transition)
+      setPhase("fading");
 
-      if (cancelled) return;
-
-      // Begin fade-out
-      setExiting(true);
-
-      // After 550ms (500ms fade + 50ms buffer), remove from DOM
+      // After 520ms (transition + small buffer) remove overlay from DOM
       setTimeout(() => {
-        if (!cancelled) {
-          setVisible(false);
-          onReady?.();
-        }
-      }, 550);
-    };
-
-    waitForReady();
+        if (!cancelled) setPhase("done");
+      }, 520);
+    });
 
     return () => {
       cancelled = true;
     };
-  }, [onReady]);
+  }, []); // ← empty deps: run exactly once on mount
 
-  if (!visible) return null;
+  // Fully done — remove from DOM entirely so it cannot block interaction
+  if (phase === "done") return null;
+
+  const isFading = phase === "fading";
 
   return (
-    <AnimatePresence>
-      {!exiting && (
-        <motion.div
-          key="preloader"
-          initial={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.5, ease: "easeInOut" }}
-          className="fixed inset-0 z-[9999] bg-black flex items-center justify-center"
-          aria-label="Loading Nota"
-          role="status"
-        >
-          {/* Wordmark with pulse while waiting */}
-          {shouldReduceMotion ? (
-            <NotaWordmark className="h-10 w-auto text-white opacity-70" />
-          ) : (
-            <motion.div
-              animate={{ opacity: [0.4, 1, 0.4] }}
-              transition={{
-                duration: 1.2,
-                ease: "easeInOut",
-                repeat: Infinity,
-              }}
-            >
-              <NotaWordmark className="h-10 w-auto text-white" />
-            </motion.div>
-          )}
-        </motion.div>
+    <div
+      ref={overlayRef}
+      aria-label="Loading Nota"
+      role="status"
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 9999,
+        backgroundColor: "#000000",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        // CSS transition drives the fade-out — no Framer Motion needed here,
+        // which avoids any AnimatePresence unmount timing issues.
+        opacity: isFading ? 0 : 1,
+        transition: isFading ? "opacity 0.5s ease" : "none",
+        // Once fading, prevent any accidental interaction bleed-through
+        pointerEvents: isFading ? "none" : "auto",
+      }}
+    >
+      {/* ── Wordmark pulse via CSS @keyframes ───────────────────────────────
+          We use a <style> tag scoped to this component rather than a Tailwind
+          animate-* class so the keyframes are guaranteed to be present even
+          before global CSS has fully hydrated, and they auto-stop when the
+          element is removed from the DOM.
+      ──────────────────────────────────────────────────────────────────────── */}
+      {!shouldReduceMotion && (
+        <style>{`
+          @keyframes nota-pulse {
+            0%,100% { opacity: 0.4; }
+            50%      { opacity: 1;   }
+          }
+          .nota-preloader-wordmark {
+            animation: nota-pulse 1.2s ease-in-out infinite;
+            animation-play-state: ${isFading ? "paused" : "running"};
+          }
+        `}</style>
       )}
-    </AnimatePresence>
+
+      <NotaWordmark
+        className={`h-10 w-auto text-white ${
+          shouldReduceMotion ? "opacity-70" : "nota-preloader-wordmark"
+        }`}
+      />
+    </div>
   );
 };
