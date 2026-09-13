@@ -19,21 +19,21 @@ export const Specs: React.FC<SpecsProps> = ({
   const cardsContainerRef = useRef<HTMLDivElement>(null);
   const shouldReduceMotion = useReducedMotion();
 
-  // Scroll scrub tracking for vertical pen descent
+  // Scroll scrub tracking for vertical pen rising UP into position
   const { scrollYProgress } = useScroll({
     target: sectionRef,
-    offset: ["start 80%", "end 40%"],
+    offset: ["start 85%", "center 45%"],
   });
 
   const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 120,
-    damping: 28,
+    stiffness: 100,
+    damping: 26,
     restDelta: 0.001,
   });
 
-  // Vertical pen translates strictly along vertical Y axis (no rotation, no diagonal drift)
-  const penTravelY = useTransform(smoothProgress, [0, 1], [-80, 520]);
-  const penOpacity = useTransform(smoothProgress, [0, 0.15, 0.85, 1], [0, 1, 1, 0.4]);
+  // Vertical pen travels UPWARDS from bottom into position behind middle card
+  const penTravelY = useTransform(smoothProgress, [0, 1], [380, -40]);
+  const penOpacity = useTransform(smoothProgress, [0, 0.08, 1], [0.3, 1, 1]);
 
   return (
     <section
