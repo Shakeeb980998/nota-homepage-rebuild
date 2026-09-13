@@ -25,9 +25,6 @@
     "react-router-dom": "^6.30.6",
     "styled-components": "^6.5.3"
   },
-  "optionalDependencies": {
-    "better-sqlite3": "^11.10.0"
-  },
   "devDependencies": {
     "@types/node": "^20.17.14",
     "typescript": "^5.7.3"
