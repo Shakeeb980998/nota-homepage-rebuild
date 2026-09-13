@@ -5,6 +5,20 @@ import { ColorVariant } from "@/types/cms";
 import { motion, AnimatePresence, useScroll, useTransform, useReducedMotion } from "framer-motion";
 import { TextInkReveal } from "@/components/TextInkReveal";
 
+/**
+ * Per-finish tagline accent color map.
+ * Keyed by ColorVariant.id (silver | graphite | blue | red | orange).
+ * This is presentation-only styling — not copy/pricing/nav data — so it can
+ * live as a client-side constant without violating the Strapi-driven rule.
+ */
+const TAGLINE_ACCENT: Record<string, string> = {
+  silver: "#2c2f38",   // dark charcoal — complements cool silver
+  graphite: "#e8e3da", // warm off-white — pops on near-black graphite
+  blue: "#1a3a2a",     // deep forest green — complements sky blue
+  red: "#2a1a3a",      // deep violet/purple — complements precision red
+  orange: "#2a1a3a",   // deep violet/purple — complements bright orange
+};
+
 interface ColorVariantsProps {
   variants: ColorVariant[];
   onOpenOrder: () => void;
@@ -78,7 +92,12 @@ export const ColorVariants: React.FC<ColorVariantsProps> = ({ variants, onOpenOr
                   <span className="text-[11px] font-sans uppercase tracking-[0.12em] text-[#8a8a8a]">
                     {activeVariant.name}
                   </span>
-                  <h4 className="text-3xl font-serif text-white leading-tight">
+                  <h4
+                    className="text-3xl font-serif leading-tight"
+                    style={{
+                      color: TAGLINE_ACCENT[activeVariant.id] ?? "#ffffff",
+                    }}
+                  >
                     {activeVariant.tagline}
                   </h4>
                   <p className="text-sm text-neutral-400 font-light">

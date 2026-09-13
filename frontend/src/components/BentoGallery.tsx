@@ -3,6 +3,7 @@
 import React from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { TextInkReveal } from "@/components/TextInkReveal";
+import { LazyImage } from "@/components/LazyImage";
 
 export const BentoGallery: React.FC = () => {
   const shouldReduceMotion = useReducedMotion();
@@ -84,9 +85,8 @@ export const BentoGallery: React.FC = () => {
                 }}
                 className={`${tile.span} ${tile.aspect} relative ${shapeRadius} overflow-hidden bg-neutral-900 border border-neutral-800 group shadow-2xl will-change-transform`}
               >
-                {/* Image */}
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                {/* Image with blur-up shimmer */}
+                <LazyImage
                   src={tile.image}
                   alt={tile.label}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 brightness-90 group-hover:brightness-100"

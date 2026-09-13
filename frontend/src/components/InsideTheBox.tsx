@@ -1,9 +1,10 @@
-﻿"use client";
+"use client";
 
 import React, { useRef, useState, useEffect } from "react";
 import { BoxItem } from "@/types/cms";
 import { motion, useScroll, useTransform, useSpring, useReducedMotion } from "framer-motion";
 import { TextInkReveal } from "@/components/TextInkReveal";
+import { LazyImage } from "@/components/LazyImage";
 
 interface InsideTheBoxProps {
   titleLine1: string;
@@ -138,11 +139,11 @@ export const InsideTheBox: React.FC<InsideTheBoxProps> = ({
                 transition={{ duration: 0.45, ease: "easeOut" }}
                 className="relative z-10 w-full flex justify-center items-center"
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <LazyImage
                   src={currentItem.image}
                   alt={currentItem.title}
                   className="w-full h-auto max-h-[460px] object-contain mx-auto"
+                  shimmerClassName="bg-[#e8e8e6]"
                 />
               </motion.div>
             </div>

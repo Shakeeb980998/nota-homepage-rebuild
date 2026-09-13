@@ -12,6 +12,7 @@ import { ColorVariants } from "@/components/ColorVariants";
 import { BentoGallery } from "@/components/BentoGallery";
 import { Footer } from "@/components/Footer";
 import { OrderModal } from "@/components/OrderModal";
+import { Preloader } from "@/components/Preloader";
 
 interface HomePageClientProps {
   initialData: HomepageData;
@@ -22,6 +23,9 @@ export const HomePageClient: React.FC<HomePageClientProps> = ({ initialData }) =
 
   return (
     <main className="min-h-screen bg-black text-white selection:bg-neutral-800 selection:text-white">
+      {/* Preloader — overlays everything until fonts are ready, then fades out */}
+      <Preloader />
+
       {/* Header */}
       <Header
         siteName={initialData.global.siteName}

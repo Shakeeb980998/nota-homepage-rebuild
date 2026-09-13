@@ -4,6 +4,7 @@ import React, { useRef, useState, useEffect } from "react";
 import { SmartPaperFeature } from "@/types/cms";
 import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
 import { TextInkReveal } from "@/components/TextInkReveal";
+import { LazyImage } from "@/components/LazyImage";
 
 interface SmartPaperProps {
   badge: string;
@@ -75,8 +76,7 @@ export const SmartPaper: React.FC<SmartPaperProps> = ({ badge, title, slides }) 
               transition={{ duration: 0.45, ease: "easeOut" }}
               className="relative z-10 w-full flex justify-center items-center"
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <LazyImage
                 src={activeImage}
                 alt={activeSlide?.title || "Nota Notebook"}
                 className="w-full h-auto max-h-[480px] object-contain mx-auto"
@@ -84,27 +84,25 @@ export const SmartPaper: React.FC<SmartPaperProps> = ({ badge, title, slides }) 
             </motion.div>
           </div>
 
-          {/* Right Column: Floating Dark Pill / Card bg #1f1f1f rounded-[16px] */}
+          {/* Right Column: Plain text directly on black background — no card/box wrapper */}
           <div className="lg:col-span-5 relative min-h-[260px] flex flex-col justify-center">
-            <div className="bg-[#1f1f1f] border border-neutral-800/80 rounded-[16px] p-8 shadow-2xl">
-              <motion.div
-                key={`text-${activeStep}`}
-                initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.45, ease: "easeOut" }}
-                className="space-y-6"
-              >
-                <span className="text-[11px] font-sans uppercase tracking-[0.12em] text-[#8a8a8a]">
-                  0{activeStep + 1} — {activeSlide?.subTitle || "Intelligent Layer"}
-                </span>
-                <h3 className="text-3xl sm:text-4xl font-serif font-normal text-white leading-snug">
-                  {activeSlide?.title}
-                </h3>
-                <p className="text-neutral-300 text-sm sm:text-base font-light leading-relaxed">
-                  {activeSlide?.text}
-                </p>
-              </motion.div>
-            </div>
+            <motion.div
+              key={`text-${activeStep}`}
+              initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, ease: "easeOut" }}
+              className="space-y-6"
+            >
+              <span className="text-[11px] font-sans uppercase tracking-[0.12em] text-[#8a8a8a]">
+                0{activeStep + 1} — {activeSlide?.subTitle || "Intelligent Layer"}
+              </span>
+              <h3 className="text-3xl sm:text-4xl font-serif font-normal text-white leading-snug">
+                {activeSlide?.title}
+              </h3>
+              <p className="text-neutral-300 text-sm sm:text-base font-light leading-relaxed">
+                {activeSlide?.text}
+              </p>
+            </motion.div>
           </div>
         </div>
 
