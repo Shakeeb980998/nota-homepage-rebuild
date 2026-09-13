@@ -7,10 +7,15 @@
   --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   background: #000000;
   color: #ffffff;
   font-family: var(--font-sans);
+  overflow-x: hidden;
 }
 
 .font-serif {
