@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useRef } from "react";
 import { SpecCard } from "@/types/cms";
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
+import { TextInkReveal } from "@/components/TextInkReveal";
 
 interface SpecsProps {
   badge?: string;
@@ -15,22 +16,55 @@ export const Specs: React.FC<SpecsProps> = ({
   title = "Specifications",
   cards,
 }) => {
-  const [activeTab, setActiveTab] = useState(0);
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const shouldReduceMotion = useReducedMotion();
+
+  // Scroll scrub tracking for icon travel
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start 65%", "end 80%"],
+  });
+
+  // Primitive #3: Small icon animates down the y-axis as the section scrolls
+  const iconTravelY = useTransform(scrollYProgress, [0, 0.8], [0, 260]);
+  const iconOpacity = useTransform(scrollYProgress, [0, 0.1, 0.7, 0.9], [0, 1, 1, 0]);
 
   return (
-    <section id="specifications" className="py-28 px-6 bg-[#f7f7f8] text-[#111111] transition-colors">
+    <section
+      id="specifications"
+      ref={sectionRef}
+      className="relative py-28 px-6 bg-[#f7f7f8] text-[#111111] overflow-hidden"
+    >
       <div className="max-w-7xl mx-auto">
-        {/* Title Header matching Image 2 */}
-        <div className="text-center max-w-3xl mx-auto space-y-2 mb-20">
-          <p className="font-serif text-3xl sm:text-4xl text-neutral-500 font-light italic">
-            {badge}
-          </p>
-          <h2 className="text-6xl sm:text-7xl md:text-8xl font-serif font-normal text-black tracking-tight leading-none">
-            {title}
-          </h2>
+        {/* Primitive #2: Text Ink-Fill Reveal for Section Headline */}
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <TextInkReveal
+            badge={badge}
+            titleLine1={badge}
+            titleLine2={title}
+            theme="light"
+            className="text-center"
+          />
         </div>
 
-        {/* 3 Spec Cards matching Image 2 */}
+        {/* Primitive #3: Traveling Icon (Pen Nib / Optical Tracker) */}
+        {!shouldReduceMotion && (
+          <div className="relative h-16 flex justify-center items-center mb-10 pointer-events-none">
+            <motion.div
+              style={{
+                y: iconTravelY,
+                opacity: iconOpacity,
+              }}
+              className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center shadow-lg z-20"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M12 2v20M17 17l-5 5-5-5" />
+              </svg>
+            </motion.div>
+          </div>
+        )}
+
+        {/* Primitive #3: Staggered Card Reveal (fades in + translateY 20px -> 0) */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start relative max-w-6xl mx-auto">
           {cards.map((card, idx) => {
             const isMiddle = idx === 1;
@@ -38,10 +72,14 @@ export const Specs: React.FC<SpecsProps> = ({
             return (
               <motion.div
                 key={card.title}
-                initial={{ opacity: 0, y: 30 }}
+                initial={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: idx * 0.15 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{
+                  duration: 0.6,
+                  delay: idx * 0.14, // ~0.1-0.15s stagger
+                  ease: "easeOut",
+                }}
                 className={`relative bg-white rounded-3xl p-8 shadow-[0_10px_35px_rgba(0,0,0,0.04)] border border-neutral-200/80 hover:shadow-[0_15px_45px_rgba(0,0,0,0.08)] transition-all ${
                   isMiddle ? "md:-translate-y-2 z-10" : ""
                 }`}
@@ -62,7 +100,6 @@ export const Specs: React.FC<SpecsProps> = ({
                   ))}
                 </div>
 
-                {/* Vertical Pen body emerging below middle card */}
                 {isMiddle && (
                   <div className="hidden md:flex absolute -bottom-36 inset-x-0 justify-center pointer-events-none -z-10 opacity-70">
                     {/* eslint-disable-next-line @next/next/no-img-element */}

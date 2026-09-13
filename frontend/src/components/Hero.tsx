@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
 
 interface HeroProps {
   titleLine1: string;
@@ -22,75 +22,86 @@ export const Hero: React.FC<HeroProps> = ({
   price = "$600",
   onOpenOrder,
 }) => {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const pinContainerRef = useRef<HTMLDivElement>(null);
+  const shouldReduceMotion = useReducedMotion();
+
+  // Scrubbing within the 100vh pin
   const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end start"],
+    target: pinContainerRef,
+    offset: ["start start", "end end"],
   });
 
-  // Dynamic flow: rotates 90 degrees and travels down into the specs section as you scroll
-  const penY = useTransform(scrollYProgress, [0, 0.5, 1], [0, 220, 560]);
-  const penRotate = useTransform(scrollYProgress, [0, 0.5, 1], [-8, 40, 90]);
-  const penScale = useTransform(scrollYProgress, [0, 0.5, 1], [1, 0.95, 0.8]);
+  // Primitive #1: Interpolate product image scale (1 -> 1.4) and translateY based on scroll progress
+  const penScale = useTransform(scrollYProgress, [0, 1], [1, 1.4]);
+  const penTranslateY = useTransform(scrollYProgress, [0, 1], [0, 90]);
+  const penRotate = useTransform(scrollYProgress, [0, 1], [-4, 6]);
 
   return (
-    <section
-      ref={containerRef}
-      className="relative min-h-[110vh] flex flex-col justify-between pt-32 pb-20 px-6 overflow-hidden bg-gradient-to-b from-[#2e3035] via-[#212226] to-[#121315]"
-    >
-      {/* Top subtle vignette lighting */}
-      <div className="absolute top-0 inset-x-0 h-96 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-white/10 via-transparent to-transparent pointer-events-none" />
+    // Outer pinned container (~200vh total height creates 100vh of pinned scroll)
+    <div ref={pinContainerRef} className="relative h-[200vh] bg-black">
+      {/* Sticky Viewport (Pins for 100vh of scroll) */}
+      <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between pt-28 pb-12 px-6 bg-gradient-to-b from-[#2e3035] via-[#212226] to-[#121315]">
+        {/* Ambient Top Vignette Glow */}
+        <div className="absolute top-0 inset-x-0 h-96 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-white/10 via-transparent to-transparent pointer-events-none" />
 
-      {/* Main Content Area */}
-      <div className="max-w-7xl mx-auto w-full relative z-10 flex flex-col justify-between flex-1">
-        {/* Horizontal Studio Pen Render that rotates into vertical on scroll */}
-        <div className="relative w-full my-auto py-8 flex items-center justify-center">
-          <motion.div
-            style={{ y: penY, rotate: penRotate, scale: penScale }}
-            className="relative w-full max-w-4xl flex items-center justify-center filter drop-shadow-[0_30px_60px_rgba(0,0,0,0.6)] z-20"
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="https://nota.uprock.pro/thumb/2/zOzK4LBsVJn0W98Pf5CalQ/364r1526/d/library_image-14634-symbol-is6ru9kkd-nota_hero_image_adaptive_866220.png"
-              alt="Nōta Smart Pen"
-              className="w-full max-h-[380px] object-contain hover:scale-[1.02] transition-transform duration-700 pointer-events-auto cursor-pointer"
-            />
-          </motion.div>
-        </div>
-
-        {/* Bottom Headline & Call To Action from reference */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-end pt-8">
-          <div className="md:col-span-7 space-y-4">
-            <span className="inline-block text-xs font-mono uppercase tracking-widest text-neutral-400">
-              {badge}
-            </span>
-            <h1 className="text-5xl sm:text-7xl lg:text-8xl font-serif font-normal text-white leading-[1.02] tracking-tight">
-              <span className="block italic">{titleLine1}</span>
-              <span className="block">{titleLine2}</span>
-            </h1>
+        <div className="max-w-7xl mx-auto w-full relative z-10 flex flex-col justify-between flex-1">
+          {/* Centered Product Image with Pinned Zoom Scrubbing */}
+          <div className="relative w-full my-auto py-6 flex items-center justify-center">
+            <motion.div
+              style={
+                shouldReduceMotion
+                  ? {}
+                  : {
+                      scale: penScale,
+                      y: penTranslateY,
+                      rotate: penRotate,
+                    }
+              }
+              className="relative w-full max-w-4xl flex items-center justify-center filter drop-shadow-[0_35px_65px_rgba(0,0,0,0.65)] z-10"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="https://nota.uprock.pro/thumb/2/zOzK4LBsVJn0W98Pf5CalQ/364r1526/d/library_image-14634-symbol-is6ru9kkd-nota_hero_image_adaptive_866220.png"
+                alt="Nōta Smart Pen"
+                className="w-full max-h-[360px] object-contain cursor-pointer transition-transform duration-500 hover:brightness-105"
+              />
+            </motion.div>
           </div>
 
-          <div className="md:col-span-5 space-y-6">
-            <p className="text-neutral-300 text-sm sm:text-base font-light leading-relaxed">
-              {subtitle}
-            </p>
-            <div className="flex flex-wrap items-center gap-4">
-              <button
-                onClick={onOpenOrder}
-                className="px-8 py-3.5 bg-white text-black font-semibold rounded-2xl hover:bg-neutral-200 transition-all text-sm tracking-tight shadow-xl"
-              >
-                {ctaText} • {price}
-              </button>
-              <a
-                href="#specifications"
-                className="px-6 py-3.5 rounded-2xl border border-white/20 text-white hover:bg-white/10 transition-all text-sm font-medium"
-              >
-                Specifications
-              </a>
+          {/* Fixed Headline & CTA layer (stays fixed in place, unaffected by pen zoom) */}
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-end relative z-20">
+            <div className="md:col-span-7 space-y-3">
+              <span className="inline-block text-xs font-mono uppercase tracking-widest text-neutral-400">
+                {badge}
+              </span>
+              <h1 className="text-5xl sm:text-7xl lg:text-8xl font-serif font-normal text-white leading-[1.02] tracking-tight">
+                <span className="block italic">{titleLine1}</span>
+                <span className="block">{titleLine2}</span>
+              </h1>
+            </div>
+
+            <div className="md:col-span-5 space-y-5">
+              <p className="text-neutral-300 text-sm sm:text-base font-light leading-relaxed">
+                {subtitle}
+              </p>
+              <div className="flex flex-wrap items-center gap-4">
+                <button
+                  onClick={onOpenOrder}
+                  className="px-8 py-3.5 bg-white text-black font-semibold rounded-2xl hover:bg-neutral-200 transition-all text-sm tracking-tight shadow-xl"
+                >
+                  {ctaText} • {price}
+                </button>
+                <a
+                  href="#specifications"
+                  className="px-6 py-3.5 rounded-2xl border border-white/20 text-white hover:bg-white/10 transition-all text-sm font-medium"
+                >
+                  Specifications
+                </a>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </section>
+    </div>
   );
 };

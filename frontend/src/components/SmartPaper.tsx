@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useRef } from "react";
 import { SmartPaperFeature } from "@/types/cms";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
+import { TextInkReveal } from "@/components/TextInkReveal";
 
 interface SmartPaperProps {
   badge: string;
@@ -11,7 +12,14 @@ interface SmartPaperProps {
 }
 
 export const SmartPaper: React.FC<SmartPaperProps> = ({ badge, title, slides }) => {
-  const [currentSlide, setCurrentSlide] = useState(2); // Slide 3 as shown in reference Image 3
+  const containerRef = useRef<HTMLDivElement>(null);
+  const shouldReduceMotion = useReducedMotion();
+
+  // Primitive #6: Pin section for scroll duration (~300vh)
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end end"],
+  });
 
   const notebookImages = [
     "https://nota.uprock.pro/thumb/2/NdNsA4zjgwV803LVWQCIkg/1276r2108/d/41_block.jpg",
@@ -20,82 +28,103 @@ export const SmartPaper: React.FC<SmartPaperProps> = ({ badge, title, slides }) 
     "https://nota.uprock.pro/thumb/2/ctuI-vbcqn2J7cCUXnBXig/1276r2108/d/41_block1212.png",
   ];
 
-  const active = slides[currentSlide % slides.length];
-  const activeImage = notebookImages[currentSlide % notebookImages.length];
+  // Discrete step index: 0, 1, 2, 3 based on scroll progress
+  const slideCount = Math.min(slides.length, notebookImages.length);
+  const stepProgress = useTransform(scrollYProgress, (v) => {
+    const step = Math.min(Math.floor(v * slideCount), slideCount - 1);
+    return Math.max(0, step);
+  });
+
+  const [activeStep, setActiveStep] = React.useState(0);
+
+  React.useEffect(() => {
+    const unsubscribe = stepProgress.on("change", (v) => {
+      setActiveStep(v);
+    });
+    return () => unsubscribe();
+  }, [stepProgress]);
+
+  const activeSlide = slides[activeStep] || slides[0];
+  const activeImage = notebookImages[activeStep] || notebookImages[0];
 
   return (
-    <section id="about" className="py-32 px-6 bg-black text-white overflow-hidden relative">
-      <div className="max-w-7xl mx-auto space-y-16">
-        {/* Big Editorial Headline from Image 3 */}
-        <div className="max-w-3xl space-y-3">
-          <p className="text-xs font-mono uppercase tracking-widest text-neutral-500">
-            {badge} {title}
-          </p>
-          <h2 className="text-5xl sm:text-6xl md:text-7xl font-serif font-light tracking-tight leading-[1.05] text-white">
-            <span className="block">No delays. No glitches.</span>
-            <span className="block italic text-neutral-400">No random effects.</span>
-          </h2>
+    <div ref={containerRef} className="relative h-[300vh] bg-black text-white">
+      {/* Primitive #6: Two-Column Sticky Layout (image left, headline+copy right) */}
+      <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between py-24 px-6">
+        <div className="max-w-7xl mx-auto w-full">
+          <TextInkReveal
+            badge={`${badge} ${title}`}
+            titleLine1="Looks like paper."
+            titleLine2="Works like a system."
+            theme="dark"
+          />
         </div>
 
-        {/* Center Stage: Open Notebook + Floating Glassmorphic Card */}
-        <div className="relative min-h-[520px] flex items-center justify-center">
-          {/* Ambient Lighting Glow */}
-          <div className="absolute w-[600px] h-[400px] bg-white/[0.04] blur-[120px] rounded-full pointer-events-none" />
+        {/* Center Stage: Two-Column Sticky Content */}
+        <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center my-auto">
+          {/* Left Column: Crossfading Product / Open Notebook Mockup */}
+          <div className="lg:col-span-7 flex justify-center items-center relative min-h-[360px] sm:min-h-[440px]">
+            <div className="absolute w-[500px] h-[350px] bg-white/[0.04] blur-[120px] rounded-full pointer-events-none" />
 
-          {/* Open Notebook Mockup */}
-          <AnimatePresence mode="wait">
             <motion.div
-              key={currentSlide}
-              initial={{ opacity: 0, scale: 0.96 }}
+              key={`img-${activeStep}`}
+              initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, scale: 0.96 }}
               animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.98 }}
-              transition={{ duration: 0.5 }}
-              className="relative z-10 w-full max-w-3xl rounded-3xl overflow-hidden shadow-2xl drop-shadow-[0_20px_50px_rgba(0,0,0,0.8)]"
+              transition={{ duration: 0.5, ease: "easeOut" }}
+              className="relative z-10 w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl drop-shadow-[0_20px_50px_rgba(0,0,0,0.85)] border border-neutral-800/80"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={activeImage}
-                alt="Nota Open Smart Paper Notebook"
-                className="w-full h-auto object-contain max-h-[480px] mx-auto rounded-3xl"
+                alt={activeSlide?.title || "Nota Notebook"}
+                className="w-full h-auto max-h-[420px] object-contain mx-auto"
               />
             </motion.div>
-          </AnimatePresence>
+          </div>
 
-          {/* Floating Glassmorphic Card from Image 3 */}
-          <motion.div
-            key={`glass-${currentSlide}`}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="absolute bottom-4 right-4 md:bottom-12 md:right-8 z-20 max-w-sm backdrop-blur-2xl bg-neutral-900/80 border border-white/10 rounded-3xl p-6 sm:p-8 text-white shadow-2xl"
-          >
-            <h3 className="text-lg sm:text-xl font-medium mb-3 tracking-tight">
-              {active.subTitle || "AI-powered structure"}
-            </h3>
-            <p className="text-xs sm:text-sm text-neutral-300 font-light leading-relaxed">
-              {active.text}
-            </p>
-          </motion.div>
+          {/* Right Column: Discrete Crossfade Headline & Copy */}
+          <div className="lg:col-span-5 relative min-h-[260px] flex flex-col justify-center">
+            <motion.div
+              key={`text-${activeStep}`}
+              initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+              className="space-y-6"
+            >
+              <span className="text-xs font-mono uppercase tracking-widest text-neutral-500">
+                0{activeStep + 1} — {activeSlide?.subTitle || "Intelligent Layer"}
+              </span>
+              <h3 className="text-3xl sm:text-4xl font-serif font-normal text-white leading-snug">
+                {activeSlide?.title}
+              </h3>
+              <p className="text-neutral-300 text-sm sm:text-base font-light leading-relaxed">
+                {activeSlide?.text}
+              </p>
+            </motion.div>
+          </div>
         </div>
 
-        {/* 4-Segment Progress Bar Slider from Image 3 */}
-        <div className="flex justify-center items-center gap-3 max-w-md mx-auto pt-6">
-          {slides.slice(0, 4).map((_, idx) => (
-            <button
-              key={idx}
-              onClick={() => setCurrentSlide(idx)}
-              aria-label={`Slide ${idx + 1}`}
-              className="group py-3 flex-1 cursor-pointer focus:outline-none"
-            >
-              <div
-                className={`h-1 rounded-full transition-all duration-300 ${
-                  currentSlide === idx ? "bg-white" : "bg-neutral-800 group-hover:bg-neutral-600"
-                }`}
-              />
-            </button>
-          ))}
+        {/* Segmented Horizontal Progress Bar advancing in sync with scroll */}
+        <div className="max-w-7xl mx-auto w-full pt-4">
+          <div className="flex items-center gap-3 max-w-sm mx-auto">
+            {Array.from({ length: slideCount }).map((_, idx) => {
+              const isActive = activeStep === idx;
+              return (
+                <div
+                  key={idx}
+                  className="h-1 flex-1 rounded-full overflow-hidden bg-neutral-800 transition-colors"
+                >
+                  <div
+                    className={`h-full transition-all duration-300 ${
+                      isActive ? "w-full bg-white" : "w-0 bg-neutral-600"
+                    }`}
+                  />
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
-    </section>
+    </div>
   );
 };
