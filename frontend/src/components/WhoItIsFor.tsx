@@ -102,7 +102,7 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
     restDelta: 0.001,
   });
 
-  // --- Phase 1: Scroll right column upward so text moves up smoothly (Frame 1 -> Frame 3) ---
+  // --- Phase 1: Scroll right column upward so text moves up smoothly ---
   const rightColumnY = useTransform(
     smoothProgress,
     [0.08, 0.42, 0.54, 0.66],
@@ -114,54 +114,32 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
   const topic2X = useTransform(smoothProgress, [0.18, 0.32], ["110%", "0%"]);
   const topic3X = useTransform(smoothProgress, [0.28, 0.42], ["110%", "0%"]);
 
-  // Fade out text as pen expands to full screen (Frame 3 -> Frame 4)
+  // Fade out text as pen expands to full screen
   const audienceOpacity = useTransform(smoothProgress, [0.54, 0.66], [1, 0]);
 
-  // --- Phase 2: White Pen Box Rises from Bottom (Frame 2: media_1789361820200 -> Frame 3: media_1789361830485) ---
+  // --- Phase 2: White Pen Photo Rises from Bottom and Expands to Full Screen (NO gray box) ---
   // Frame 2 (0.42): Rises from bottom (top: 72vh), right side (left: 45%)
   // Frame 3 (0.52): Rises higher (top: 48vh) directly under "Managers", expands left (left: 24%)
-  // Frame 4 (0.70): Expands to full screen (top: 0, left: 0, 100vw x 100vh)
-  // Frame 5 (0.90): Recedes into centered container (top: 14vh, bottom: 14vh, left: 12%, right: 12%)
+  // Full Screen (0.68 -> 1.00): Covers full screen (top: 0vh, left: 0%, right: 0, bottom: 0, pure white)
   const penTop = useTransform(
     smoothProgress,
-    [0.30, 0.42, 0.52, 0.70, 0.82, 0.90],
-    ["100vh", "72vh", "48vh", "0vh", "0vh", "14vh"]
+    [0.30, 0.42, 0.52, 0.68],
+    ["100vh", "72vh", "48vh", "0vh"]
   );
 
   const penLeft = useTransform(
     smoothProgress,
-    [0.30, 0.42, 0.52, 0.70, 0.82, 0.90],
+    [0.30, 0.42, 0.52, 0.68],
     [
       isDesktop ? "45%" : "0%",
       isDesktop ? "45%" : "0%",
       isDesktop ? "24%" : "0%",
       "0%",
-      "0%",
-      isDesktop ? "12%" : "4%",
     ]
   );
 
-  const penRight = useTransform(
-    smoothProgress,
-    [0.70, 0.82, 0.90],
-    ["0%", "0%", isDesktop ? "12%" : "4%"]
-  );
-
-  const penBottom = useTransform(
-    smoothProgress,
-    [0.70, 0.82, 0.90],
-    ["0vh", "0vh", "14vh"]
-  );
-
-  // Background color transitions to dark slate-gray in Frame 5 (media_1789361854804)
-  const penBg = useTransform(
-    smoothProgress,
-    [0.78, 0.88],
-    ["#ffffff", "#4e5158"]
-  );
-
-  // --- Phase 4: White Cover ("Works with smart paper") Slides UP over the pen (Frame 5: media_1789361854804) ---
-  const coverY = useTransform(smoothProgress, [0.84, 0.98], ["100%", "0%"]);
+  // --- Phase 3: White Cover ("Works with smart paper") Slides UP over the photo ---
+  const coverY = useTransform(smoothProgress, [0.78, 0.96], ["100%", "0%"]);
 
   const quoteText =
     introQuote ||
@@ -183,8 +161,8 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
         />
       </div>
 
-      {/* Pinned Scroll Track: Exact 5-Frame sequence matching media_1789361810856 -> media_1789361854804 */}
-      <div ref={pinTrackRef} className="relative h-[420vh]">
+      {/* Pinned Scroll Track: Clean sequence with NO gray box, pure photo expanding to full screen */}
+      <div ref={pinTrackRef} className="relative h-[400vh]">
         <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-center px-6 sm:px-10 lg:px-14">
           
           {/* Two-Column Section with Label & Upward Scrolling Text Column */}
@@ -260,7 +238,7 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
             </motion.div>
           </div>
 
-          {/* Layer 2: Pen Showcase (Exact Frame 2 -> Frame 5 reproduction) */}
+          {/* Layer 2: Pen Showcase (NO gray box, pure clean white background filling to full screen) */}
           <motion.div
             style={
               shouldReduceMotion
@@ -268,12 +246,11 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
                 : {
                     top: penTop,
                     left: penLeft,
-                    right: penRight,
-                    bottom: penBottom,
-                    backgroundColor: penBg,
+                    right: 0,
+                    bottom: 0,
                   }
             }
-            className="absolute z-20 overflow-hidden will-change-[top,left,right,bottom,background-color] pointer-events-none"
+            className="absolute z-20 bg-white overflow-hidden will-change-[top,left] pointer-events-none"
           >
             <div className="w-full h-full flex items-center justify-center p-4 sm:p-8 lg:p-12 select-none pointer-events-none">
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -285,7 +262,7 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
             </div>
           </motion.div>
 
-          {/* Layer 3: Next Section White Cover ("Works with smart paper" - Frame 5: media_1789361854804) */}
+          {/* Layer 3: Next Section White Cover ("Works with smart paper") */}
           <motion.div
             style={shouldReduceMotion ? { display: "none" } : { y: coverY }}
             className="absolute inset-0 bg-white z-30 flex flex-col justify-center px-6 sm:px-10 lg:px-14 will-change-transform pointer-events-none"
