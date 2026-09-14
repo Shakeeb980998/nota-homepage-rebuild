@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { X, CheckCircle, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 interface OrderModalProps {
   isOpen: boolean;
@@ -12,7 +12,6 @@ interface OrderModalProps {
 export const OrderModal: React.FC<OrderModalProps> = ({
   isOpen,
   onClose,
-  productPrice = "$300",
 }) => {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
@@ -46,65 +45,54 @@ export const OrderModal: React.FC<OrderModalProps> = ({
       setEmail("");
     } catch {
       setStatus("error");
-      setErrorMessage("Something went wrong! Please try again.");
+      setErrorMessage("Something went wrong! Try again");
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md transition-opacity">
-      <div className="relative w-full max-w-md bg-neutral-900 border border-neutral-800 rounded-3xl p-8 text-center shadow-2xl text-white">
-        <button
-          onClick={onClose}
-          aria-label="Close modal"
-          className="absolute top-5 right-5 text-neutral-400 hover:text-white p-2 transition-colors rounded-full hover:bg-neutral-800"
-        >
-          <X size={20} />
-        </button>
-
+    <div
+      onClick={onClose}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
+    >
+      {/* Modal Card (White background matching sample site media_1789399560879) */}
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="relative w-full max-w-[460px] bg-white rounded-xl sm:rounded-2xl px-8 py-10 sm:px-12 sm:py-12 text-center shadow-2xl text-black animate-in zoom-in-95 duration-200"
+      >
         {status === "success" ? (
-          <div className="py-8 space-y-4">
-            <CheckCircle className="w-16 h-16 text-emerald-400 mx-auto animate-bounce" />
-            <h3 className="text-2xl font-serif tracking-tight font-medium text-white">
+          <div className="py-6 space-y-4">
+            <h3 className="font-serif text-3xl sm:text-4xl text-black font-normal tracking-tight leading-snug">
               All set. We’ll keep you posted
             </h3>
-            <p className="text-neutral-400 text-sm">
-              Thank you for reserving your Nota One. You’ll receive early access and launch updates directly in your inbox.
+            <p className="text-[#666666] text-xs sm:text-sm font-sans leading-relaxed">
+              Launching soon. You’ll receive early access and insider updates directly in your inbox.
             </p>
-            <button
-              onClick={onClose}
-              className="mt-6 px-6 py-2.5 bg-white text-black font-medium rounded-full hover:bg-neutral-200 transition-colors text-sm"
-            >
-              Done
-            </button>
+            <div className="pt-4">
+              <button
+                type="button"
+                onClick={onClose}
+                className="text-xs text-[#777777] hover:text-black font-sans transition-colors cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Modal Product Image */}
-            <div className="w-full h-36 rounded-2xl overflow-hidden mb-4 relative bg-neutral-950 flex items-center justify-center">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="https://nota.uprock.pro/thumb/2/48v7oqZUAYG0LHOJ-CgFqA/1472r1008/d/library_image-14639-symbol-ibp1e2m59-popup_order-img.png"
-                alt="Nota One Reservation"
-                className="w-full h-full object-contain p-2"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <span className="inline-block text-xs uppercase tracking-widest text-neutral-500 font-mono">
-                Reservation • {productPrice}
-              </span>
-              <h3 className="text-3xl font-serif tracking-tight font-light text-white">
+            
+            {/* Title & Subtitle */}
+            <div className="space-y-2.5">
+              <h2 className="font-serif text-5xl sm:text-6xl text-black font-normal tracking-tight leading-none select-none">
                 Stay ahead
-              </h3>
-              <p className="text-neutral-400 text-sm">
-                Launching soon. Get early access and insider updates.
+              </h2>
+              <p className="text-[#666666] text-xs sm:text-[13px] font-sans leading-snug">
+                Launching soon. Get early access <br className="hidden sm:block" />
+                and insider updates
               </p>
             </div>
 
-            <div className="space-y-2 text-left">
-              <label htmlFor="modal-email" className="text-xs text-neutral-400 font-mono">
-                Your email address
-              </label>
+            {/* Underline E-mail Input */}
+            <div className="pt-3 text-left">
               <input
                 id="modal-email"
                 type="email"
@@ -114,32 +102,43 @@ export const OrderModal: React.FC<OrderModalProps> = ({
                   setEmail(e.target.value);
                   if (status === "error") setStatus("idle");
                 }}
-                placeholder="name@example.com"
-                className="w-full px-4 py-3 bg-neutral-950 border border-neutral-800 rounded-xl text-white placeholder-neutral-600 focus:outline-none focus:border-white transition-colors text-sm"
+                placeholder="E-mail"
+                className="w-full pb-2.5 pt-1 bg-transparent border-b border-[#cccccc] focus:border-black text-black placeholder-[#888888] focus:outline-none transition-colors text-sm font-sans"
               />
               {status === "error" && (
-                <p className="text-rose-400 text-xs mt-1">{errorMessage}</p>
+                <p className="text-red-600 text-xs mt-1.5 font-sans">{errorMessage}</p>
               )}
             </div>
 
-            <button
-              type="submit"
-              disabled={status === "loading"}
-              className="w-full py-3.5 bg-white text-black font-medium rounded-xl hover:bg-neutral-200 transition-all flex items-center justify-center gap-2 text-sm disabled:opacity-50"
-            >
-              {status === "loading" ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Submitting to Strapi...</span>
-                </>
-              ) : (
-                <span>Notify me</span>
-              )}
-            </button>
+            {/* Black Notify me Button */}
+            <div className="pt-2 space-y-4">
+              <button
+                type="submit"
+                disabled={status === "loading"}
+                className="w-full py-3.5 bg-black hover:bg-neutral-900 text-white font-medium rounded-lg sm:rounded-xl transition-all flex items-center justify-center gap-2 text-xs sm:text-sm font-sans cursor-pointer disabled:opacity-50 tracking-tight"
+              >
+                {status === "loading" ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin text-white" />
+                    <span>Submitting...</span>
+                  </>
+                ) : (
+                  <span>Notify me &nbsp;•</span>
+                )}
+              </button>
 
-            <p className="text-neutral-500 text-xs">
-              Saved securely to Strapi CMS with instant validation.
-            </p>
+              {/* Close Link */}
+              <div>
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="text-xs text-[#777777] hover:text-black font-sans transition-colors cursor-pointer"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+
           </form>
         )}
       </div>
