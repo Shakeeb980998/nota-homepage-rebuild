@@ -103,6 +103,13 @@ export const SmartPaper: React.FC<SmartPaperProps> = ({ badge, title, slides }) 
   const activeSlide = slides[activeStep] || slides[0];
   const activeImage = slides[activeStep]?.image || notebookImages[activeStep] || notebookImages[0];
 
+  const formattedTitles: Record<number, string> = {
+    0: "We use special paper<br/>with a nearly invisible<br/>pattern",
+    1: "Looks like paper.<br/>Works like a system.",
+    2: "No delays. No glitches.<br/>No random effects.",
+    3: "Everything you write is synced<br/>to your phone in real time",
+  };
+
   return (
     <div id="about" ref={containerRef} className="relative h-[450vh] bg-black text-white">
       {/* Sticky Viewport */}
@@ -154,67 +161,63 @@ export const SmartPaper: React.FC<SmartPaperProps> = ({ badge, title, slides }) 
           ))}
         </div>
 
-        {/* Layer C: Step 3 Revealed Dark Section (media_1789364689354) */}
+        {/* Layer C: Step 3 Revealed Dark Section (media_1789368040023) */}
+        {/* Full-bleed Studio Background Image */}
+        <div className="absolute inset-0 z-10 overflow-hidden pointer-events-none">
+          <motion.img
+            key={`img-${activeStep}`}
+            src={activeImage}
+            alt={activeSlide?.title || "Nota Notebook"}
+            initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.45, ease: "easeOut" }}
+            className="w-full h-full object-cover object-center select-none pointer-events-none"
+          />
+        </div>
+
         {/* Top-Left: Large Serif Headline */}
-        <div className="absolute top-20 sm:top-24 lg:top-28 left-6 sm:left-10 lg:left-14 z-20 max-w-sm sm:max-w-md lg:max-w-lg pointer-events-none">
+        <div className="absolute top-20 sm:top-24 lg:top-28 left-6 sm:left-10 lg:left-14 xl:left-16 z-20 max-w-md lg:max-w-xl xl:max-w-2xl pointer-events-none">
           <motion.h2
             key={`title-${activeStep}`}
             initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="font-serif text-3xl sm:text-4xl lg:text-[48px] font-normal text-white leading-[1.12] tracking-tight"
-          >
-            {activeSlide?.title}
-          </motion.h2>
+            className="font-serif text-4xl sm:text-5xl lg:text-[56px] xl:text-[64px] font-normal text-white leading-[1.05] tracking-tight"
+            dangerouslySetInnerHTML={{
+              __html: formattedTitles[activeStep] || activeSlide?.title || "",
+            }}
+          />
         </div>
 
-        {/* Center: Vertical Notebook Showcase */}
-        <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none px-6">
-          <motion.div
-            key={`img-${activeStep}`}
-            initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, scale: 0.96 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.45, ease: "easeOut" }}
-            className="flex items-center justify-center"
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={activeImage}
-              alt={activeSlide?.title || "Nota Notebook"}
-              className="w-auto h-auto max-h-[48vh] sm:max-h-[56vh] lg:max-h-[64vh] object-contain drop-shadow-[0_30px_60px_rgba(0,0,0,0.7)] select-none pointer-events-none"
-            />
-          </motion.div>
-        </div>
-
-        {/* Bottom-Right: Dark Rounded Glass Card */}
-        <div className="absolute bottom-20 sm:bottom-24 right-6 sm:right-10 lg:right-14 z-20 max-w-xs sm:max-w-sm w-full">
+        {/* Bottom-Right: Refined Dark Card */}
+        <div className="absolute bottom-16 sm:bottom-20 right-6 sm:right-10 lg:right-16 z-20 max-w-[340px] sm:max-w-[400px] lg:max-w-[420px] w-full">
           <motion.div
             key={`card-${activeStep}`}
             initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="bg-[#18181b]/90 border border-white/10 rounded-2xl p-6 sm:p-7 backdrop-blur-md shadow-2xl space-y-2.5"
+            className="bg-[#181818]/90 border border-white/10 rounded-[22px] p-6 lg:p-7 backdrop-blur-md shadow-2xl space-y-2.5"
           >
-            <h3 className="text-base sm:text-lg font-medium text-white tracking-tight">
+            <h3 className="font-sans text-base lg:text-[17px] font-medium text-white tracking-tight leading-snug">
               {activeSlide?.subTitle}
             </h3>
-            <p className="text-xs sm:text-sm text-neutral-300 font-light leading-relaxed">
+            <p className="font-sans text-xs sm:text-[13px] lg:text-[13.5px] text-neutral-300 font-light leading-[1.6]">
               {activeSlide?.text}
             </p>
           </motion.div>
         </div>
 
-        {/* Bottom-Center: 4-Segment Progress Indicator */}
-        <div className="absolute bottom-8 sm:bottom-10 left-6 sm:left-10 right-6 sm:right-10 flex justify-center z-20">
-          <div className="w-full max-w-md flex items-center gap-3">
+        {/* Bottom-Center: Sleek Hairline Progress Indicator */}
+        <div className="absolute bottom-6 sm:bottom-8 left-6 sm:left-12 right-6 sm:right-12 flex justify-center z-20">
+          <div className="w-full max-w-xl lg:max-w-2xl flex items-center gap-4 sm:gap-6">
             {Array.from({ length: slideCount }).map((_, idx) => (
               <div
                 key={idx}
-                className="h-1 flex-1 rounded-full overflow-hidden bg-neutral-800 transition-colors"
+                className="h-[1.5px] flex-1 overflow-hidden bg-white/20 transition-colors"
               >
                 <div
                   className={`h-full transition-all duration-300 ${
-                    activeStep === idx || activeStep > idx ? "w-full bg-white" : "w-0 bg-neutral-600"
+                    activeStep === idx || activeStep > idx ? "w-full bg-white" : "w-0 bg-transparent"
                   }`}
                 />
               </div>
