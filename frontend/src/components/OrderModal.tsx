@@ -110,12 +110,12 @@ export const OrderModal: React.FC<OrderModalProps> = ({
               )}
             </div>
 
-            {/* Black Notify me Button */}
+            {/* Notify me Button (hover:bg-[#ff2200] matching sample site button-notify:hover) */}
             <div className="pt-2 space-y-4">
               <button
                 type="submit"
                 disabled={status === "loading"}
-                className="w-full py-3.5 bg-black hover:bg-neutral-900 text-white font-medium rounded-lg sm:rounded-xl transition-all flex items-center justify-center gap-2 text-xs sm:text-sm font-sans cursor-pointer disabled:opacity-50 tracking-tight"
+                className="w-full py-3.5 bg-black hover:bg-[#ff2200] text-white font-medium rounded-lg sm:rounded-xl transition-colors duration-200 flex items-center justify-center gap-2 text-xs sm:text-sm font-sans cursor-pointer disabled:opacity-50 tracking-tight"
               >
                 {status === "loading" ? (
                   <>

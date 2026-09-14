@@ -104,21 +104,26 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="w-full px-4 sm:px-8 md:px-10 lg:px-14 flex items-center justify-between pointer-events-auto">
         {/* Left Side: Didone Serif Wordmark + Desktop Nav grouped together */}
         <div className="flex items-center gap-6 sm:gap-10 md:gap-14">
-          <a
-            href="#"
-            className="flex items-center gap-2 group transition-opacity hover:opacity-80"
+          <button
+            type="button"
+            onClick={() => {
+              window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+              window.location.reload();
+            }}
+            className="flex items-center gap-2 group transition-opacity hover:opacity-80 cursor-pointer bg-transparent border-none p-0 outline-none"
+            aria-label="Refresh page"
           >
             <NotaWordmark className="h-5 sm:h-6 w-auto text-white fill-white" />
             <span className="sr-only">{siteName}</span>
-          </a>
+          </button>
 
-          {/* Desktop Nav: Title/sentence case, text-sm, clean white */}
+          {/* Desktop Nav: Title/sentence case, text-sm, clean white with hover underline */}
           <nav className="hidden md:flex items-center gap-8 text-sm font-sans font-normal text-white/90">
             {links.map((link, idx) => (
               <a
                 key={link.label}
                 href={link.href}
-                className="hover:text-white transition-colors duration-200"
+                className="relative py-1 text-white/90 hover:text-white transition-colors duration-200 group/nav"
               >
                 <ScrambleText
                   text={link.label}
@@ -126,27 +131,30 @@ export const Header: React.FC<HeaderProps> = ({
                   delay={idx * 60}
                   duration={480}
                 />
+                {/* Clean hover underline indicator matching sample site (media_1789402901410.png) */}
+                <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-white transition-all duration-200 ease-out group-hover/nav:w-full" />
               </a>
             ))}
           </nav>
         </div>
 
-        {/* Right Side: White rectangular card with flower logo & Order button */}
+        {/* Right Side: White rectangular card with flower logo & Order button (Matches sample media_1789402803096 & media_1789402873932) */}
         <div className="flex items-center gap-3">
-          <div className="hidden sm:flex items-center bg-[#ffffff] text-[#000000] rounded-xl p-2 pl-4 pr-2 shadow-2xl gap-4 border border-white/20">
+          <div className="hidden sm:flex items-center bg-[#ffffff] text-[#000000] rounded-sm py-2 px-3 sm:py-2.5 sm:px-4 shadow-xl gap-4 sm:gap-6 border border-white/20">
+            {/* Flower Logo */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/nota-flower-logo.svg"
               alt="Nōta Logo"
-              className="w-6 h-6 object-contain select-none"
+              className="w-5 h-5 sm:w-6 sm:h-6 object-contain select-none"
             />
-            {/* Order Button: bg #000000, text #ffffff, rounded-lg */}
+            {/* Order Button: default bg #000000, hover bg rgb(255, 34, 0), rounded-sm */}
             <button
               onClick={onOpenOrder}
-              className="bg-[#000000] hover:bg-neutral-900 text-[#ffffff] px-6 py-2.5 rounded-lg font-sans font-medium text-xs sm:text-sm tracking-tight transition-all flex items-center gap-1.5"
+              className="bg-[#000000] hover:bg-[#ff2200] text-[#ffffff] px-4 py-2 sm:px-5 sm:py-2 rounded-sm font-sans font-medium text-xs sm:text-sm tracking-tight transition-colors duration-200 flex items-center gap-1.5 cursor-pointer"
             >
               <span>Order</span>
-              <span className="text-neutral-400 font-normal">Nota One</span>
+              <span className="text-white/60 font-normal">Nota One</span>
               <span>•</span>
               <span>{price}</span>
             </button>
@@ -154,7 +162,7 @@ export const Header: React.FC<HeaderProps> = ({
 
           <button
             onClick={onOpenOrder}
-            className="sm:hidden bg-[#ffffff] text-[#000000] px-4 py-2 rounded-xl text-xs font-semibold"
+            className="sm:hidden bg-[#ffffff] hover:bg-[#ff2200] text-[#000000] hover:text-white px-3.5 py-1.5 rounded-sm text-xs font-semibold transition-colors duration-200 cursor-pointer"
           >
             Order • {price}
           </button>
@@ -162,7 +170,7 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Mobile Hamburger Toggle */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 text-neutral-300 hover:text-white"
+            className="md:hidden p-2 text-neutral-300 hover:text-white cursor-pointer"
             aria-label="Toggle Navigation Menu"
           >
             {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
