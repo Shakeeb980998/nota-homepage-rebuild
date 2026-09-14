@@ -16,12 +16,10 @@ const DividingLine: React.FC<{
   progress: any;
   shouldReduceMotion: boolean | null;
 }> = ({ index, progress, shouldReduceMotion }) => {
-  // Lines draw down from right to left between 0.08 and 0.19 (matching media_1789366700783 and media_1789365968867)
-  const lineStart = 0.08 + (4 - index) * 0.015;
-  const lineEnd = lineStart + 0.055;
-  const scaleY = useTransform(progress, [lineStart, Math.min(lineEnd, 0.19)], [0, 1]);
-  // Line fades out right before curtain columns drop down
-  const opacity = useTransform(progress, [0.19, 0.22], [1, 0]);
+  // Lines draw down from right to left between 0.08 and 0.17 (matching media_1789366700783 and media_1789365968867)
+  const lineStart = 0.08 + (4 - index) * 0.014;
+  const lineEnd = lineStart + 0.045;
+  const scaleY = useTransform(progress, [lineStart, Math.min(lineEnd, 0.17)], [0, 1]);
 
   if (shouldReduceMotion) return null;
 
@@ -30,7 +28,6 @@ const DividingLine: React.FC<{
       style={{
         left: `${((index + 1) / 6) * 100}%`,
         scaleY,
-        opacity,
         transformOrigin: "top",
       }}
       className="absolute top-0 w-[1px] h-full bg-neutral-300 pointer-events-none will-change-transform"
@@ -38,13 +35,13 @@ const DividingLine: React.FC<{
   );
 };
 
-// Vertical Curtain Column that drops down AFTER lines are drawn and faded (media_1789365992897)
+// Vertical Curtain Column that drops down AFTER lines are drawn and vanished (media_1789365992897)
 const CurtainColumn: React.FC<{
   index: number;
   progress: any;
   shouldReduceMotion: boolean | null;
 }> = ({ index, progress, shouldReduceMotion }) => {
-  // Drops down between 0.22 and 0.40 in staggered cascade from left to right (matching media_1789365992897)
+  // Drops down between 0.22 and 0.42 in staggered cascade from left to right (matching media_1789365992897)
   const colStart = 0.22 + index * 0.024;
   const colEnd = colStart + 0.10;
   const y = useTransform(progress, [colStart, colEnd], ["0%", "100%"]);
@@ -81,6 +78,10 @@ export const SmartPaper: React.FC<SmartPaperProps> = ({ badge, title, slides }) 
   // Title ("Works with smart paper") fades out cleanly before dividing lines draw (0.01 -> 0.06)
   const titleFadeOpacity = useTransform(scrollYProgress, [0.01, 0.06], [1, 0]);
   const titleDisplay = useTransform(scrollYProgress, (v) => (v >= 0.07 ? "none" : "flex"));
+
+  // Dividing lines draw down (0.08 -> 0.17) and vanish completely before curtain drop begins (0.17 -> 0.19)
+  const linesOpacity = useTransform(scrollYProgress, [0.17, 0.19], [1, 0]);
+  const linesDisplay = useTransform(scrollYProgress, (v) => (v >= 0.19 ? "none" : "block"));
 
   // Step indices mapped across [0.42, 0.95] for the 4 notebook slides
   const stepIndex = useTransform(scrollYProgress, (v) => {
@@ -122,8 +123,15 @@ export const SmartPaper: React.FC<SmartPaperProps> = ({ badge, title, slides }) 
           </h2>
         </motion.div>
 
-        {/* Layer B1: 5 Vertical Dividing Lines Drawing Down from Top (media_1789366700783 & media_1789365968867) */}
-        <div className="absolute inset-0 z-45 pointer-events-none overflow-hidden">
+        {/* Layer B1: 5 Vertical Dividing Lines (vanishes with display: none before columns drop) */}
+        <motion.div
+          style={
+            shouldReduceMotion
+              ? { display: "none" }
+              : { opacity: linesOpacity, display: linesDisplay }
+          }
+          className="absolute inset-0 z-45 pointer-events-none overflow-hidden"
+        >
           {Array.from({ length: 5 }).map((_, i) => (
             <DividingLine
               key={`line-${i}`}
@@ -132,7 +140,7 @@ export const SmartPaper: React.FC<SmartPaperProps> = ({ badge, title, slides }) 
               shouldReduceMotion={shouldReduceMotion}
             />
           ))}
-        </div>
+        </motion.div>
 
         {/* Layer B2: 6 Vertical Curtain Columns Dropping Down (media_1789365992897) */}
         <div className="absolute inset-0 z-40 pointer-events-none overflow-hidden flex">
