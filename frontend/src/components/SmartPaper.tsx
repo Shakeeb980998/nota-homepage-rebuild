@@ -16,8 +16,8 @@ const CurtainColumn: React.FC<{
   progress: any;
   shouldReduceMotion: boolean | null;
 }> = ({ index, progress, shouldReduceMotion }) => {
-  const start = 0.02 + index * 0.02;
-  const end = start + 0.10;
+  const start = 0.08 + index * 0.03;
+  const end = start + 0.14;
   const y = useTransform(progress, [start, end], ["0%", "100%"]);
 
   if (shouldReduceMotion) return null;
@@ -25,7 +25,7 @@ const CurtainColumn: React.FC<{
   return (
     <motion.div
       style={{ y }}
-      className="w-1/6 h-full bg-white will-change-transform border-r border-neutral-100/20 last:border-r-0"
+      className="w-1/6 h-full bg-white will-change-transform border-r border-neutral-100/10 last:border-r-0"
     />
   );
 };
@@ -49,13 +49,13 @@ export const SmartPaper: React.FC<SmartPaperProps> = ({ badge, title, slides }) 
 
   const slideCount = Math.min(slides.length, notebookImages.length);
 
-  // Initial title ("Works with smart paper") fades out quickly as scroll begins (media_1789364660655 -> media_1789364677500)
-  const titleFadeOpacity = useTransform(scrollYProgress, [0.00, 0.05], [1, 0]);
+  // Title ("Works with smart paper") holds for a beat then fades out as curtains start dropping (0.04 -> 0.12)
+  const titleFadeOpacity = useTransform(scrollYProgress, [0.04, 0.12], [1, 0]);
 
-  // Step indices mapped across [0.22, 0.90] for the 4 notebook slides
+  // Step indices mapped across [0.28, 0.90] for the 4 notebook slides
   const stepIndex = useTransform(scrollYProgress, (v) => {
-    if (v < 0.40) return 0;
-    if (v < 0.60) return 1;
+    if (v < 0.44) return 0;
+    if (v < 0.62) return 1;
     if (v < 0.80) return 2;
     return 3;
   });
@@ -77,13 +77,13 @@ export const SmartPaper: React.FC<SmartPaperProps> = ({ badge, title, slides }) 
       {/* Sticky Viewport */}
       <div className="sticky top-0 h-screen w-full overflow-hidden z-10 flex flex-col justify-between">
         
-        {/* Layer A: Step 1 Centered Title ("Works with smart paper" - media_1789364660655) */}
+        {/* Layer A: Step 1 Centered Title - Exact font, size, and layout matching media_1789364660655 */}
         <motion.div
           style={shouldReduceMotion ? { display: "none" } : { opacity: titleFadeOpacity }}
           className="absolute inset-0 z-50 flex flex-col items-center justify-center text-center px-6 pointer-events-none"
         >
-          <h2 className="font-serif text-5xl sm:text-7xl lg:text-[100px] font-normal leading-[1.05] tracking-tight">
-            <span className="text-[#8a8a8a] block">Works with</span>
+          <h2 className="font-serif text-6xl sm:text-8xl md:text-9xl lg:text-[130px] font-normal leading-[0.92] tracking-tight select-none">
+            <span className="text-[#888888] block">Works with</span>
             <span className="text-[#000000] block mt-1 sm:mt-2">smart paper</span>
           </h2>
         </motion.div>
