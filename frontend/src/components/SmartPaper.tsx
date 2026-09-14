@@ -3,8 +3,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import { SmartPaperFeature } from "@/types/cms";
 import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
-import { TextInkReveal } from "@/components/TextInkReveal";
-import { LazyImage } from "@/components/LazyImage";
 
 interface SmartPaperProps {
   badge: string;
@@ -12,11 +10,31 @@ interface SmartPaperProps {
   slides: SmartPaperFeature[];
 }
 
+// 6 Vertical White Curtain Columns that drop down in a staggered cascade (media_1789364677500)
+const CurtainColumn: React.FC<{
+  index: number;
+  progress: any;
+  shouldReduceMotion: boolean | null;
+}> = ({ index, progress, shouldReduceMotion }) => {
+  const start = 0.02 + index * 0.02;
+  const end = start + 0.10;
+  const y = useTransform(progress, [start, end], ["0%", "100%"]);
+
+  if (shouldReduceMotion) return null;
+
+  return (
+    <motion.div
+      style={{ y }}
+      className="w-1/6 h-full bg-white will-change-transform border-r border-neutral-100/20 last:border-r-0"
+    />
+  );
+};
+
 export const SmartPaper: React.FC<SmartPaperProps> = ({ badge, title, slides }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const shouldReduceMotion = useReducedMotion();
 
-  // Pin section for 320vh
+  // Pin section for 380vh
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end end"],
@@ -31,15 +49,14 @@ export const SmartPaper: React.FC<SmartPaperProps> = ({ badge, title, slides }) 
 
   const slideCount = Math.min(slides.length, notebookImages.length);
 
-  // Transition cover: Glides up and off-screen (0% -> -100%) during the first 14% of scroll
-  const coverY = useTransform(scrollYProgress, [0.00, 0.14], ["0%", "-100%"]);
-  const coverOpacity = useTransform(scrollYProgress, [0.12, 0.15], [1, 0]);
+  // Initial title ("Works with smart paper") fades out quickly as scroll begins (media_1789364660655 -> media_1789364677500)
+  const titleFadeOpacity = useTransform(scrollYProgress, [0.00, 0.05], [1, 0]);
 
-  // Step indices mapped across [0.12, 0.85] with release buffer for the 4 notebook slides
+  // Step indices mapped across [0.22, 0.90] for the 4 notebook slides
   const stepIndex = useTransform(scrollYProgress, (v) => {
-    if (v < 0.32) return 0;
-    if (v < 0.52) return 1;
-    if (v < 0.72) return 2;
+    if (v < 0.40) return 0;
+    if (v < 0.60) return 1;
+    if (v < 0.80) return 2;
     return 3;
   });
 
@@ -53,98 +70,104 @@ export const SmartPaper: React.FC<SmartPaperProps> = ({ badge, title, slides }) 
   }, [stepIndex]);
 
   const activeSlide = slides[activeStep] || slides[0];
-  const activeImage = notebookImages[activeStep] || notebookImages[0];
+  const activeImage = slides[activeStep]?.image || notebookImages[activeStep] || notebookImages[0];
 
   return (
-    // Pinned container with clean unpin release buffer
-    <div ref={containerRef} className="relative h-[320vh] bg-black text-white">
+    <div id="about" ref={containerRef} className="relative h-[380vh] bg-black text-white">
       {/* Sticky Viewport */}
-      <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between pt-24 pb-12 px-6 sm:px-10 lg:px-14 z-10">
+      <div className="sticky top-0 h-screen w-full overflow-hidden z-10 flex flex-col justify-between">
         
-        {/* Continuous White Cover Handoff from Previous Pen Transition */}
+        {/* Layer A: Step 1 Centered Title ("Works with smart paper" - media_1789364660655) */}
         <motion.div
-          style={shouldReduceMotion ? { display: "none" } : { y: coverY, opacity: coverOpacity }}
-          className="absolute inset-0 bg-white z-40 flex flex-col justify-center px-6 sm:px-10 lg:px-14 will-change-transform pointer-events-none"
+          style={shouldReduceMotion ? { display: "none" } : { opacity: titleFadeOpacity }}
+          className="absolute inset-0 z-50 flex flex-col items-center justify-center text-center px-6 pointer-events-none"
         >
-          <div className="max-w-7xl mx-auto w-full">
-            <h2 className="font-serif text-5xl sm:text-7xl lg:text-[96px] font-normal leading-[1.05] tracking-tight">
-              <span className="text-[#8a8a8a] block">Works with</span>
-              <span className="text-[#000000] block mt-1 sm:mt-2">smart paper</span>
-            </h2>
-          </div>
+          <h2 className="font-serif text-5xl sm:text-7xl lg:text-[100px] font-normal leading-[1.05] tracking-tight">
+            <span className="text-[#8a8a8a] block">Works with</span>
+            <span className="text-[#000000] block mt-1 sm:mt-2">smart paper</span>
+          </h2>
         </motion.div>
 
-        <div className="max-w-7xl mx-auto w-full">
-          <TextInkReveal
-            badge={`${badge} ${title}`}
-            titleLine1="Looks like paper."
-            titleLine2="Works like a system."
-            theme="dark"
-          />
+        {/* Layer B: Step 2 6 Vertical Curtain Columns Dropping Down (media_1789364677500) */}
+        <div className="absolute inset-0 z-40 pointer-events-none overflow-hidden flex">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <CurtainColumn
+              key={i}
+              index={i}
+              progress={scrollYProgress}
+              shouldReduceMotion={shouldReduceMotion}
+            />
+          ))}
         </div>
 
-        {/* Center Stage: Two-Column Sticky Layout */}
-        <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center my-auto">
-          {/* Left Column: Un-boxed large image directly on section background (~60-70% width) */}
-          <div className="lg:col-span-7 flex justify-center items-center relative min-h-[260px] sm:min-h-[360px] lg:min-h-[440px]">
-            <motion.div
-              key={`img-${activeStep}`}
-              initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, scale: 0.96 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.45, ease: "easeOut" }}
-              className="relative z-10 w-full flex justify-center items-center"
-            >
-              <LazyImage
-                src={activeImage}
-                alt={activeSlide?.title || "Nota Notebook"}
-                className="w-full h-auto max-h-[300px] sm:max-h-[380px] lg:max-h-[480px] object-contain mx-auto"
-              />
-            </motion.div>
-          </div>
-
-          {/* Right Column: Plain text directly on black background — no card/box wrapper */}
-          <div className="lg:col-span-5 relative min-h-[260px] flex flex-col justify-center">
-            <motion.div
-              key={`text-${activeStep}`}
-              initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.45, ease: "easeOut" }}
-              className="space-y-6"
-            >
-              <span className="text-[11px] font-sans uppercase tracking-[0.12em] text-[#8a8a8a]">
-                0{activeStep + 1} — {activeSlide?.subTitle || "Intelligent Layer"}
-              </span>
-              <h3 className="text-3xl sm:text-4xl font-serif font-normal text-white leading-snug">
-                {activeSlide?.title}
-              </h3>
-              <p className="text-neutral-300 text-sm sm:text-base font-light leading-relaxed">
-                {activeSlide?.text}
-              </p>
-            </motion.div>
-          </div>
+        {/* Layer C: Step 3 Revealed Dark Section (media_1789364689354) */}
+        {/* Top-Left: Large Serif Headline */}
+        <div className="absolute top-20 sm:top-24 lg:top-28 left-6 sm:left-10 lg:left-14 z-20 max-w-sm sm:max-w-md lg:max-w-lg pointer-events-none">
+          <motion.h2
+            key={`title-${activeStep}`}
+            initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="font-serif text-3xl sm:text-4xl lg:text-[48px] font-normal text-white leading-[1.12] tracking-tight"
+          >
+            {activeSlide?.title}
+          </motion.h2>
         </div>
 
-        {/* Segmented Horizontal Progress Bar advancing in sync with scroll */}
-        <div className="max-w-7xl mx-auto w-full pt-4">
-          <div className="flex items-center gap-3 max-w-sm mx-auto">
-            {Array.from({ length: slideCount }).map((_, idx) => {
-              const isActive = activeStep === idx;
-              const isPassed = activeStep > idx;
-              return (
+        {/* Center: Vertical Notebook Showcase */}
+        <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none px-6">
+          <motion.div
+            key={`img-${activeStep}`}
+            initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, scale: 0.96 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.45, ease: "easeOut" }}
+            className="flex items-center justify-center"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={activeImage}
+              alt={activeSlide?.title || "Nota Notebook"}
+              className="w-auto h-auto max-h-[48vh] sm:max-h-[56vh] lg:max-h-[64vh] object-contain drop-shadow-[0_30px_60px_rgba(0,0,0,0.7)] select-none pointer-events-none"
+            />
+          </motion.div>
+        </div>
+
+        {/* Bottom-Right: Dark Rounded Glass Card */}
+        <div className="absolute bottom-20 sm:bottom-24 right-6 sm:right-10 lg:right-14 z-20 max-w-xs sm:max-w-sm w-full">
+          <motion.div
+            key={`card-${activeStep}`}
+            initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="bg-[#18181b]/90 border border-white/10 rounded-2xl p-6 sm:p-7 backdrop-blur-md shadow-2xl space-y-2.5"
+          >
+            <h3 className="text-base sm:text-lg font-medium text-white tracking-tight">
+              {activeSlide?.subTitle}
+            </h3>
+            <p className="text-xs sm:text-sm text-neutral-300 font-light leading-relaxed">
+              {activeSlide?.text}
+            </p>
+          </motion.div>
+        </div>
+
+        {/* Bottom-Center: 4-Segment Progress Indicator */}
+        <div className="absolute bottom-8 sm:bottom-10 left-6 sm:left-10 right-6 sm:right-10 flex justify-center z-20">
+          <div className="w-full max-w-md flex items-center gap-3">
+            {Array.from({ length: slideCount }).map((_, idx) => (
+              <div
+                key={idx}
+                className="h-1 flex-1 rounded-full overflow-hidden bg-neutral-800 transition-colors"
+              >
                 <div
-                  key={idx}
-                  className="h-1 flex-1 rounded-full overflow-hidden bg-neutral-800 transition-colors"
-                >
-                  <div
-                    className={`h-full transition-all duration-300 ${
-                      isActive || isPassed ? "w-full bg-white" : "w-0 bg-neutral-600"
-                    }`}
-                  />
-                </div>
-              );
-            })}
+                  className={`h-full transition-all duration-300 ${
+                    activeStep === idx || activeStep > idx ? "w-full bg-white" : "w-0 bg-neutral-600"
+                  }`}
+                />
+              </div>
+            ))}
           </div>
         </div>
+
       </div>
     </div>
   );
