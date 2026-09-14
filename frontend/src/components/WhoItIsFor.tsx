@@ -80,78 +80,68 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
   audiences,
 }) => {
   const pinTrackRef = useRef<HTMLDivElement>(null);
-  const penSectionRef = useRef<HTMLDivElement>(null);
   const shouldReduceMotion = useReducedMotion();
 
-  // Track pinned scroll scrub across topics reveal
+  // Unified master scroll track for Audience reveal, Pen Entrance, Full-Bleed Expansion, and Next Section Hand-off
   const { scrollYProgress } = useScroll({
     target: pinTrackRef,
     offset: ["start start", "end end"],
   });
 
   const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 140,
-    damping: 26,
+    stiffness: 120,
+    damping: 24,
     restDelta: 0.001,
   });
 
-  // Staggered horizontal slide-in from right (110% -> 0%) matching sample site keyframes
-  const topic1X = useTransform(smoothProgress, [0.10, 0.40], ["110%", "0%"]);
-  const topic2X = useTransform(smoothProgress, [0.30, 0.60], ["110%", "0%"]);
-  const topic3X = useTransform(smoothProgress, [0.50, 0.80], ["110%", "0%"]);
+  // --- Phase 1: 3 Audience Topics Sliding in from Right ---
+  const topic1X = useTransform(smoothProgress, [0.08, 0.24], ["110%", "0%"]);
+  const topic2X = useTransform(smoothProgress, [0.18, 0.34], ["110%", "0%"]);
+  const topic3X = useTransform(smoothProgress, [0.28, 0.44], ["110%", "0%"]);
 
-  // Track scroll scrub for the white pen showcase section (pinned flight from 0 to 1)
-  const { scrollYProgress: penScrollProgress } = useScroll({
-    target: penSectionRef,
-    offset: ["start start", "end end"],
-  });
+  // Audience Content Fade & Drift Up as Pen Expands
+  const audienceOpacity = useTransform(smoothProgress, [0.44, 0.52], [1, 0]);
+  const audienceY = useTransform(smoothProgress, [0.44, 0.52], ["0px", "-40px"]);
 
-  const smoothPenProgress = useSpring(penScrollProgress, {
-    stiffness: 100,
-    damping: 20,
-    restDelta: 0.001,
-  });
+  // --- Phase 2 & 3: Pen Card Enters & Expands to Full Screen (Matching media_1789358417860 -> media_1789358383060) ---
+  // Entrance at 0.28 -> 0.44: Card rises into view from bottom (52vh), holding horizontal pen
+  // Expansion at 0.44 -> 0.64: Card expands to 100vw x 100vh full-bleed
+  // Hold at 0.64 -> 0.76: Holds full-bleed white pen showcase
+  // Recession at 0.76 -> 0.88: Shrinks down slightly into dark container (media_1789358453483)
+  const cardY = useTransform(
+    smoothProgress,
+    [0.26, 0.44, 0.64, 0.76, 0.88],
+    ["110vh", "50vh", "0vh", "0vh", "6vh"]
+  );
+  const cardWidth = useTransform(
+    smoothProgress,
+    [0.26, 0.44, 0.64, 0.76, 0.88],
+    ["78vw", "78vw", "100vw", "100vw", "82vw"]
+  );
+  const cardHeight = useTransform(
+    smoothProgress,
+    [0.26, 0.44, 0.64, 0.76, 0.88],
+    ["44vh", "44vh", "100vh", "100vh", "65vh"]
+  );
+  const cardRadius = useTransform(
+    smoothProgress,
+    [0.26, 0.44, 0.64, 0.76, 0.88],
+    [24, 24, 0, 0, 20]
+  );
+  const cardBg = useTransform(
+    smoothProgress,
+    [0.64, 0.76, 0.88],
+    ["#ffffff", "#ffffff", "#383b42"]
+  );
+  const penScale = useTransform(
+    smoothProgress,
+    [0.26, 0.44, 0.64, 0.76, 0.88],
+    [0.88, 0.94, 1.05, 1.05, 0.92]
+  );
 
-  // Container scale / crop via clipPath inset:
-  // 0% -> 35%: container expands from ~55% centered box to full-bleed (100vw x 100vh)
-  // 35% -> 55%: holds beat at full-bleed
-  // 55% -> 100%: shrinks back down and collapses to near-0 height
-  const clipInset = useTransform(smoothPenProgress, (v) => {
-    // 1. Entrance: 0% -> 35%
-    if (v <= 0.35) {
-      const t = Math.max(0, v / 0.35); // 0 -> 1
-      const tb = (1 - t) * 25; // 25% -> 0%
-      const lr = (1 - t) * 22.5; // 22.5% -> 0%
-      const radius = Math.round((1 - t) * 24); // 24px -> 0px
-      return `inset(${tb.toFixed(2)}% ${lr.toFixed(2)}% ${tb.toFixed(2)}% ${lr.toFixed(2)}% round ${radius}px)`;
-    }
-    // 2. Hold: 35% -> 55%
-    if (v <= 0.55) {
-      return "inset(0% 0% 0% 0% round 0px)";
-    }
-    // 3. Exit: 55% -> 100%
-    const t = Math.min(1, (v - 0.55) / 0.45); // 0 -> 1
-    const tb = t * 50; // collapses to 50% top and 50% bottom (0 height)
-    const lr = t * 25;
-    const radius = Math.round(t * 16);
-    return `inset(${tb.toFixed(2)}% ${lr.toFixed(2)}% ${tb.toFixed(2)}% ${lr.toFixed(2)}% round ${radius}px)`;
-  });
-
-  // Container opacity crossfade (1 -> 0 between 70% and 95%) with soft power1.inOut ease
-  const containerOpacity = useTransform(smoothPenProgress, (v) => {
-    if (v <= 0.70) return 1;
-    if (v >= 0.95) return 0;
-    const t = (v - 0.70) / 0.25;
-    return 1 - (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
-  });
-
-  // Next section title reveal on the black background behind the container (fades in 60% -> 90%)
-  const titleOpacity = useTransform(smoothPenProgress, (v) => {
-    if (v <= 0.60) return 0;
-    if (v >= 0.90) return 1;
-    const t = (v - 0.60) / 0.30;
-    return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
-  });
+  // --- Phase 4: Disappear into Next Section "Works with smart paper" (Matching media_1789358453483) ---
+  // White cover panel slides up from 100% to 0% between 0.78 and 0.98, seamlessly covering pen
+  const coverY = useTransform(smoothProgress, [0.78, 0.98], ["100%", "0%"]);
 
   const quoteText =
     introQuote ||
@@ -164,7 +154,7 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
 
   return (
     <section id="who-it-is-for" className="bg-black text-white relative z-20">
-      {/* Top Manifesto Quote (Matches sample site media_178932019030.png - NO border line) */}
+      {/* Top Manifesto Quote (Matches sample site media_178932019030.png) */}
       <div className="pt-28 sm:pt-36 pb-16 sm:pb-24 px-6 sm:px-10 lg:px-14 max-w-7xl mx-auto">
         <ScrollIlluminatedText
           text={quoteText}
@@ -173,10 +163,15 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
         />
       </div>
 
-      {/* Pinned Two-Column Section: Label on Left, Sticky Copy + Scroll-Scrubbed Topics on Right */}
-      <div ref={pinTrackRef} className="relative h-[260vh]">
+      {/* Pinned Scroll Track: Audience scrub + Pen entrance, full-screen scale, and exit cover */}
+      <div ref={pinTrackRef} className="relative h-[380vh]">
         <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-center px-6 sm:px-10 lg:px-14">
-          <div className="max-w-7xl mx-auto w-full flex flex-col lg:flex-row justify-between items-start gap-8 lg:gap-16">
+          
+          {/* Layer 1: Two-Column Section with Label, Illuminated Copy & 3 Audience Cards */}
+          <motion.div
+            style={shouldReduceMotion ? {} : { opacity: audienceOpacity, y: audienceY }}
+            className="max-w-7xl mx-auto w-full flex flex-col lg:flex-row justify-between items-start gap-8 lg:gap-16 relative z-10 will-change-[opacity,transform]"
+          >
             {/* Left Column: Label */}
             <div className="shrink-0 pt-2">
               <span className="text-xs sm:text-sm font-mono uppercase tracking-[0.15em] text-[#8a8a8a] block">
@@ -185,7 +180,7 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
             </div>
 
             {/* Right Column: Illuminated Headline Copy + 3 Sliding Topics */}
-            <div className="w-full lg:max-w-2xl ml-auto space-y-12 sm:space-y-16">
+            <div className="w-full lg:max-w-2xl ml-auto space-y-10 sm:space-y-14">
               {/* Word-by-Word Scroll Illuminated Copy */}
               <div className="space-y-4">
                 <ScrollIlluminatedText
@@ -198,7 +193,7 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
                 />
               </div>
 
-              {/* 3 Audience Topics Sliding in from off-screen Right (110% -> 0%) */}
+              {/* 3 Audience Topics Sliding in from off-screen Right */}
               <div className="space-y-8 sm:space-y-10 overflow-hidden py-2">
                 {/* Topic 1: Students & Learners */}
                 <motion.div
@@ -243,52 +238,49 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
                 </motion.div>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Pinned Pen Scale/Crop Full-Bleed Transition (Reference sequence) */}
-      <div
-        ref={penSectionRef}
-        className="relative h-[180vh] bg-black text-white pointer-events-none"
-      >
-        <div className="sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center">
-          {/* Background Behind Container: Next section title reveals starting around 60% progress */}
-          <motion.div
-            style={shouldReduceMotion ? { opacity: 1 } : { opacity: titleOpacity }}
-            className="absolute top-20 sm:top-24 left-6 sm:left-10 lg:left-14 z-10 max-w-7xl pointer-events-none"
-          >
-            <span className="block italic text-[#8a8a8a] text-xs sm:text-sm font-mono uppercase tracking-[0.15em] mb-2">
-              Works with smart paper
-            </span>
-            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif font-normal text-white leading-tight tracking-tight">
-              <span className="block">Looks like paper.</span>
-              <span className="block">Works like a system.</span>
-            </h2>
           </motion.div>
 
-          {/* Pen Container: Scales from ~55% centered box up to 100vw x 100vh full-bleed, holds beat, then collapses and dissolves */}
+          {/* Layer 2: Pen Card (Enters from bottom, scales to 100vw x 100vh full-bleed, then recedes) */}
           <motion.div
             style={
               shouldReduceMotion
-                ? { opacity: containerOpacity }
+                ? { display: "none" }
                 : {
-                    clipPath: clipInset,
-                    opacity: containerOpacity,
-                    willChange: "clip-path, opacity",
+                    y: cardY,
+                    width: cardWidth,
+                    height: cardHeight,
+                    borderRadius: cardRadius,
+                    backgroundColor: cardBg,
                   }
             }
-            className="absolute inset-0 bg-white flex items-center justify-center overflow-hidden z-20 shadow-2xl"
+            className="absolute left-1/2 -translate-x-1/2 top-0 z-20 flex items-center justify-center overflow-hidden shadow-2xl will-change-transform pointer-events-none"
           >
-            <div className="w-full max-w-5xl px-6 flex items-center justify-center select-none pointer-events-none">
+            <motion.div
+              style={shouldReduceMotion ? {} : { scale: penScale }}
+              className="w-full max-w-5xl px-6 flex items-center justify-center select-none will-change-transform"
+            >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/nota_horizontal_pen.png"
-                alt="Nōta Smart Pen full-bleed showcase"
-                className="w-full max-w-4xl h-auto object-contain select-none pointer-events-none drop-shadow-[0_20px_40px_rgba(0,0,0,0.12)]"
+                alt="Nōta Smart Pen showcase"
+                className="w-full max-w-3xl sm:max-w-4xl lg:max-w-5xl max-h-[35vh] sm:max-h-[45vh] lg:max-h-[55vh] object-contain select-none drop-shadow-[0_20px_40px_rgba(0,0,0,0.14)]"
               />
+            </motion.div>
+          </motion.div>
+
+          {/* Layer 3: Next Section White Cover ("Works with smart paper" - media_1789358453483) */}
+          <motion.div
+            style={shouldReduceMotion ? { display: "none" } : { y: coverY }}
+            className="absolute inset-0 bg-white z-30 flex flex-col justify-center px-6 sm:px-10 lg:px-14 will-change-transform shadow-[0_-20px_50px_rgba(0,0,0,0.18)] pointer-events-none"
+          >
+            <div className="max-w-7xl mx-auto w-full">
+              <h2 className="font-serif text-5xl sm:text-7xl lg:text-[96px] font-normal leading-[1.05] tracking-tight">
+                <span className="text-[#8a8a8a] block">Works with</span>
+                <span className="text-[#000000] block mt-1 sm:mt-2">smart paper</span>
+              </h2>
             </div>
           </motion.div>
+
         </div>
       </div>
     </section>

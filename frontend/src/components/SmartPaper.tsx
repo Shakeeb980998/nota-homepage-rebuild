@@ -16,7 +16,7 @@ export const SmartPaper: React.FC<SmartPaperProps> = ({ badge, title, slides }) 
   const containerRef = useRef<HTMLDivElement>(null);
   const shouldReduceMotion = useReducedMotion();
 
-  // Pin section for ~300vh
+  // Pin section for 320vh
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end end"],
@@ -31,11 +31,15 @@ export const SmartPaper: React.FC<SmartPaperProps> = ({ badge, title, slides }) 
 
   const slideCount = Math.min(slides.length, notebookImages.length);
 
-  // Pin release buffer: Map steps across [0, 0.80] so the final slide holds firmly for the remaining 20% before unpinning
+  // Transition cover: Glides up and off-screen (0% -> -100%) during the first 14% of scroll
+  const coverY = useTransform(scrollYProgress, [0.00, 0.14], ["0%", "-100%"]);
+  const coverOpacity = useTransform(scrollYProgress, [0.12, 0.15], [1, 0]);
+
+  // Step indices mapped across [0.12, 0.85] with release buffer for the 4 notebook slides
   const stepIndex = useTransform(scrollYProgress, (v) => {
-    if (v < 0.22) return 0;
-    if (v < 0.45) return 1;
-    if (v < 0.68) return 2;
+    if (v < 0.32) return 0;
+    if (v < 0.52) return 1;
+    if (v < 0.72) return 2;
     return 3;
   });
 
@@ -53,9 +57,23 @@ export const SmartPaper: React.FC<SmartPaperProps> = ({ badge, title, slides }) 
 
   return (
     // Pinned container with clean unpin release buffer
-    <div ref={containerRef} className="relative h-[300vh] bg-black text-white">
+    <div ref={containerRef} className="relative h-[320vh] bg-black text-white">
       {/* Sticky Viewport */}
       <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between pt-24 pb-12 px-6 sm:px-10 lg:px-14 z-10">
+        
+        {/* Continuous White Cover Handoff from Previous Pen Transition */}
+        <motion.div
+          style={shouldReduceMotion ? { display: "none" } : { y: coverY, opacity: coverOpacity }}
+          className="absolute inset-0 bg-white z-40 flex flex-col justify-center px-6 sm:px-10 lg:px-14 will-change-transform pointer-events-none"
+        >
+          <div className="max-w-7xl mx-auto w-full">
+            <h2 className="font-serif text-5xl sm:text-7xl lg:text-[96px] font-normal leading-[1.05] tracking-tight">
+              <span className="text-[#8a8a8a] block">Works with</span>
+              <span className="text-[#000000] block mt-1 sm:mt-2">smart paper</span>
+            </h2>
+          </div>
+        </motion.div>
+
         <div className="max-w-7xl mx-auto w-full">
           <TextInkReveal
             badge={`${badge} ${title}`}
@@ -106,7 +124,7 @@ export const SmartPaper: React.FC<SmartPaperProps> = ({ badge, title, slides }) 
           </div>
         </div>
 
-        {/* Issue #4: Segmented Horizontal Progress Bar advancing in sync with scroll */}
+        {/* Segmented Horizontal Progress Bar advancing in sync with scroll */}
         <div className="max-w-7xl mx-auto w-full pt-4">
           <div className="flex items-center gap-3 max-w-sm mx-auto">
             {Array.from({ length: slideCount }).map((_, idx) => {
