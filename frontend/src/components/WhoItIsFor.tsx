@@ -102,23 +102,25 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
     restDelta: 0.001,
   });
 
-  // --- Phase 1: 3 Audience Topics Sliding in from Right (Side) ---
+  // --- Phase 1: Scroll right column upward so text moves up, making room UNDER it ---
+  const rightColumnY = useTransform(smoothProgress, [0.08, 0.48, 0.62], ["0px", "-260px", "-450px"]);
+
+  // 3 Audience Topics Sliding in from Right (Side)
   const topic1X = useTransform(smoothProgress, [0.08, 0.22], ["110%", "0%"]);
   const topic2X = useTransform(smoothProgress, [0.18, 0.32], ["110%", "0%"]);
   const topic3X = useTransform(smoothProgress, [0.28, 0.42], ["110%", "0%"]);
 
-  // --- Phase 2: Pen Image Slides in from the Side (Matching media_1789359107442) ---
-  // Follows immediately after Topic 3, sliding from the right ("110%" -> "0%") into the right column
-  const penX = useTransform(smoothProgress, [0.34, 0.48], ["110%", "0%"]);
+  // --- Phase 2: Pen Image Slides in from the Side UNDER the text (media_1789360371442) ---
+  // Follows immediately after Topic 3, sliding from the right ("110%" -> "0%") placed vertically UNDER "Managers & Product Thinkers"
+  const penX = useTransform(smoothProgress, [0.36, 0.50], ["110%", "0%"]);
 
-  // Fade & drift audience text away as pen prepares to expand
-  const audienceOpacity = useTransform(smoothProgress, [0.52, 0.62], [1, 0]);
-  const audienceY = useTransform(smoothProgress, [0.52, 0.62], ["0px", "-40px"]);
+  // Fade out text as pen prepares to expand to full screen
+  const audienceOpacity = useTransform(smoothProgress, [0.54, 0.64], [1, 0]);
 
-  // --- Phase 3: Expansion to Full Screen (Matching media_1789358383060) ---
-  // Expands from right-column bottom position to cover the full viewport (100vw x 100vh)
-  const penTop = useTransform(smoothProgress, [0.56, 0.72], [isDesktop ? "48%" : "55%", "0%"]);
-  const penLeft = useTransform(smoothProgress, [0.56, 0.72], [isDesktop ? "40%" : "0%", "0%"]);
+  // --- Phase 3: Expansion to Full Screen (media_1789358383060) ---
+  // Expands from below the text (top: 52vh, left: 42%) to cover the full viewport (100vw x 100vh)
+  const penTop = useTransform(smoothProgress, [0.56, 0.72], ["52vh", "0vh"]);
+  const penLeft = useTransform(smoothProgress, [0.56, 0.72], [isDesktop ? "42%" : "0%", "0%"]);
 
   // --- Phase 4: Disappear into Next Section "Works with smart paper" (media_1789358453483) ---
   const coverY = useTransform(smoothProgress, [0.82, 0.98], ["100%", "0%"]);
@@ -143,15 +145,12 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
         />
       </div>
 
-      {/* Pinned Scroll Track: Audience scrub + Pen side entrance + full-screen expansion + exit cover */}
+      {/* Pinned Scroll Track: Audience scrub + Pen side entrance UNDER text + full-screen expansion + exit cover */}
       <div ref={pinTrackRef} className="relative h-[400vh]">
         <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-center px-6 sm:px-10 lg:px-14">
           
-          {/* Layer 1: Two-Column Section with Label, Illuminated Copy & 3 Audience Cards */}
-          <motion.div
-            style={shouldReduceMotion ? {} : { opacity: audienceOpacity, y: audienceY }}
-            className="max-w-7xl mx-auto w-full flex flex-col lg:flex-row justify-between items-start gap-8 lg:gap-16 relative z-10 will-change-[opacity,transform]"
-          >
+          {/* Two-Column Section with Label & Scrolling Text Column */}
+          <div className="max-w-7xl mx-auto w-full flex flex-col lg:flex-row justify-between items-start gap-8 lg:gap-16 relative z-10">
             {/* Left Column: Label */}
             <div className="shrink-0 pt-2">
               <span className="text-xs sm:text-sm font-mono uppercase tracking-[0.15em] text-[#8a8a8a] block">
@@ -159,8 +158,11 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
               </span>
             </div>
 
-            {/* Right Column: Illuminated Headline Copy + 3 Sliding Topics */}
-            <div className="w-full lg:max-w-2xl ml-auto space-y-10 sm:space-y-14">
+            {/* Right Column: Illuminated Headline Copy + 3 Sliding Topics scrolling smoothly upward */}
+            <motion.div
+              style={shouldReduceMotion ? {} : { y: rightColumnY, opacity: audienceOpacity }}
+              className="w-full lg:max-w-2xl ml-auto space-y-10 sm:space-y-12 will-change-[transform,opacity]"
+            >
               {/* Word-by-Word Scroll Illuminated Copy */}
               <div className="space-y-4">
                 <ScrollIlluminatedText
@@ -217,10 +219,10 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
                   </p>
                 </motion.div>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          </div>
 
-          {/* Layer 2: Pen Showcase (Slides in from side like the above text, NO outer card/outline/radius, expands to full screen) */}
+          {/* Layer 2: Pen Showcase (Slides in from side UNDER the text, NO outline/card, expands to full screen) */}
           <motion.div
             style={
               shouldReduceMotion
