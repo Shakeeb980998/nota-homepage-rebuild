@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { AudienceCard } from "@/types/cms";
 import { motion, useScroll, useTransform, useSpring, useReducedMotion } from "framer-motion";
 
@@ -81,8 +81,16 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
 }) => {
   const pinTrackRef = useRef<HTMLDivElement>(null);
   const shouldReduceMotion = useReducedMotion();
+  const [isDesktop, setIsDesktop] = useState(false);
 
-  // Unified master scroll track for Audience reveal, Pen Entrance, Full-Bleed Expansion, and Next Section Hand-off
+  useEffect(() => {
+    const updateSize = () => setIsDesktop(window.innerWidth >= 1024);
+    updateSize();
+    window.addEventListener("resize", updateSize);
+    return () => window.removeEventListener("resize", updateSize);
+  }, []);
+
+  // Master scroll scrub across Audience topics, Pen side entrance, full-bleed expansion, and exit cover
   const { scrollYProgress } = useScroll({
     target: pinTrackRef,
     offset: ["start start", "end end"],
@@ -94,54 +102,26 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
     restDelta: 0.001,
   });
 
-  // --- Phase 1: 3 Audience Topics Sliding in from Right ---
-  const topic1X = useTransform(smoothProgress, [0.08, 0.24], ["110%", "0%"]);
-  const topic2X = useTransform(smoothProgress, [0.18, 0.34], ["110%", "0%"]);
-  const topic3X = useTransform(smoothProgress, [0.28, 0.44], ["110%", "0%"]);
+  // --- Phase 1: 3 Audience Topics Sliding in from Right (Side) ---
+  const topic1X = useTransform(smoothProgress, [0.08, 0.22], ["110%", "0%"]);
+  const topic2X = useTransform(smoothProgress, [0.18, 0.32], ["110%", "0%"]);
+  const topic3X = useTransform(smoothProgress, [0.28, 0.42], ["110%", "0%"]);
 
-  // Audience Content Fade & Drift Up as Pen Expands
-  const audienceOpacity = useTransform(smoothProgress, [0.44, 0.52], [1, 0]);
-  const audienceY = useTransform(smoothProgress, [0.44, 0.52], ["0px", "-40px"]);
+  // --- Phase 2: Pen Image Slides in from the Side (Matching media_1789359107442) ---
+  // Follows immediately after Topic 3, sliding from the right ("110%" -> "0%") into the right column
+  const penX = useTransform(smoothProgress, [0.34, 0.48], ["110%", "0%"]);
 
-  // --- Phase 2 & 3: Pen Card Enters & Expands to Full Screen (Matching media_1789358417860 -> media_1789358383060) ---
-  // Entrance at 0.28 -> 0.44: Card rises into view from bottom (52vh), holding horizontal pen
-  // Expansion at 0.44 -> 0.64: Card expands to 100vw x 100vh full-bleed
-  // Hold at 0.64 -> 0.76: Holds full-bleed white pen showcase
-  // Recession at 0.76 -> 0.88: Shrinks down slightly into dark container (media_1789358453483)
-  const cardY = useTransform(
-    smoothProgress,
-    [0.26, 0.44, 0.64, 0.76, 0.88],
-    ["110vh", "50vh", "0vh", "0vh", "6vh"]
-  );
-  const cardWidth = useTransform(
-    smoothProgress,
-    [0.26, 0.44, 0.64, 0.76, 0.88],
-    ["78vw", "78vw", "100vw", "100vw", "82vw"]
-  );
-  const cardHeight = useTransform(
-    smoothProgress,
-    [0.26, 0.44, 0.64, 0.76, 0.88],
-    ["44vh", "44vh", "100vh", "100vh", "65vh"]
-  );
-  const cardRadius = useTransform(
-    smoothProgress,
-    [0.26, 0.44, 0.64, 0.76, 0.88],
-    [24, 24, 0, 0, 20]
-  );
-  const cardBg = useTransform(
-    smoothProgress,
-    [0.64, 0.76, 0.88],
-    ["#ffffff", "#ffffff", "#383b42"]
-  );
-  const penScale = useTransform(
-    smoothProgress,
-    [0.26, 0.44, 0.64, 0.76, 0.88],
-    [0.88, 0.94, 1.05, 1.05, 0.92]
-  );
+  // Fade & drift audience text away as pen prepares to expand
+  const audienceOpacity = useTransform(smoothProgress, [0.52, 0.62], [1, 0]);
+  const audienceY = useTransform(smoothProgress, [0.52, 0.62], ["0px", "-40px"]);
 
-  // --- Phase 4: Disappear into Next Section "Works with smart paper" (Matching media_1789358453483) ---
-  // White cover panel slides up from 100% to 0% between 0.78 and 0.98, seamlessly covering pen
-  const coverY = useTransform(smoothProgress, [0.78, 0.98], ["100%", "0%"]);
+  // --- Phase 3: Expansion to Full Screen (Matching media_1789358383060) ---
+  // Expands from right-column bottom position to cover the full viewport (100vw x 100vh)
+  const penTop = useTransform(smoothProgress, [0.56, 0.72], [isDesktop ? "48%" : "55%", "0%"]);
+  const penLeft = useTransform(smoothProgress, [0.56, 0.72], [isDesktop ? "40%" : "0%", "0%"]);
+
+  // --- Phase 4: Disappear into Next Section "Works with smart paper" (media_1789358453483) ---
+  const coverY = useTransform(smoothProgress, [0.82, 0.98], ["100%", "0%"]);
 
   const quoteText =
     introQuote ||
@@ -163,8 +143,8 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
         />
       </div>
 
-      {/* Pinned Scroll Track: Audience scrub + Pen entrance, full-screen scale, and exit cover */}
-      <div ref={pinTrackRef} className="relative h-[380vh]">
+      {/* Pinned Scroll Track: Audience scrub + Pen side entrance + full-screen expansion + exit cover */}
+      <div ref={pinTrackRef} className="relative h-[400vh]">
         <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-center px-6 sm:px-10 lg:px-14">
           
           {/* Layer 1: Two-Column Section with Label, Illuminated Copy & 3 Audience Cards */}
@@ -240,38 +220,33 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
             </div>
           </motion.div>
 
-          {/* Layer 2: Pen Card (Enters from bottom, scales to 100vw x 100vh full-bleed, then recedes) */}
+          {/* Layer 2: Pen Showcase (Slides in from side like the above text, NO outer card/outline/radius, expands to full screen) */}
           <motion.div
             style={
               shouldReduceMotion
                 ? { display: "none" }
                 : {
-                    y: cardY,
-                    width: cardWidth,
-                    height: cardHeight,
-                    borderRadius: cardRadius,
-                    backgroundColor: cardBg,
+                    x: penX,
+                    top: penTop,
+                    left: penLeft,
                   }
             }
-            className="absolute left-1/2 -translate-x-1/2 top-0 z-20 flex items-center justify-center overflow-hidden shadow-2xl will-change-transform pointer-events-none"
+            className="absolute right-0 bottom-0 z-20 bg-white overflow-hidden will-change-transform pointer-events-none"
           >
-            <motion.div
-              style={shouldReduceMotion ? {} : { scale: penScale }}
-              className="w-full max-w-5xl px-6 flex items-center justify-center select-none will-change-transform"
-            >
+            <div className="w-full h-full flex items-center justify-center p-4 sm:p-8 lg:p-12 select-none pointer-events-none">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/nota_horizontal_pen.png"
                 alt="Nōta Smart Pen showcase"
-                className="w-full max-w-3xl sm:max-w-4xl lg:max-w-5xl max-h-[35vh] sm:max-h-[45vh] lg:max-h-[55vh] object-contain select-none drop-shadow-[0_20px_40px_rgba(0,0,0,0.14)]"
+                className="w-full h-full max-h-[35vh] sm:max-h-[45vh] lg:max-h-[60vh] object-contain select-none pointer-events-none"
               />
-            </motion.div>
+            </div>
           </motion.div>
 
           {/* Layer 3: Next Section White Cover ("Works with smart paper" - media_1789358453483) */}
           <motion.div
             style={shouldReduceMotion ? { display: "none" } : { y: coverY }}
-            className="absolute inset-0 bg-white z-30 flex flex-col justify-center px-6 sm:px-10 lg:px-14 will-change-transform shadow-[0_-20px_50px_rgba(0,0,0,0.18)] pointer-events-none"
+            className="absolute inset-0 bg-white z-30 flex flex-col justify-center px-6 sm:px-10 lg:px-14 will-change-transform pointer-events-none"
           >
             <div className="max-w-7xl mx-auto w-full">
               <h2 className="font-serif text-5xl sm:text-7xl lg:text-[96px] font-normal leading-[1.05] tracking-tight">
