@@ -77,6 +77,7 @@ export const InsideTheBox: React.FC<InsideTheBoxProps> = ({
     title: "A complete, ready-to-use set",
     description:
       "Smart pen, Smartpaper notepad, charging cable, and instructions — carefully packaged for a hassle-free start.",
+    image: "/inside_box.webp",
   };
 
   return (
@@ -117,10 +118,10 @@ export const InsideTheBox: React.FC<InsideTheBoxProps> = ({
           </h2>
         </motion.div>
 
-        {/* Phase 3 & 4: Full-Screen Showcase Stage with Full-Width Blinds (media_1789370947573 -> media_1789370960390) */}
+        {/* Phase 3 & 4: Full-Screen Showcase Stage with Full-Width Blinds (media_1789371918106) */}
         <motion.div
           style={shouldReduceMotion ? { opacity: 1 } : { opacity: stageOpacity, y: stageY }}
-          className="relative z-20 w-full h-[82vh] sm:h-[85vh] lg:h-[88vh] flex items-end justify-center"
+          className="relative z-20 w-full h-[76vh] sm:h-[80vh] lg:h-[84vh] bg-[#f2f2f2] flex items-end justify-center"
         >
           {/* Venetian Blinds Overlay spanning the full width of the screen */}
           <FullWidthHorizontalBlinds
@@ -129,25 +130,25 @@ export const InsideTheBox: React.FC<InsideTheBoxProps> = ({
           />
 
           {/* Stage Container: Left large luxury box + Right top-aligned text */}
-          <div className="relative z-10 w-full max-w-[1440px] h-full mx-auto px-6 sm:px-12 lg:px-16 flex flex-col lg:flex-row items-end justify-between gap-6 lg:gap-12 pb-0">
+          <div className="relative z-10 w-full max-w-[1520px] h-full mx-auto px-6 sm:px-12 lg:px-16 flex flex-col lg:flex-row items-end justify-center gap-8 lg:gap-14 pb-0">
             
-            {/* Left Column: Full-Height Open Luxury Box */}
-            <div className="relative w-full lg:w-[60%] h-[68vh] sm:h-[75vh] lg:h-[82vh] max-h-[820px] flex items-end justify-center lg:justify-end">
-              {/* Real Box Photograph from nota.uprock.pro */}
+            {/* Left Column: Full-Height Open Luxury Box touching bottom */}
+            <div className="relative w-full lg:w-[56%] h-full flex items-end justify-center lg:justify-end">
+              {/* High-resolution cropped box image without margins */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="https://nota.uprock.pro/d/library_image-14643-symbol-ispnvazts-nota_scene_5_img_01_adaptive.jpg"
+                src={primaryItem.image || "/inside_box.webp"}
                 alt={primaryItem.title}
-                className="h-full w-auto max-w-full object-contain object-bottom select-none pointer-events-none drop-shadow-sm"
+                className="h-[96%] max-h-[780px] w-auto object-contain object-bottom select-none pointer-events-none drop-shadow-md"
               />
             </div>
 
             {/* Right Column: Title and Description aligned to the top right of the box */}
-            <div className="w-full lg:w-[38%] self-start pt-4 sm:pt-8 lg:pt-14 xl:pt-18 space-y-3 sm:space-y-4 text-left">
-              <h3 className="font-sans text-xl sm:text-2xl lg:text-[25px] xl:text-[27px] font-medium text-black tracking-[-0.01em] leading-snug">
+            <div className="w-full lg:w-[40%] self-start pt-6 sm:pt-10 lg:pt-16 xl:pt-20 space-y-3 sm:space-y-4 text-left">
+              <h3 className="font-sans text-xl sm:text-2xl lg:text-[25px] xl:text-[27px] font-medium text-[#1a1a1a] tracking-[-0.01em] leading-snug">
                 {primaryItem.title}
               </h3>
-              <p className="font-sans text-sm sm:text-base text-[#555555] font-normal leading-[1.65] max-w-sm lg:max-w-md">
+              <p className="font-sans text-sm sm:text-base text-[#666666] font-normal leading-[1.65] max-w-sm lg:max-w-md">
                 {primaryItem.description}
               </p>
             </div>
