@@ -10,47 +10,38 @@ interface SmartPaperProps {
   slides: SmartPaperFeature[];
 }
 
-// Vertical Line that draws down from top to bottom (media_1789365968867 -> media_1789365980850)
-const DividingLine: React.FC<{
-  index: number;
-  progress: any;
-  shouldReduceMotion: boolean | null;
-}> = ({ index, progress, shouldReduceMotion }) => {
-  // Staggered top-to-bottom line draw between 0.04 and 0.18
-  const start = 0.04 + index * 0.025;
-  const end = start + 0.08;
-  const scaleY = useTransform(progress, [start, end], [0, 1]);
-
-  if (shouldReduceMotion) return null;
-
-  return (
-    <div className="relative w-1/6 h-full pointer-events-none">
-      <motion.div
-        style={{ scaleY, transformOrigin: "top" }}
-        className="absolute top-0 right-0 w-[1px] h-full bg-neutral-200/80 will-change-transform"
-      />
-    </div>
-  );
-};
-
-// Vertical Curtain Column that drops down AFTER lines are drawn (media_1789365992897)
+// Vertical Curtain Column with internal hairline divider that draws down and drops down with the column
 const CurtainColumn: React.FC<{
   index: number;
   progress: any;
   shouldReduceMotion: boolean | null;
 }> = ({ index, progress, shouldReduceMotion }) => {
-  // Drops down between 0.18 and 0.32 in staggered cascade
-  const start = 0.18 + index * 0.025;
-  const end = start + 0.10;
-  const y = useTransform(progress, [start, end], ["0%", "100%"]);
+  // Staggered top-to-bottom line draw between 0.05 and 0.14
+  const lineStart = 0.05 + index * 0.015;
+  const lineEnd = lineStart + 0.05;
+  const lineScaleY = useTransform(progress, [lineStart, Math.min(lineEnd, 0.14)], [0, 1]);
+  // Line fades out right as the curtain columns begin dropping
+  const lineOpacity = useTransform(progress, [0.14, 0.17], [1, 0]);
+
+  // Drops down between 0.16 and 0.30 in staggered cascade (left to right)
+  const colStart = 0.16 + index * 0.022;
+  const colEnd = colStart + 0.10;
+  const y = useTransform(progress, [colStart, colEnd], ["0%", "100%"]);
 
   if (shouldReduceMotion) return null;
 
   return (
     <motion.div
       style={{ y }}
-      className="w-1/6 h-full bg-white will-change-transform"
-    />
+      className="relative w-1/6 h-full bg-white will-change-transform"
+    >
+      {index < 5 && (
+        <motion.div
+          style={{ scaleY: lineScaleY, opacity: lineOpacity, transformOrigin: "top" }}
+          className="absolute top-0 right-0 w-[1px] h-full bg-neutral-300 will-change-transform pointer-events-none"
+        />
+      )}
+    </motion.div>
   );
 };
 
@@ -73,8 +64,9 @@ export const SmartPaper: React.FC<SmartPaperProps> = ({ badge, title, slides }) 
 
   const slideCount = Math.min(slides.length, notebookImages.length);
 
-  // Title ("Works with smart paper") fades out smoothly as lines finish drawing and columns drop (0.12 -> 0.20)
-  const titleFadeOpacity = useTransform(scrollYProgress, [0.12, 0.20], [1, 0]);
+  // Title ("Works with smart paper") fades out cleanly before dividing lines finish & curtain drops (0.01 -> 0.06)
+  const titleFadeOpacity = useTransform(scrollYProgress, [0.01, 0.06], [1, 0]);
+  const titleDisplay = useTransform(scrollYProgress, (v) => (v >= 0.07 ? "none" : "flex"));
 
   // Step indices mapped across [0.34, 0.90] for the 4 notebook slides
   const stepIndex = useTransform(scrollYProgress, (v) => {
@@ -103,8 +95,12 @@ export const SmartPaper: React.FC<SmartPaperProps> = ({ badge, title, slides }) 
         
         {/* Layer A: Centered Title ("Works with smart paper" - media_1789364660655) */}
         <motion.div
-          style={shouldReduceMotion ? { display: "none" } : { opacity: titleFadeOpacity }}
-          className="absolute inset-0 z-50 flex flex-col items-center justify-center text-center px-6 pointer-events-none"
+          style={
+            shouldReduceMotion
+              ? { display: "none" }
+              : { opacity: titleFadeOpacity, display: titleDisplay }
+          }
+          className="absolute inset-0 z-50 flex-col items-center justify-center text-center px-6 pointer-events-none"
         >
           <h2 className="font-serif text-6xl sm:text-8xl md:text-9xl lg:text-[130px] font-normal leading-[0.92] tracking-tight select-none">
             <span className="text-[#888888] block">Works with</span>
@@ -112,19 +108,7 @@ export const SmartPaper: React.FC<SmartPaperProps> = ({ badge, title, slides }) 
           </h2>
         </motion.div>
 
-        {/* Layer B1: 5 Dividing Lines Drawing Down from Top (media_1789365968867 -> media_1789365980850) */}
-        <div className="absolute inset-0 z-45 pointer-events-none overflow-hidden flex">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <DividingLine
-              key={`line-${i}`}
-              index={i}
-              progress={scrollYProgress}
-              shouldReduceMotion={shouldReduceMotion}
-            />
-          ))}
-        </div>
-
-        {/* Layer B2: 6 Vertical Curtain Columns Dropping Down (media_1789365992897) */}
+        {/* Layer B: 6 Vertical Curtain Columns Dropping Down with Internal Dividers (media_1789365992897) */}
         <div className="absolute inset-0 z-40 pointer-events-none overflow-hidden flex">
           {Array.from({ length: 6 }).map((_, i) => (
             <CurtainColumn
