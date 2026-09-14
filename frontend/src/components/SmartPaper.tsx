@@ -10,14 +10,38 @@ interface SmartPaperProps {
   slides: SmartPaperFeature[];
 }
 
-// 6 Vertical White Curtain Columns that drop down in a staggered cascade (media_1789364677500)
+// Vertical Line that draws down from top to bottom (media_1789365968867 -> media_1789365980850)
+const DividingLine: React.FC<{
+  index: number;
+  progress: any;
+  shouldReduceMotion: boolean | null;
+}> = ({ index, progress, shouldReduceMotion }) => {
+  // Staggered top-to-bottom line draw between 0.04 and 0.18
+  const start = 0.04 + index * 0.025;
+  const end = start + 0.08;
+  const scaleY = useTransform(progress, [start, end], [0, 1]);
+
+  if (shouldReduceMotion) return null;
+
+  return (
+    <div className="relative w-1/6 h-full pointer-events-none">
+      <motion.div
+        style={{ scaleY, transformOrigin: "top" }}
+        className="absolute top-0 right-0 w-[1px] h-full bg-neutral-200/80 will-change-transform"
+      />
+    </div>
+  );
+};
+
+// Vertical Curtain Column that drops down AFTER lines are drawn (media_1789365992897)
 const CurtainColumn: React.FC<{
   index: number;
   progress: any;
   shouldReduceMotion: boolean | null;
 }> = ({ index, progress, shouldReduceMotion }) => {
-  const start = 0.08 + index * 0.03;
-  const end = start + 0.14;
+  // Drops down between 0.18 and 0.32 in staggered cascade
+  const start = 0.18 + index * 0.025;
+  const end = start + 0.10;
   const y = useTransform(progress, [start, end], ["0%", "100%"]);
 
   if (shouldReduceMotion) return null;
@@ -25,7 +49,7 @@ const CurtainColumn: React.FC<{
   return (
     <motion.div
       style={{ y }}
-      className="w-1/6 h-full bg-white will-change-transform border-r border-neutral-100/10 last:border-r-0"
+      className="w-1/6 h-full bg-white will-change-transform"
     />
   );
 };
@@ -34,7 +58,7 @@ export const SmartPaper: React.FC<SmartPaperProps> = ({ badge, title, slides }) 
   const containerRef = useRef<HTMLDivElement>(null);
   const shouldReduceMotion = useReducedMotion();
 
-  // Pin section for 380vh
+  // Pinned container
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end end"],
@@ -49,14 +73,14 @@ export const SmartPaper: React.FC<SmartPaperProps> = ({ badge, title, slides }) 
 
   const slideCount = Math.min(slides.length, notebookImages.length);
 
-  // Title ("Works with smart paper") holds for a beat then fades out as curtains start dropping (0.04 -> 0.12)
-  const titleFadeOpacity = useTransform(scrollYProgress, [0.04, 0.12], [1, 0]);
+  // Title ("Works with smart paper") fades out smoothly as lines finish drawing and columns drop (0.12 -> 0.20)
+  const titleFadeOpacity = useTransform(scrollYProgress, [0.12, 0.20], [1, 0]);
 
-  // Step indices mapped across [0.28, 0.90] for the 4 notebook slides
+  // Step indices mapped across [0.34, 0.90] for the 4 notebook slides
   const stepIndex = useTransform(scrollYProgress, (v) => {
-    if (v < 0.44) return 0;
-    if (v < 0.62) return 1;
-    if (v < 0.80) return 2;
+    if (v < 0.48) return 0;
+    if (v < 0.64) return 1;
+    if (v < 0.82) return 2;
     return 3;
   });
 
@@ -73,11 +97,11 @@ export const SmartPaper: React.FC<SmartPaperProps> = ({ badge, title, slides }) 
   const activeImage = slides[activeStep]?.image || notebookImages[activeStep] || notebookImages[0];
 
   return (
-    <div id="about" ref={containerRef} className="relative h-[380vh] bg-black text-white">
+    <div id="about" ref={containerRef} className="relative h-[400vh] bg-black text-white">
       {/* Sticky Viewport */}
       <div className="sticky top-0 h-screen w-full overflow-hidden z-10 flex flex-col justify-between">
         
-        {/* Layer A: Step 1 Centered Title - Exact font, size, and layout matching media_1789364660655 */}
+        {/* Layer A: Centered Title ("Works with smart paper" - media_1789364660655) */}
         <motion.div
           style={shouldReduceMotion ? { display: "none" } : { opacity: titleFadeOpacity }}
           className="absolute inset-0 z-50 flex flex-col items-center justify-center text-center px-6 pointer-events-none"
@@ -88,11 +112,23 @@ export const SmartPaper: React.FC<SmartPaperProps> = ({ badge, title, slides }) 
           </h2>
         </motion.div>
 
-        {/* Layer B: Step 2 6 Vertical Curtain Columns Dropping Down (media_1789364677500) */}
+        {/* Layer B1: 5 Dividing Lines Drawing Down from Top (media_1789365968867 -> media_1789365980850) */}
+        <div className="absolute inset-0 z-45 pointer-events-none overflow-hidden flex">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <DividingLine
+              key={`line-${i}`}
+              index={i}
+              progress={scrollYProgress}
+              shouldReduceMotion={shouldReduceMotion}
+            />
+          ))}
+        </div>
+
+        {/* Layer B2: 6 Vertical Curtain Columns Dropping Down (media_1789365992897) */}
         <div className="absolute inset-0 z-40 pointer-events-none overflow-hidden flex">
           {Array.from({ length: 6 }).map((_, i) => (
             <CurtainColumn
-              key={i}
+              key={`col-${i}`}
               index={i}
               progress={scrollYProgress}
               shouldReduceMotion={shouldReduceMotion}
