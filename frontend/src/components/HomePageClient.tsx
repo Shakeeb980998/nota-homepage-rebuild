@@ -22,10 +22,27 @@ export const HomePageClient: React.FC<HomePageClientProps> = ({ initialData }) =
   const [isOrderOpen, setIsOrderOpen] = useState(false);
   const [isRevealed, setIsRevealed] = useState(false);
 
+  // Disable browser scroll cache and ensure top on mount
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      if ("scrollRestoration" in window.history) {
+        window.history.scrollRestoration = "manual";
+      }
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    }
+  }, []);
+
   return (
     <main className="min-h-screen bg-black text-white selection:bg-neutral-800 selection:text-white">
       {/* Preloader — exact sequence matching reference (slate radial gradient + serif % counter + handoff) */}
-      <Preloader onRevealStart={() => setIsRevealed(true)} />
+      <Preloader
+        onRevealStart={() => {
+          setIsRevealed(true);
+          if (typeof window !== "undefined") {
+            window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+          }
+        }}
+      />
 
       {/* Header */}
       <Header

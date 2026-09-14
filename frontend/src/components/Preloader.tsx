@@ -27,6 +27,14 @@ export const Preloader: React.FC<PreloaderProps> = ({ onRevealStart }) => {
   }, [onRevealStart]);
 
   useEffect(() => {
+    // Disable browser automatic scroll restoration on refresh so page always starts cleanly at top
+    if (typeof window !== "undefined") {
+      if ("scrollRestoration" in window.history) {
+        window.history.scrollRestoration = "manual";
+      }
+      window.scrollTo(0, 0);
+    }
+
     let isCancelled = false;
     const startTime = Date.now();
     const DURATION = 1700; // ~1.7s total duration
@@ -64,11 +72,23 @@ export const Preloader: React.FC<PreloaderProps> = ({ onRevealStart }) => {
       if (completed) return;
       completed = true;
       setPct(100);
+
+      // Instant scroll to top when 100% is reached to show customer page refreshed from top
+      if (typeof window !== "undefined") {
+        window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+        requestAnimationFrame(() => {
+          window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+        });
+      }
+
       onRevealStartRef.current?.();
       setIsFadingOut(true);
       setTimeout(() => {
         if (!isCancelled) {
           setIsDone(true);
+          if (typeof window !== "undefined") {
+            window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+          }
         }
       }, 420);
     };
