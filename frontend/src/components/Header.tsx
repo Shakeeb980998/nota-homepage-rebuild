@@ -95,20 +95,20 @@ export const Header: React.FC<HeaderProps> = ({
           "transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease, border-color 0.3s ease",
         willChange: "transform",
       }}
-      className={`fixed top-0 left-0 right-0 z-50 pointer-events-none h-20 flex items-center ${
+      className={`fixed top-0 left-0 right-0 z-50 pointer-events-none h-16 sm:h-20 flex items-center ${
         isScrolled
           ? "bg-black/75 backdrop-blur-xl border-b border-white/10 shadow-lg"
           : "bg-transparent"
       }`}
     >
-      <div className="w-full px-6 sm:px-10 lg:px-14 flex items-center justify-between pointer-events-auto">
+      <div className="w-full px-4 sm:px-8 md:px-10 lg:px-14 flex items-center justify-between pointer-events-auto">
         {/* Left Side: Didone Serif Wordmark + Desktop Nav grouped together */}
-        <div className="flex items-center gap-10 md:gap-14">
+        <div className="flex items-center gap-6 sm:gap-10 md:gap-14">
           <a
             href="#"
             className="flex items-center gap-2 group transition-opacity hover:opacity-80"
           >
-            <NotaWordmark className="h-6 w-auto text-white fill-white" />
+            <NotaWordmark className="h-5 sm:h-6 w-auto text-white fill-white" />
             <span className="sr-only">{siteName}</span>
           </a>
 

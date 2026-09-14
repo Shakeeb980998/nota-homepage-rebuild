@@ -114,15 +114,15 @@ export const ColorVariants: React.FC<ColorVariantsProps> = ({ variants = DEFAULT
               />
 
               {/* Left Headline (Didone Serif) */}
-              <div className="absolute left-6 sm:left-12 lg:left-[10vw] xl:left-[14vw] top-1/2 -translate-y-1/2 max-w-sm sm:max-w-md text-left z-20">
-                <h2 className="font-serif text-4xl sm:text-6xl md:text-7xl lg:text-[84px] xl:text-[96px] text-white tracking-tight leading-[1.02] select-none drop-shadow-sm">
+              <div className="absolute left-4 sm:left-10 md:left-12 lg:left-[10vw] xl:left-[14vw] top-1/2 -translate-y-1/2 max-w-[45vw] sm:max-w-sm md:max-w-md text-left z-20">
+                <h2 className="font-serif text-3xl sm:text-5xl md:text-6xl lg:text-[76px] xl:text-[96px] text-white tracking-tight leading-[1.02] select-none drop-shadow-sm">
                   {variant.tagline}
                 </h2>
               </div>
 
               {/* Right Headline (Didone Serif) */}
-              <div className="absolute right-6 sm:right-12 lg:right-[10vw] xl:right-[14vw] top-1/2 -translate-y-1/2 max-w-sm sm:max-w-md text-right z-20">
-                <h2 className="font-serif text-4xl sm:text-6xl md:text-7xl lg:text-[84px] xl:text-[96px] text-white tracking-tight leading-[1.02] select-none drop-shadow-sm">
+              <div className="absolute right-4 sm:right-10 md:right-12 lg:right-[10vw] xl:right-[14vw] top-1/2 -translate-y-1/2 max-w-[45vw] sm:max-w-sm md:max-w-md text-right z-20">
+                <h2 className="font-serif text-3xl sm:text-5xl md:text-6xl lg:text-[76px] xl:text-[96px] text-white tracking-tight leading-[1.02] select-none drop-shadow-sm">
                   {variant.subtext}
                 </h2>
               </div>

@@ -141,8 +141,8 @@ const DeviceShowcaseCards: React.FC<{ items: BoxItem[] }> = ({ items }) => {
         {/* Left Card: The NŌTA Smart Pen */}
         <div className="relative flex flex-col justify-between bg-[#fbfbfb] rounded-2xl overflow-hidden border border-neutral-100 shadow-sm">
           {/* Card Header */}
-          <div className="p-8 sm:p-10 flex flex-col sm:flex-row justify-between items-start gap-4 z-10">
-            <h3 className="font-sans text-xl sm:text-2xl font-medium text-black tracking-tight whitespace-nowrap">
+          <div className="p-6 sm:p-8 lg:p-10 flex flex-col sm:flex-row justify-between items-start gap-3 sm:gap-4 z-10">
+            <h3 className="font-sans text-lg sm:text-xl lg:text-2xl font-medium text-black tracking-tight whitespace-normal sm:whitespace-nowrap">
               {penItem.title}
             </h3>
             <p className="font-sans text-xs sm:text-sm text-[#666666] leading-relaxed max-w-xs text-left sm:text-right">
@@ -167,8 +167,8 @@ const DeviceShowcaseCards: React.FC<{ items: BoxItem[] }> = ({ items }) => {
         {/* Right Card: Charging Adapter with Interactive Hover Swap */}
         <div className="group relative flex flex-col justify-between bg-[#fbfbfb] rounded-2xl overflow-hidden border border-neutral-100 shadow-sm cursor-pointer">
           {/* Card Header */}
-          <div className="p-8 sm:p-10 flex flex-col sm:flex-row justify-between items-start gap-4 z-10">
-            <h3 className="font-sans text-xl sm:text-2xl font-medium text-black tracking-tight whitespace-nowrap">
+          <div className="p-6 sm:p-8 lg:p-10 flex flex-col sm:flex-row justify-between items-start gap-3 sm:gap-4 z-10">
+            <h3 className="font-sans text-lg sm:text-xl lg:text-2xl font-medium text-black tracking-tight whitespace-normal sm:whitespace-nowrap">
               {adapterItem.title}
             </h3>
             <p className="font-sans text-xs sm:text-sm text-[#666666] leading-relaxed max-w-xs text-left sm:text-right">
@@ -274,9 +274,9 @@ export const InsideTheBox: React.FC<InsideTheBoxProps> = ({
                 ? { display: "none" }
                 : { opacity: titleOpacity, y: titleY, display: titleDisplay }
             }
-            className="absolute inset-0 z-20 flex-col items-center justify-center text-center px-6 pointer-events-none"
+            className="absolute inset-0 z-20 flex-col items-center justify-center text-center px-4 sm:px-6 pointer-events-none"
           >
-            <h2 className="font-serif text-6xl sm:text-8xl md:text-9xl lg:text-[110px] xl:text-[130px] font-normal leading-[0.92] tracking-tight select-none">
+            <h2 className="font-serif text-5xl sm:text-7xl md:text-8xl lg:text-[110px] xl:text-[130px] font-normal leading-[0.92] tracking-tight select-none">
               <span className="text-[#999999] block">{titleLine1}</span>
               <span className="text-[#000000] block mt-1 sm:mt-2">{titleLine2}</span>
             </h2>
@@ -285,7 +285,7 @@ export const InsideTheBox: React.FC<InsideTheBoxProps> = ({
           {/* Phase 3 & 4: Full-Screen Showcase Stage with Full-Width Blinds (media_1789371918106) */}
           <motion.div
             style={shouldReduceMotion ? { opacity: 1 } : { opacity: stageOpacity, y: stageY }}
-            className="relative z-20 w-full h-[76vh] sm:h-[80vh] lg:h-[84vh] bg-[#f2f2f2] flex items-end justify-center"
+            className="relative z-20 w-full h-[82vh] sm:h-[84vh] lg:h-[86vh] bg-[#f2f2f2] flex items-end justify-center"
           >
             {/* Venetian Blinds Overlay spanning the full width of the screen */}
             <FullWidthHorizontalBlinds
@@ -294,25 +294,25 @@ export const InsideTheBox: React.FC<InsideTheBoxProps> = ({
             />
 
             {/* Stage Container: Left large luxury box + Right top-aligned text */}
-            <div className="relative z-10 w-full max-w-[1520px] h-full mx-auto px-6 sm:px-12 lg:px-16 flex flex-col lg:flex-row items-end justify-center gap-8 lg:gap-14 pb-0">
+            <div className="relative z-10 w-full max-w-[1520px] h-full mx-auto px-4 sm:px-8 md:px-12 lg:px-16 flex flex-col lg:flex-row items-center lg:items-end justify-between gap-4 sm:gap-8 lg:gap-14 pb-0">
               
               {/* Left Column: Full-Height Open Luxury Box touching bottom */}
-              <div className="relative w-full lg:w-[56%] h-full flex items-end justify-center lg:justify-end">
+              <div className="relative w-full lg:w-[56%] h-[55%] sm:h-[62%] lg:h-full flex items-end justify-center lg:justify-end order-2 lg:order-1">
                 {/* High-resolution cropped box image without margins */}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={primaryItem.image || "/inside_box.webp"}
                   alt={primaryItem.title}
-                  className="h-[96%] max-h-[780px] w-auto object-contain object-bottom select-none pointer-events-none drop-shadow-md"
+                  className="h-[98%] max-h-[780px] w-auto max-w-full object-contain object-bottom select-none pointer-events-none drop-shadow-md"
                 />
               </div>
 
               {/* Right Column: Title and Description aligned to the top right of the box */}
-              <div className="w-full lg:w-[40%] self-start pt-6 sm:pt-10 lg:pt-16 xl:pt-20 space-y-3 sm:space-y-4 text-left">
-                <h3 className="font-sans text-xl sm:text-2xl lg:text-[25px] xl:text-[27px] font-medium text-[#1a1a1a] tracking-[-0.01em] leading-snug">
+              <div className="w-full lg:w-[40%] self-start pt-4 sm:pt-8 md:pt-12 lg:pt-16 xl:pt-20 space-y-2 sm:space-y-4 text-left order-1 lg:order-2">
+                <h3 className="font-sans text-lg sm:text-xl md:text-2xl lg:text-[25px] xl:text-[27px] font-medium text-[#1a1a1a] tracking-[-0.01em] leading-snug">
                   {primaryItem.title}
                 </h3>
-                <p className="font-sans text-sm sm:text-base text-[#666666] font-normal leading-[1.65] max-w-sm lg:max-w-md">
+                <p className="font-sans text-xs sm:text-sm md:text-base text-[#666666] font-normal leading-[1.55] sm:leading-[1.65] max-w-sm lg:max-w-md">
                   {primaryItem.description}
                 </p>
               </div>

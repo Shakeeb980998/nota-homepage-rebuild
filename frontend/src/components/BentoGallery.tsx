@@ -7,7 +7,7 @@ export const BentoGallery: React.FC = () => {
   const shouldReduceMotion = useReducedMotion();
 
   return (
-    <section id="details" className="py-24 sm:py-32 lg:py-40 px-6 sm:px-10 lg:px-16 bg-black text-white">
+    <section id="details" className="py-16 sm:py-24 md:py-32 lg:py-40 px-4 sm:px-8 lg:px-16 bg-black text-white">
       <div className="max-w-[1520px] mx-auto space-y-6 sm:space-y-8">
         
         {/* Row 1: Left Stack (2 Cards) & Right Large Card */}
@@ -21,7 +21,7 @@ export const BentoGallery: React.FC = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-50px" }}
               transition={{ duration: 0.7, ease: [0.25, 1, 0.5, 1] }}
-              className="relative w-full h-[320px] sm:h-[380px] lg:h-[400px] rounded-[32px] overflow-hidden bg-neutral-900 border border-neutral-800 group"
+              className="relative w-full h-[280px] sm:h-[340px] md:h-[380px] lg:h-[400px] rounded-[24px] sm:rounded-[32px] overflow-hidden bg-neutral-900 border border-neutral-800 group"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -29,8 +29,8 @@ export const BentoGallery: React.FC = () => {
                 alt="Flush-fit precision cap"
                 className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
               />
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none p-6">
-                <span className="px-6 py-3 rounded-full backdrop-blur-xl bg-black/40 border border-white/15 text-white text-sm sm:text-base font-medium tracking-tight shadow-xl">
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none p-4 sm:p-6">
+                <span className="px-5 py-2.5 sm:px-6 sm:py-3 rounded-full backdrop-blur-xl bg-black/40 border border-white/15 text-white text-xs sm:text-sm md:text-base font-medium tracking-tight shadow-xl text-center">
                   Flush-fit precision cap
                 </span>
               </div>
@@ -42,7 +42,7 @@ export const BentoGallery: React.FC = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-50px" }}
               transition={{ duration: 0.7, delay: 0.1, ease: [0.25, 1, 0.5, 1] }}
-              className="relative w-full h-[240px] sm:h-[280px] lg:h-[300px] rounded-[32px] overflow-hidden bg-neutral-900 border border-neutral-800 group"
+              className="relative w-full h-[200px] sm:h-[240px] md:h-[280px] lg:h-[300px] rounded-[24px] sm:rounded-[32px] overflow-hidden bg-neutral-900 border border-neutral-800 group"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -59,7 +59,7 @@ export const BentoGallery: React.FC = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 0.7, delay: 0.15, ease: [0.25, 1, 0.5, 1] }}
-            className="lg:col-span-6 relative min-h-[460px] sm:min-h-[580px] lg:min-h-[730px] rounded-[32px] overflow-hidden bg-neutral-900 border border-neutral-800 group"
+            className="lg:col-span-6 relative min-h-[360px] sm:min-h-[480px] md:min-h-[580px] lg:min-h-[730px] rounded-[24px] sm:rounded-[32px] overflow-hidden bg-neutral-900 border border-neutral-800 group"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -67,8 +67,8 @@ export const BentoGallery: React.FC = () => {
               alt="Refined colors. Personal expression"
               className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
             />
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none p-6">
-              <span className="px-6 py-3 rounded-full backdrop-blur-xl bg-black/40 border border-white/15 text-white text-sm sm:text-base font-medium tracking-tight shadow-xl">
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none p-4 sm:p-6">
+              <span className="px-5 py-2.5 sm:px-6 sm:py-3 rounded-full backdrop-blur-xl bg-black/40 border border-white/15 text-white text-xs sm:text-sm md:text-base font-medium tracking-tight shadow-xl text-center">
                 Refined colors. Personal expression
               </span>
             </div>
@@ -82,7 +82,7 @@ export const BentoGallery: React.FC = () => {
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
-          className="relative w-full h-[50vh] sm:h-[65vh] lg:h-[80vh] rounded-[48px] sm:rounded-[80px] lg:rounded-[120px] overflow-hidden bg-neutral-900 border border-neutral-800 shadow-2xl"
+          className="relative w-full h-[40vh] sm:h-[55vh] md:h-[65vh] lg:h-[80vh] rounded-[36px] sm:rounded-[60px] md:rounded-[80px] lg:rounded-[120px] overflow-hidden bg-neutral-900 border border-neutral-800 shadow-2xl"
         >
           <video
             src="https://nota.uprock.pro/f/7b66fa812d04f9c7075f91ef42d4dd53_1920.mp4"
@@ -93,8 +93,8 @@ export const BentoGallery: React.FC = () => {
             preload="metadata"
             className="w-full h-full object-cover object-center"
           />
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none p-6">
-            <span className="px-6 py-3.5 rounded-full backdrop-blur-xl bg-black/40 border border-white/15 text-white text-sm sm:text-base font-medium tracking-tight shadow-xl text-center">
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none p-4 sm:p-6">
+            <span className="px-5 py-2.5 sm:px-6 sm:py-3.5 rounded-full backdrop-blur-xl bg-black/40 border border-white/15 text-white text-xs sm:text-sm md:text-base font-medium tracking-tight shadow-xl text-center max-w-sm sm:max-w-none">
               Durable metal nib, low-profile control button
             </span>
           </div>
@@ -109,7 +109,7 @@ export const BentoGallery: React.FC = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 0.7, ease: [0.25, 1, 0.5, 1] }}
-            className="lg:col-span-6 relative h-[360px] sm:h-[460px] lg:h-[540px] rounded-[32px] overflow-hidden bg-neutral-900 border border-neutral-800 group"
+            className="lg:col-span-6 relative h-[280px] sm:h-[380px] md:h-[460px] lg:h-[540px] rounded-[24px] sm:rounded-[32px] overflow-hidden bg-neutral-900 border border-neutral-800 group"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -117,8 +117,8 @@ export const BentoGallery: React.FC = () => {
               alt="Aluminum body"
               className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
             />
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none p-6">
-              <span className="px-6 py-3 rounded-full backdrop-blur-xl bg-black/40 border border-white/15 text-white text-sm sm:text-base font-medium tracking-tight shadow-xl">
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none p-4 sm:p-6">
+              <span className="px-5 py-2.5 sm:px-6 sm:py-3 rounded-full backdrop-blur-xl bg-black/40 border border-white/15 text-white text-xs sm:text-sm md:text-base font-medium tracking-tight shadow-xl text-center">
                 Aluminum body
               </span>
             </div>
@@ -130,7 +130,7 @@ export const BentoGallery: React.FC = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 0.7, delay: 0.1, ease: [0.25, 1, 0.5, 1] }}
-            className="lg:col-span-6 relative h-[360px] sm:h-[460px] lg:h-[540px] rounded-[32px] overflow-hidden bg-neutral-900 border border-neutral-800 group"
+            className="lg:col-span-6 relative h-[280px] sm:h-[380px] md:h-[460px] lg:h-[540px] rounded-[24px] sm:rounded-[32px] overflow-hidden bg-neutral-900 border border-neutral-800 group"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -141,8 +141,8 @@ export const BentoGallery: React.FC = () => {
           </motion.div>
 
         </div>
-
       </div>
     </section>
   );
 };
+

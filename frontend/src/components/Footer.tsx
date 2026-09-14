@@ -33,28 +33,28 @@ export const Footer: React.FC<FooterProps> = ({
   const [teamPopupOpen, setTeamPopupOpen] = useState(false);
 
   return (
-    <footer className="bg-black text-white pt-24 pb-12 px-6 sm:px-12 lg:px-20 border-t border-neutral-900">
-      <div className="max-w-[1520px] mx-auto space-y-20">
+    <footer className="bg-black text-white pt-16 sm:pt-20 md:pt-24 pb-8 sm:pb-12 px-4 sm:px-8 md:px-12 lg:px-20 border-t border-neutral-900">
+      <div className="max-w-[1520px] mx-auto space-y-12 sm:space-y-16 md:space-y-20">
         
         {/* Top Grid: Description, Navigation, Year (media_1789376130368) */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-10 sm:gap-14 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 sm:gap-10 md:gap-14 items-start">
           
           {/* Left Column (Span 6): Statement */}
-          <div className="md:col-span-6 lg:col-span-7 pr-4 sm:pr-8">
-            <p className="font-sans text-lg sm:text-xl md:text-[22px] leading-[1.45] text-white font-normal max-w-xl">
+          <div className="md:col-span-6 lg:col-span-7 pr-0 sm:pr-4 md:pr-8">
+            <p className="font-sans text-base sm:text-lg md:text-xl lg:text-[22px] leading-[1.45] text-white font-normal max-w-xl">
               NŌTA creates tools that respect the way people think and write. Natural handwriting, quietly connected to digital structure.
             </p>
           </div>
 
           {/* Middle Column (Span 3): Navigation */}
-          <div className="md:col-span-3 lg:col-span-3 space-y-3">
+          <div className="md:col-span-3 lg:col-span-3 space-y-2 sm:space-y-3">
             <h3 className="text-xs font-sans text-neutral-500 font-medium">Navigation</h3>
-            <nav className="flex flex-col space-y-2.5">
+            <nav className="flex flex-col space-y-2 sm:space-y-2.5">
               {links.map((link) => (
                 <a
                   key={link.label}
                   href={link.href}
-                  className="text-sm font-sans text-white hover:text-neutral-400 transition-colors"
+                  className="text-xs sm:text-sm font-sans text-white hover:text-neutral-400 transition-colors"
                 >
                   {link.label}
                 </a>
@@ -63,15 +63,15 @@ export const Footer: React.FC<FooterProps> = ({
           </div>
 
           {/* Right Column (Span 2): Year */}
-          <div className="md:col-span-3 lg:col-span-2 space-y-3">
+          <div className="md:col-span-3 lg:col-span-2 space-y-2 sm:space-y-3">
             <h3 className="text-xs font-sans text-neutral-500 font-medium">Year</h3>
-            <p className="text-sm font-sans text-white font-medium">2026</p>
+            <p className="text-xs sm:text-sm font-sans text-white font-medium">2026</p>
           </div>
 
         </div>
 
         {/* Bottom Bar: Copyright, Team links, Credits (media_1789376130368) */}
-        <div className="pt-8 border-t border-neutral-900 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-sans text-neutral-500">
+        <div className="pt-6 sm:pt-8 border-t border-neutral-900 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 text-xs font-sans text-neutral-500 text-center sm:text-left">
           <div>{copyright}</div>
 
           <div className="flex items-center gap-2">
@@ -86,7 +86,7 @@ export const Footer: React.FC<FooterProps> = ({
             <span>•</span>
             <button
               onClick={() => setTeamPopupOpen(true)}
-              className="hover:text-white transition-colors"
+              className="hover:text-white transition-colors cursor-pointer"
             >
               Builded by NōtaTeam
             </button>

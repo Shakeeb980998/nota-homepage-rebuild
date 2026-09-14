@@ -122,9 +122,9 @@ export const SmartPaper: React.FC<SmartPaperProps> = ({ badge, title, slides }) 
               ? { display: "none" }
               : { opacity: titleFadeOpacity, display: titleDisplay }
           }
-          className="absolute inset-0 z-50 flex-col items-center justify-center text-center px-6 pointer-events-none"
+          className="absolute inset-0 z-50 flex-col items-center justify-center text-center px-4 sm:px-6 pointer-events-none"
         >
-          <h2 className="font-serif text-6xl sm:text-8xl md:text-9xl lg:text-[130px] font-normal leading-[0.92] tracking-tight select-none">
+          <h2 className="font-serif text-5xl sm:text-7xl md:text-8xl lg:text-[110px] xl:text-[130px] font-normal leading-[0.92] tracking-tight select-none">
             <span className="text-[#888888] block">Works with</span>
             <span className="text-[#000000] block mt-1 sm:mt-2">smart paper</span>
           </h2>
@@ -175,33 +175,33 @@ export const SmartPaper: React.FC<SmartPaperProps> = ({ badge, title, slides }) 
           />
         </div>
 
-        {/* Top-Left: Large Serif Headline */}
-        <div className="absolute top-20 sm:top-24 lg:top-28 left-6 sm:left-10 lg:left-14 xl:left-16 z-20 max-w-md lg:max-w-xl xl:max-w-2xl pointer-events-none">
+        {/* Top-Left: Large Serif Headline (Fluid scaling across viewports) */}
+        <div className="absolute top-16 sm:top-20 md:top-24 lg:top-28 left-5 sm:left-8 md:left-12 lg:left-16 z-20 max-w-[85vw] sm:max-w-md lg:max-w-xl xl:max-w-2xl pointer-events-none pr-4">
           <motion.h2
             key={`title-${activeStep}`}
             initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="font-serif text-4xl sm:text-5xl lg:text-[56px] xl:text-[64px] font-normal text-white leading-[1.05] tracking-tight"
+            className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-[56px] xl:text-[64px] font-normal text-white leading-[1.05] tracking-tight"
             dangerouslySetInnerHTML={{
               __html: formattedTitles[activeStep] || activeSlide?.title || "",
             }}
           />
         </div>
 
-        {/* Bottom-Right: Refined Dark Card */}
-        <div className="absolute bottom-16 sm:bottom-20 right-6 sm:right-10 lg:right-16 z-20 max-w-[340px] sm:max-w-[400px] lg:max-w-[420px] w-full">
+        {/* Bottom-Right: Refined Dark Card (Fluid width and padding) */}
+        <div className="absolute bottom-12 sm:bottom-16 md:bottom-20 right-4 sm:right-8 md:right-12 lg:right-16 z-20 max-w-[92vw] sm:max-w-[380px] lg:max-w-[420px] w-full">
           <motion.div
             key={`card-${activeStep}`}
             initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="bg-[#181818]/90 border border-white/10 rounded-[22px] p-6 lg:p-7 backdrop-blur-md shadow-2xl space-y-2.5"
+            className="bg-[#181818]/90 border border-white/10 rounded-[18px] sm:rounded-[22px] p-4 sm:p-6 lg:p-7 backdrop-blur-md shadow-2xl space-y-2 sm:space-y-2.5"
           >
-            <h3 className="font-sans text-base lg:text-[17px] font-medium text-white tracking-tight leading-snug">
+            <h3 className="font-sans text-sm sm:text-base lg:text-[17px] font-medium text-white tracking-tight leading-snug">
               {activeSlide?.subTitle}
             </h3>
-            <p className="font-sans text-xs sm:text-[13px] lg:text-[13.5px] text-neutral-300 font-light leading-[1.6]">
+            <p className="font-sans text-xs sm:text-[13px] lg:text-[13.5px] text-neutral-300 font-light leading-[1.55] sm:leading-[1.6]">
               {activeSlide?.text}
             </p>
           </motion.div>

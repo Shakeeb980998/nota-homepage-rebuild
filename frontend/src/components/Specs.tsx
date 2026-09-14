@@ -63,18 +63,18 @@ export const Specs: React.FC<SpecsProps> = ({
     // Outer pinned scroll container (~220vh, allows comfortable hold + curtain wipe into next section)
     <div id="specifications" ref={pinContainerRef} className="relative h-[220vh] bg-white text-[#111111]">
       {/* Sticky Viewport with guaranteed top clearance beneath fixed 80px navbar */}
-      <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between pt-24 sm:pt-28 pb-8 px-6">
+      <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between pt-20 sm:pt-24 md:pt-28 pb-4 sm:pb-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto w-full relative z-10 flex flex-col justify-between h-full my-auto">
-          {/* Centered Large Didone Headline (Comfortably cleared below navbar) */}
-          <div className="text-center max-w-4xl mx-auto pt-2 sm:pt-4 mb-2 sm:mb-4 relative z-20">
-            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif font-normal leading-[1.0] tracking-tight">
-              <span className="block italic text-[#8a8a8a] text-2xl sm:text-3xl md:text-4xl mb-1">{badge}</span>
+          {/* Centered Large Didone Headline (Fluid sizing across all viewports) */}
+          <div className="text-center max-w-4xl mx-auto pt-1 sm:pt-3 mb-1 sm:mb-3 relative z-20">
+            <h2 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-serif font-normal leading-[1.0] tracking-tight">
+              <span className="block italic text-[#8a8a8a] text-lg sm:text-2xl md:text-3xl lg:text-4xl mb-0.5 sm:mb-1">{badge}</span>
               <span className="block text-[#000000]">{title}</span>
             </h2>
           </div>
 
           {/* Relative Cards Grid Container with Pen behind cards (z-0) */}
-          <div className="relative max-w-6xl mx-auto w-full mb-auto pb-4">
+          <div className="relative max-w-6xl mx-auto w-full mb-auto pb-2 sm:pb-4">
             {/* Vertical Smart Pen (Rises UP with nib reaching into headline, body clearly visible) */}
             <div className="absolute inset-x-0 top-0 pointer-events-none z-0 flex justify-center">
               <motion.div
@@ -92,13 +92,13 @@ export const Specs: React.FC<SpecsProps> = ({
                 <img
                   src="/nota_scene_2_img.png"
                   alt="Nōta Vertical Smart Pen"
-                  className="w-auto h-[440px] sm:h-[540px] max-w-none object-contain select-none"
+                  className="w-auto h-[360px] sm:h-[460px] md:h-[540px] max-h-[60vh] max-w-none object-contain select-none"
                 />
               </motion.div>
             </div>
 
             {/* Staggered Card Reveal: Horizontal snap carousel on mobile, 3-column grid on desktop */}
-            <div className="flex md:grid md:grid-cols-3 gap-4 sm:gap-6 items-stretch overflow-x-auto md:overflow-x-visible pb-4 md:pb-0 snap-x snap-mandatory relative z-10 no-scrollbar">
+            <div className="flex md:grid md:grid-cols-3 gap-3 sm:gap-5 md:gap-6 items-stretch overflow-x-auto md:overflow-x-visible pb-3 md:pb-0 snap-x snap-mandatory relative z-10 no-scrollbar px-1">
               {cards.map((card, idx) => {
                 const isMiddle = idx === 1;
                 const transform = cardTransforms[idx % cardTransforms.length];
@@ -114,13 +114,13 @@ export const Specs: React.FC<SpecsProps> = ({
                             y: transform.y,
                           }
                     }
-                    className={`relative rounded-[24px] p-6 sm:p-7 shadow-[0_10px_35px_rgba(0,0,0,0.04)] border border-neutral-200/70 hover:shadow-[0_20px_45px_rgba(0,0,0,0.08)] transition-all z-10 min-w-[84vw] sm:min-w-[340px] md:min-w-0 snap-center shrink-0 md:shrink ${
+                    className={`relative rounded-[20px] sm:rounded-[24px] p-5 sm:p-6 md:p-7 shadow-[0_10px_35px_rgba(0,0,0,0.04)] border border-neutral-200/70 hover:shadow-[0_20px_45px_rgba(0,0,0,0.08)] transition-all z-10 min-w-[78vw] sm:min-w-[320px] md:min-w-0 snap-center shrink-0 md:shrink ${
                       isMiddle
-                        ? "bg-white/45 backdrop-blur-md md:-translate-y-2 border-neutral-300/80 shadow-[0_15px_40px_rgba(0,0,0,0.06)]"
-                        : "bg-[#f4f4f5]/85 backdrop-blur-md"
+                        ? "bg-white/55 backdrop-blur-md md:-translate-y-2 border-neutral-300/80 shadow-[0_15px_40px_rgba(0,0,0,0.06)]"
+                        : "bg-[#f4f4f5]/90 backdrop-blur-md"
                     }`}
                   >
-                    <h3 className="text-xl sm:text-2xl font-serif font-normal text-[#111111] mb-5">
+                    <h3 className="text-lg sm:text-xl md:text-2xl font-serif font-normal text-[#111111] mb-3 sm:mb-5">
                       {card.title}
                     </h3>
 
@@ -128,10 +128,10 @@ export const Specs: React.FC<SpecsProps> = ({
                       {card.features.map((feature, fIdx) => (
                         <div
                           key={fIdx}
-                          className="py-3 flex items-center justify-between gap-3 text-xs sm:text-sm text-neutral-800 font-light"
+                          className="py-2.5 sm:py-3 flex items-center justify-between gap-2.5 sm:gap-3 text-xs sm:text-sm text-neutral-800 font-light"
                         >
-                          <span>{feature}</span>
-                          <div className="w-2 h-2 rounded-full bg-neutral-300 shrink-0" />
+                          <span className="leading-snug">{feature}</span>
+                          <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-neutral-300 shrink-0" />
                         </div>
                       ))}
                     </div>

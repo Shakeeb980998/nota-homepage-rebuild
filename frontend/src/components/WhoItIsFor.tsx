@@ -173,22 +173,22 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
   return (
     <section id="who-it-is-for" className="bg-black text-white relative z-20">
       {/* Top Manifesto Quote (Matches sample site media_178932019030.png) */}
-      <div className="pt-28 sm:pt-36 pb-16 sm:pb-24 px-6 sm:px-10 lg:px-14 max-w-7xl mx-auto">
+      <div className="pt-20 sm:pt-28 md:pt-36 pb-12 sm:pb-16 md:pb-24 px-4 sm:px-8 md:px-12 lg:px-14 max-w-7xl mx-auto">
         <ScrollIlluminatedText
           text={quoteText}
           className="max-w-5xl"
-          wordClassName="text-3xl sm:text-4xl md:text-5xl lg:text-[48px] font-serif font-normal leading-[1.14] tracking-tight"
+          wordClassName="text-2xl sm:text-3xl md:text-4xl lg:text-[48px] font-serif font-normal leading-[1.18] sm:leading-[1.14] tracking-tight"
         />
       </div>
 
       {/* Pinned Scroll Track */}
       <div ref={pinTrackRef} className="relative h-[360vh]">
-        <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-center px-6 sm:px-10 lg:px-14">
+        <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-center px-4 sm:px-8 md:px-12 lg:px-14">
           
           {/* Two-Column Section with Label & Upward Scrolling Text Column */}
-          <div className="max-w-7xl mx-auto w-full flex flex-col lg:flex-row justify-between items-start gap-8 lg:gap-16 relative z-10">
+          <div className="max-w-7xl mx-auto w-full flex flex-col lg:flex-row justify-between items-start gap-6 sm:gap-8 lg:gap-16 relative z-10">
             {/* Left Column: Label */}
-            <div className="shrink-0 pt-2">
+            <div className="shrink-0 pt-1 sm:pt-2">
               <span className="text-xs sm:text-sm font-mono uppercase tracking-[0.15em] text-[#8a8a8a] block">
                 {sectionTitle || "WHO IT'S FOR:"}
               </span>
@@ -197,17 +197,17 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
             {/* Right Column: Illuminated Headline Copy + 3 Sliding Topics scrolling smoothly upward */}
             <motion.div
               style={shouldReduceMotion ? {} : { y: rightColumnY, opacity: audienceOpacity }}
-              className="w-full lg:max-w-2xl ml-auto space-y-10 sm:space-y-12 will-change-[transform,opacity]"
+              className="w-full lg:max-w-2xl ml-auto space-y-8 sm:space-y-10 md:space-y-12 will-change-[transform,opacity]"
             >
               {/* Word-by-Word Scroll Illuminated Copy */}
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 <ScrollIlluminatedText
                   text={p1}
-                  wordClassName="text-xl sm:text-2xl md:text-[26px] lg:text-[28px] font-medium leading-[1.25] tracking-tight"
+                  wordClassName="text-lg sm:text-xl md:text-2xl lg:text-[28px] font-medium leading-[1.28] sm:leading-[1.25] tracking-tight"
                 />
                 <ScrollIlluminatedText
                   text={p2}
-                  wordClassName="text-xl sm:text-2xl md:text-[26px] lg:text-[28px] font-medium leading-[1.25] tracking-tight"
+                  wordClassName="text-lg sm:text-xl md:text-2xl lg:text-[28px] font-medium leading-[1.28] sm:leading-[1.25] tracking-tight"
                 />
               </div>
 

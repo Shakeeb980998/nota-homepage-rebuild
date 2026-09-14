@@ -38,3 +38,13 @@ svg path[stroke*="rgb(255"],
   stroke: transparent !important;
   fill: none !important;
 }
+
+/* Hide scrollbar for clean carousels across all browsers */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
