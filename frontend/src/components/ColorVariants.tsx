@@ -2,217 +2,157 @@
 
 import React, { useRef, useState, useEffect } from "react";
 import { ColorVariant } from "@/types/cms";
-import { motion, AnimatePresence, useScroll, useTransform, useReducedMotion } from "framer-motion";
-import { TextInkReveal } from "@/components/TextInkReveal";
-
-/**
- * Per-finish tagline accent color map.
- * Keyed by ColorVariant.id (silver | graphite | blue | red | orange).
- * This is presentation-only styling — not copy/pricing/nav data — so it can
- * live as a client-side constant without violating the Strapi-driven rule.
- */
-const TAGLINE_ACCENT: Record<string, string> = {
-  silver: "#2c2f38",   // dark charcoal — complements cool silver
-  graphite: "#e8e3da", // warm off-white — pops on near-black graphite
-  blue: "#1a3a2a",     // deep forest green — complements sky blue
-  red: "#2a1a3a",      // deep violet/purple — complements precision red
-  orange: "#2a1a3a",   // deep violet/purple — complements bright orange
-};
+import { motion, useScroll, useReducedMotion } from "framer-motion";
 
 interface ColorVariantsProps {
-  variants: ColorVariant[];
-  onOpenOrder: () => void;
+  variants?: ColorVariant[];
+  onOpenOrder?: () => void;
 }
 
-export const ColorVariants: React.FC<ColorVariantsProps> = ({ variants, onOpenOrder }) => {
-  const pinRef = useRef<HTMLDivElement>(null);
-  const shouldReduceMotion = useReducedMotion();
-  const [selectedIdx, setSelectedIdx] = useState(0);
+const DEFAULT_VARIANTS: ColorVariant[] = [
+  {
+    id: "silver",
+    name: "Silver",
+    tagline: "Impossible to",
+    subtext: "overthink",
+    hexColor: "#D1D5DB",
+    image: "https://nota.uprock.pro/d/library_image-14781-symbol-i64njjjjo-nota_scene_7_img_01.jpg",
+  },
+  {
+    id: "graphite",
+    name: "Graphite Black",
+    tagline: "Graphite Black.",
+    subtext: "Clarity in silence.",
+    hexColor: "#1F2937",
+    image: "https://nota.uprock.pro/d/library_image-14781-symbol-i64njjjjo-nota_scene_7_img_02.jpg",
+  },
+  {
+    id: "blue",
+    name: "Deep Blue",
+    tagline: "Deep Blue.",
+    subtext: "Quiet depth.",
+    hexColor: "#60A5FA",
+    image: "https://nota.uprock.pro/d/library_image-14781-symbol-i64njjjjo-nota_scene_7_img_03.jpg",
+  },
+  {
+    id: "red",
+    name: "Burgundy Red",
+    tagline: "Burgundy Red.",
+    subtext: "Pure intention.",
+    hexColor: "#EF4444",
+    image: "https://nota.uprock.pro/d/library_image-14781-symbol-i64njjjjo-nota_scene_7_img_04.jpg",
+  },
+  {
+    id: "orange",
+    name: "Bright Orange",
+    tagline: "Bright Orange.",
+    subtext: "Steady focus.",
+    hexColor: "#F97316",
+    image: "https://nota.uprock.pro/d/library_image-14781-symbol-i64njjjjo-nota_scene_7_img_05.jpg",
+  },
+];
 
-  // Pin section for scroll-driven color crossfade
+export const ColorVariants: React.FC<ColorVariantsProps> = ({ variants = DEFAULT_VARIANTS }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const shouldReduceMotion = useReducedMotion();
+  const [activeIdx, setActiveIdx] = useState(0);
+
+  const displayVariants = variants && variants.length > 0 ? variants : DEFAULT_VARIANTS;
+  const count = displayVariants.length;
+
   const { scrollYProgress } = useScroll({
-    target: pinRef,
+    target: containerRef,
     offset: ["start start", "end end"],
   });
 
-  // Calculate active index from scroll progress (divided across variants)
-  const variantCount = variants.length || 5;
-  const scrollVariantIdx = useTransform(scrollYProgress, (v) => {
-    const idx = Math.min(Math.floor(v * variantCount), variantCount - 1);
-    return Math.max(0, idx);
-  });
-
+  // Calculate current active index based on scroll progress
   useEffect(() => {
-    const unsubscribe = scrollVariantIdx.on("change", (latest) => {
-      setSelectedIdx(latest);
+    const unsubscribe = scrollYProgress.on("change", (latest) => {
+      const idx = Math.min(Math.floor(latest * count), count - 1);
+      setActiveIdx(Math.max(0, idx));
     });
     return () => unsubscribe();
-  }, [scrollVariantIdx, variantCount]);
+  }, [scrollYProgress, count]);
 
-  // Handle rapid clicks without double-exposure
-  const handleSwatchClick = (idx: number) => {
-    setSelectedIdx(idx);
+  const handleJumpToVariant = (idx: number) => {
+    if (!containerRef.current) return;
+    const top = containerRef.current.offsetTop;
+    const height = containerRef.current.offsetHeight;
+    const step = height / count;
+    window.scrollTo({
+      top: top + step * idx + 10,
+      behavior: "smooth",
+    });
   };
 
-  const activeVariant = variants[selectedIdx] || variants[0];
-
   return (
-    <div ref={pinRef} className="relative h-[250vh] bg-black text-white">
+    <div ref={containerRef} id="about" className="relative h-[400vh] bg-black">
       {/* Sticky Viewport */}
-      <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between py-24 px-6 z-10">
-        <div className="max-w-7xl mx-auto w-full text-center">
-          <TextInkReveal
-            badge="Finishes & Craft"
-            titleLine1="Anodized aluminum."
-            titleLine2="Five quiet shades."
-            theme="dark"
-            className="text-center"
-          />
-        </div>
+      <div className="sticky top-0 h-screen w-full overflow-hidden">
+        
+        {/* Variant Layers with Crossfade */}
+        {displayVariants.map((variant, idx) => {
+          const isActive = activeIdx === idx;
 
-        {/* Center Stage: Centered Product Image with Non-Overlapping Crossfading Taglines */}
-        <div className="max-w-7xl mx-auto w-full grid grid-cols-1 md:grid-cols-12 gap-8 items-center my-auto relative">
-          {/* Left Taglines Crossfade: Absolute Positioning with Shared Container */}
-          <div className="md:col-span-4 text-left hidden md:block">
-            <div className="relative h-32 flex flex-col justify-center">
-              <AnimatePresence initial={false}>
-                <motion.div
-                  key={`left-${activeVariant.id || selectedIdx}`}
-                  initial={{ opacity: 0 }}
-                  animate={{
-                    opacity: 1,
-                    transition: { duration: 0.22, delay: 0.08, ease: [0.25, 1, 0.5, 1] },
-                  }}
-                  exit={{
-                    opacity: 0,
-                    transition: { duration: 0.18, ease: [0.25, 1, 0.5, 1] },
-                  }}
-                  className="absolute inset-0 flex flex-col justify-center space-y-1"
-                >
-                  <span className="text-[11px] font-sans uppercase tracking-[0.12em] text-[#8a8a8a]">
-                    {activeVariant.name}
-                  </span>
-                  <h4
-                    className="text-3xl font-serif leading-tight"
-                    style={{
-                      color: TAGLINE_ACCENT[activeVariant.id] ?? "#ffffff",
-                    }}
-                  >
-                    {activeVariant.tagline}
-                  </h4>
-                  <p className="text-sm text-neutral-400 font-light">
-                    {activeVariant.subtext}
-                  </p>
-                </motion.div>
-              </AnimatePresence>
-            </div>
-          </div>
-
-          {/* Centered Product Image with soft overlapping crossfade */}
-          <div className="md:col-span-4 flex justify-center items-center relative min-h-[380px]">
-            <div className="absolute w-72 h-72 bg-white/5 blur-3xl rounded-full pointer-events-none" />
-
-            <div className="relative z-10 w-full max-w-xs flex justify-center filter drop-shadow-[0_25px_50px_rgba(0,0,0,0.8)]">
-              <AnimatePresence initial={false}>
-                <motion.img
-                  key={activeVariant.id || selectedIdx}
-                  src={activeVariant.image || "https://nota.uprock.pro/thumb/2/1SLA07O2y250d4sm92qnPg/1920r1080/d/library_image-14781-symbol-i64njjjjo-nota_scene_7_img_01.jpg"}
-                  alt={activeVariant.name}
-                  initial={{ opacity: 0, scale: 0.98 }}
-                  animate={{
-                    opacity: 1,
-                    scale: 1,
-                    transition: { duration: 0.22, delay: 0.08, ease: [0.25, 1, 0.5, 1] },
-                  }}
-                  exit={{
-                    opacity: 0,
-                    scale: 0.98,
-                    transition: { duration: 0.18, ease: [0.25, 1, 0.5, 1] },
-                  }}
-                  className="absolute max-h-[380px] object-contain"
-                />
-              </AnimatePresence>
-            </div>
-          </div>
-
-          {/* Mobile Tagline (visible on mobile screens) */}
-          <div className="md:hidden col-span-1 text-center py-2">
-            <span className="text-[11px] font-sans uppercase tracking-[0.12em] text-[#8a8a8a]">
-              {activeVariant.name}
-            </span>
-            <h4
-              className="text-2xl font-serif leading-tight mt-1"
-              style={{
-                color: TAGLINE_ACCENT[activeVariant.id] ?? "#ffffff",
+          return (
+            <motion.div
+              key={variant.id || idx}
+              initial={false}
+              animate={{
+                opacity: isActive ? 1 : 0,
+                zIndex: isActive ? 10 : 0,
               }}
+              transition={{ duration: 0.5, ease: "easeInOut" }}
+              className="absolute inset-0 w-full h-full flex items-center justify-center pointer-events-none"
             >
-              {activeVariant.tagline}
-            </h4>
-            <p className="text-xs text-neutral-400 font-light mt-1">
-              {activeVariant.subtext}
-            </p>
-          </div>
+              {/* Full-bleed Studio Background with Pen */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={variant.image}
+                alt={variant.name}
+                className="w-full h-full object-cover object-center select-none"
+              />
 
-          {/* Right Taglines Crossfade: Absolute Positioning with Shared Container */}
-          <div className="md:col-span-4 text-right hidden md:block">
-            <div className="relative h-32 flex flex-col justify-center items-end">
-              <AnimatePresence initial={false}>
-                <motion.div
-                  key={`right-${activeVariant.id || selectedIdx}`}
-                  initial={{ opacity: 0 }}
-                  animate={{
-                    opacity: 1,
-                    transition: { duration: 0.22, delay: 0.08, ease: [0.25, 1, 0.5, 1] },
-                  }}
-                  exit={{
-                    opacity: 0,
-                    transition: { duration: 0.18, ease: [0.25, 1, 0.5, 1] },
-                  }}
-                  className="absolute inset-0 flex flex-col justify-center items-end text-right space-y-1"
+              {/* Left Headline (Didone Serif) */}
+              <div className="absolute left-6 sm:left-12 lg:left-[10vw] xl:left-[14vw] top-1/2 -translate-y-1/2 max-w-sm sm:max-w-md text-left z-20">
+                <h2 className="font-serif text-4xl sm:text-6xl md:text-7xl lg:text-[84px] xl:text-[96px] text-white tracking-tight leading-[1.02] select-none drop-shadow-sm">
+                  {variant.tagline}
+                </h2>
+              </div>
+
+              {/* Right Headline (Didone Serif) */}
+              <div className="absolute right-6 sm:right-12 lg:right-[10vw] xl:right-[14vw] top-1/2 -translate-y-1/2 max-w-sm sm:max-w-md text-right z-20">
+                <h2 className="font-serif text-4xl sm:text-6xl md:text-7xl lg:text-[84px] xl:text-[96px] text-white tracking-tight leading-[1.02] select-none drop-shadow-sm">
+                  {variant.subtext}
+                </h2>
+              </div>
+            </motion.div>
+          );
+        })}
+
+        {/* Bottom Segmented Progress Indicators (media_1789376073867 & media_1789376086068) */}
+        <div className="absolute bottom-8 sm:bottom-10 inset-x-0 z-30 flex justify-center items-center px-6 pointer-events-auto">
+          <div className="flex items-center gap-2 sm:gap-3 w-full max-w-lg">
+            {displayVariants.map((v, idx) => {
+              const isActive = activeIdx === idx;
+              return (
+                <button
+                  key={v.id || idx}
+                  onClick={() => handleJumpToVariant(idx)}
+                  className="relative h-1 sm:h-1.5 flex-1 rounded-full overflow-hidden bg-white/20 hover:bg-white/40 transition-colors cursor-pointer py-2 -my-2"
+                  aria-label={`Select ${v.name}`}
                 >
-                  <span className="text-[11px] font-sans uppercase tracking-[0.12em] text-[#8a8a8a]">
-                    Edition 0{selectedIdx + 1}
-                  </span>
-                  <p className="text-sm text-neutral-300 font-light max-w-xs leading-relaxed">
-                    Machined aerospace aluminum with tactile micro-bead blast finish.
-                  </p>
-                </motion.div>
-              </AnimatePresence>
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom Swatches + Order CTA */}
-        <div className="max-w-7xl mx-auto w-full flex flex-col sm:flex-row items-center justify-between gap-6 pt-6 border-t border-neutral-900">
-          <div className="flex items-center gap-5">
-            <span className="font-mono text-xs text-neutral-400 tabular-nums">
-              {selectedIdx + 1} / {variants.length}
-            </span>
-            <div className="flex items-center gap-3">
-              {variants.map((v, idx) => {
-                const isSelected = selectedIdx === idx;
-                return (
-                  <button
-                    key={v.id || idx}
-                    onClick={() => handleSwatchClick(idx)}
-                    className={`w-7 h-7 rounded-full transition-all border ${
-                      isSelected ? "ring-2 ring-white ring-offset-2 ring-offset-black scale-125" : "opacity-60 hover:opacity-100"
+                  <div
+                    className={`h-full w-full rounded-full transition-all duration-300 ${
+                      isActive ? "bg-white opacity-100" : "bg-transparent opacity-0"
                     }`}
-                    style={{ backgroundColor: v.hexColor }}
-                    aria-label={`Select ${v.name}`}
                   />
-                );
-              })}
-            </div>
+                </button>
+              );
+            })}
           </div>
-
-          <button
-            onClick={onOpenOrder}
-            className="px-8 py-3.5 bg-[#ffffff] text-[#000000] font-semibold rounded-[999px] hover:bg-neutral-200 transition-all text-xs font-mono uppercase tracking-wider shadow-xl"
-          >
-            Order {activeVariant.name}
-          </button>
         </div>
+
       </div>
     </div>
   );

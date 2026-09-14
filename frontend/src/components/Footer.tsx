@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
-import { X, Sparkles } from "lucide-react";
+import { X } from "lucide-react";
 
 interface FooterProps {
   siteName?: string;
-  copyright: string;
-  links: Array<{ label: string; href: string }>;
+  copyright?: string;
+  links?: Array<{ label: string; href: string }>;
 }
 
 const teamMembers = [
@@ -21,101 +21,85 @@ const teamMembers = [
   { name: "Anastasia Voronova", role: "Producer", link: "https://telegram.me/Anastasia_coin" },
 ];
 
-export const Footer: React.FC<FooterProps> = ({ siteName = "Nōta", copyright, links }) => {
+export const Footer: React.FC<FooterProps> = ({
+  copyright = "@2026 Nōta Team",
+  links = [
+    { label: "Specifications", href: "#specifications" },
+    { label: "Who it's for", href: "#who-it-is-for" },
+    { label: "About", href: "#about" },
+    { label: "Inside the box", href: "#inside-the-box" },
+  ],
+}) => {
   const [teamPopupOpen, setTeamPopupOpen] = useState(false);
 
   return (
-    <div>
-      {/* Primitive #9: Product Image on Vertical Gradient (pen-tip section: #7a2f1a -> #b3521f -> #d17a3a) */}
-      <section
-        className="relative pt-36 pb-28 px-6 overflow-hidden text-white text-center"
-        style={{
-          background: "linear-gradient(180deg, #7a2f1a 0%, #b3521f 50%, #d17a3a 100%)",
-        }}
-      >
-        {/* Ambient Top Glow */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,_var(--tw-gradient-stops))] from-amber-500/20 via-transparent to-transparent pointer-events-none" />
-
-        <div className="max-w-4xl mx-auto space-y-8 relative z-10">
-          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-[999px] bg-white/10 backdrop-blur-md border border-white/20 text-[11px] font-sans uppercase tracking-[0.12em] text-white">
-            <Sparkles size={13} /> Writing Infrastructure
-          </span>
-
-          <h2 className="text-5xl sm:text-6xl md:text-7xl font-serif font-light tracking-tight leading-tight">
-            Designed for those who <br />
-            <span className="italic text-white">think better by hand.</span>
-          </h2>
-
-          <div className="relative w-full max-w-xl mx-auto py-6 flex justify-center drop-shadow-[0_30px_50px_rgba(0,0,0,0.7)]">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="https://nota.uprock.pro/thumb/2/zOzK4LBsVJn0W98Pf5CalQ/364r1526/d/library_image-14634-symbol-is6ru9kkd-nota_hero_image_adaptive_866220.png"
-              alt="Nota Precision Pen"
-              className="w-full max-h-72 object-contain transform -rotate-6 hover:scale-105 transition-transform duration-700"
-            />
+    <footer className="bg-black text-white pt-24 pb-12 px-6 sm:px-12 lg:px-20 border-t border-neutral-900">
+      <div className="max-w-[1520px] mx-auto space-y-20">
+        
+        {/* Top Grid: Description, Navigation, Year (media_1789376130368) */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-10 sm:gap-14 items-start">
+          
+          {/* Left Column (Span 6): Statement */}
+          <div className="md:col-span-6 lg:col-span-7 pr-4 sm:pr-8">
+            <p className="font-sans text-lg sm:text-xl md:text-[22px] leading-[1.45] text-white font-normal max-w-xl">
+              NŌTA creates tools that respect the way people think and write. Natural handwriting, quietly connected to digital structure.
+            </p>
           </div>
-        </div>
-      </section>
 
-      {/* Abrupt Transition to Solid Black (#000000) Footer with 3-Column Layout */}
-      <footer className="bg-[#000000] py-24 px-6 sm:px-10 lg:px-14 text-neutral-400">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-12 pb-16 border-b border-neutral-800">
-            {/* Column 1: Brand Blurb */}
-            <div className="md:col-span-5 space-y-4">
-              <span className="font-serif text-3xl tracking-tight text-white font-normal block">
-                {siteName}
-              </span>
-              <p className="text-sm text-neutral-400 max-w-sm font-light leading-relaxed">
-                Writing infrastructure for modern thinking. A precision smart pen and intelligent paper system that connects analog handwriting to structured digital knowledge.
-              </p>
-            </div>
-
-            {/* Column 2: Navigation Links */}
-            <div className="md:col-span-4 space-y-4">
-              <h4 className="text-[11px] font-sans uppercase tracking-[0.12em] text-[#8a8a8a]">Navigation</h4>
-              <nav className="flex flex-col space-y-3 text-sm font-light">
-                {links.map((link) => (
-                  <a
-                    key={link.label}
-                    href={link.href}
-                    className="hover:text-white transition-colors"
-                  >
-                    {link.label}
-                  </a>
-                ))}
-              </nav>
-            </div>
-
-            {/* Column 3: Credits & Reviewer Info */}
-            <div className="md:col-span-3 space-y-4">
-              <h4 className="text-[11px] font-sans uppercase tracking-[0.12em] text-[#8a8a8a]">Credits & Administration</h4>
-              <div className="space-y-3 text-sm font-light">
-                <button
-                  onClick={() => setTeamPopupOpen(true)}
-                  className="hover:text-white transition-colors underline underline-offset-4 block text-left"
-                >
-                  Builded by NōtaTeam
-                </button>
+          {/* Middle Column (Span 3): Navigation */}
+          <div className="md:col-span-3 lg:col-span-3 space-y-3">
+            <h3 className="text-xs font-sans text-neutral-500 font-medium">Navigation</h3>
+            <nav className="flex flex-col space-y-2.5">
+              {links.map((link) => (
                 <a
-                  href="/admin"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-neutral-500 hover:text-neutral-300 transition-colors block text-xs font-mono"
+                  key={link.label}
+                  href={link.href}
+                  className="text-sm font-sans text-white hover:text-neutral-400 transition-colors"
                 >
-                  Strapi Admin Panel →
+                  {link.label}
                 </a>
-              </div>
-            </div>
+              ))}
+            </nav>
           </div>
 
-          {/* Bottom Bar */}
-          <div className="pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs font-mono text-neutral-500">
-            <div>{copyright}</div>
-            <div className="text-neutral-600">Surge Global Senior Web Developer Assessment</div>
+          {/* Right Column (Span 2): Year */}
+          <div className="md:col-span-3 lg:col-span-2 space-y-3">
+            <h3 className="text-xs font-sans text-neutral-500 font-medium">Year</h3>
+            <p className="text-sm font-sans text-white font-medium">2026</p>
+          </div>
+
+        </div>
+
+        {/* Bottom Bar: Copyright, Team links, Credits (media_1789376130368) */}
+        <div className="pt-8 border-t border-neutral-900 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-sans text-neutral-500">
+          <div>{copyright}</div>
+
+          <div className="flex items-center gap-2">
+            <a
+              href="https://taptop.pro/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-white transition-colors"
+            >
+              Made in Taptop
+            </a>
+            <span>•</span>
+            <button
+              onClick={() => setTeamPopupOpen(true)}
+              className="hover:text-white transition-colors"
+            >
+              Builded by NōtaTeam
+            </button>
+          </div>
+
+          <div>
+            <span className="hover:text-neutral-400 transition-colors">
+              Designed by Alice &amp; UPROCK Studio
+            </span>
           </div>
         </div>
-      </footer>
+
+      </div>
 
       {/* Team Modal Popup */}
       {teamPopupOpen && (
@@ -146,6 +130,6 @@ export const Footer: React.FC<FooterProps> = ({ siteName = "Nōta", copyright, l
           </div>
         </div>
       )}
-    </div>
+    </footer>
   );
 };
