@@ -1,10 +1,8 @@
 "use client";
 
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef } from "react";
 import { BoxItem } from "@/types/cms";
-import { motion, useScroll, useTransform, useSpring, useReducedMotion } from "framer-motion";
-import { TextInkReveal } from "@/components/TextInkReveal";
-import { LazyImage } from "@/components/LazyImage";
+import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
 
 interface InsideTheBoxProps {
   titleLine1: string;
@@ -13,190 +11,151 @@ interface InsideTheBoxProps {
   items: BoxItem[];
 }
 
+const BLINDS_COUNT = 22;
+
+// Horizontal Blinds Overlay that collapses open (media_1789369949345 -> media_1789369964283)
+const HorizontalBlinds: React.FC<{ progress: any; shouldReduceMotion: boolean | null }> = ({
+  progress,
+  shouldReduceMotion,
+}) => {
+  // Blinds collapse open between 0.44 and 0.58
+  const scaleY = useTransform(progress, [0.44, 0.58], [1, 0]);
+  const opacity = useTransform(progress, [0.55, 0.59], [1, 0]);
+  const display = useTransform(progress, (v: number) => (v >= 0.59 ? "none" : "flex"));
+
+  if (shouldReduceMotion) return null;
+
+  return (
+    <motion.div
+      style={{ opacity, display }}
+      className="absolute inset-0 flex flex-col justify-between pointer-events-none z-20 overflow-hidden"
+    >
+      {Array.from({ length: BLINDS_COUNT }).map((_, idx) => (
+        <motion.div
+          key={idx}
+          style={{ scaleY, transformOrigin: "center" }}
+          className="w-full h-2.5 sm:h-3.5 lg:h-4 bg-white will-change-transform"
+        />
+      ))}
+    </motion.div>
+  );
+};
+
 export const InsideTheBox: React.FC<InsideTheBoxProps> = ({
-  titleLine1,
-  titleLine2,
+  titleLine1 = "Inside",
+  titleLine2 = "the box",
   leadText,
   items,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const shouldReduceMotion = useReducedMotion();
 
-  // Pin section scroll for the internal step carousel (0->1 across full scroll height)
-  const { scrollYProgress: carouselProgress } = useScroll({
+  // Scroll scrub across the entire pinned section
+  const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end end"],
   });
 
-  // Iris-wipe entry scroll: 0->1 as the section top crosses from viewport-bottom to viewport-top
-  const { scrollYProgress: irisRaw } = useScroll({
-    target: containerRef,
-    offset: ["start end", "start start"],
-  });
+  // Phase 1: Expanding white circle from center on black background (0.00 -> 0.22)
+  const circleScale = useTransform(scrollYProgress, [0.00, 0.22], [0, 4.8]);
+  const whiteBgOpacity = useTransform(scrollYProgress, [0.20, 0.24], [0, 1]);
 
-  // Spring for smoother iris scrub (skipped in reduced-motion mode)
-  const irisSpring = useSpring(irisRaw, {
-    stiffness: 80,
-    damping: 18,
-    restDelta: 0.001,
-  });
+  // Phase 2: Centered "Inside the box" serif headline (0.12 -> 0.38)
+  const titleOpacity = useTransform(scrollYProgress, [0.12, 0.18, 0.26, 0.36], [0, 1, 1, 0]);
+  const titleY = useTransform(scrollYProgress, [0.25, 0.38], ["0px", "-180px"]);
+  const titleDisplay = useTransform(scrollYProgress, (v: number) => (v >= 0.38 ? "none" : "flex"));
 
-  // Compute clip-path MotionValue at hook level (rules of hooks: never inline in JSX)
-  const irisSource = shouldReduceMotion ? irisRaw : irisSpring;
-  const irisClipPath = useTransform(
-    irisSource,
-    [0, 1],
-    ["circle(0% at 50% 50%)", "circle(150% at 50% 50%)"]
+  // Phase 3 & 4: Unboxing stage entrance and scroll (0.30 -> 1.00)
+  const stageOpacity = useTransform(scrollYProgress, [0.30, 0.38], [0, 1]);
+  const stageY = useTransform(
+    scrollYProgress,
+    [0.30, 0.44, 0.70, 1.00],
+    ["140px", "0px", "0px", "-240px"]
   );
-  // Reduced-motion fallback: fade in quickly
-  const irisOpacity = useTransform(irisRaw, [0, 0.4], [0, 1]);
 
-  // Verified high-res box photography assets (images reused from reference, markup original)
-  const boxAssets = [
-    {
-      badge: "01",
-      title: items[0]?.title || "A complete, ready-to-use set",
-      description:
-        items[0]?.description ||
-        "Smart pen, Smartpaper notepad, charging cable, and instructions — carefully packaged for a hassle-free start.",
-      image: "https://nota.uprock.pro/thumb/2/NdNsA4zjgwV803LVWQCIkg/1276r2108/d/41_block.jpg",
-    },
-    {
-      badge: "02",
-      title: items[1]?.title || "The NOTA Smart Pen",
-      description:
-        items[1]?.description ||
-        "Aluminum body, USB-C charging, physical control button, and Bluetooth connectivity. Up to 8 hours of active use.",
-      image: "https://nota.uprock.pro/thumb/2/V-Pld1tdphvc6bqPvkKsvw/1276r2108/d/42_block.jpg",
-    },
-    {
-      badge: "03",
-      title: items[2]?.title || "Charging Adapter",
-      description:
-        items[2]?.description ||
-        "Compact USB-C power adapter with stable output for everyday charging. Designed for safe, efficient power delivery.",
-      image: "https://nota.uprock.pro/thumb/2/uY0WbSXhbz5r3fxyMekPng/1276r2108/d/43_block.jpg",
-    },
-  ];
-
-  const stepCount = boxAssets.length;
-  const stepIndex = useTransform(carouselProgress, (v) => {
-    if (v < 0.33) return 0;
-    if (v < 0.66) return 1;
-    return 2;
-  });
-
-  const [activeStep, setActiveStep] = useState(0);
-
-  useEffect(() => {
-    const unsubscribe = stepIndex.on("change", (latest) => {
-      setActiveStep(latest);
-    });
-    return () => unsubscribe();
-  }, [stepIndex]);
-
-  const currentItem = boxAssets[activeStep] || boxAssets[0];
+  const primaryItem = items?.[0] || {
+    title: "A complete, ready-to-use set",
+    description:
+      "Smart pen, Smartpaper notepad, charging cable, and instructions — carefully packaged for a hassle-free start.",
+  };
 
   return (
-    // Tall scroll container — sticky child provides pinned viewport
-    <div ref={containerRef} id="inside-the-box" className="relative h-[250vh]">
-      {/* Sticky viewport */}
-      <div className="sticky top-0 h-screen w-full overflow-hidden">
-        {/*
-          Iris-wipe reveal: clip-path circle scrubbed by scroll, growing from 0 to 150%
-          from viewport center, revealing the light section as user scrolls in.
-          GPU-composited (clip-path). Reduced-motion users get opacity fade instead.
-        */}
+    <div ref={containerRef} id="inside-the-box" className="relative h-[450vh] bg-black">
+      {/* Sticky Viewport */}
+      <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-center">
+        
+        {/* Solid White Background layer that activates once circle finishes expansion */}
+        <motion.div
+          style={{ opacity: whiteBgOpacity }}
+          className="absolute inset-0 bg-white z-0 pointer-events-none"
+        />
+
+        {/* Phase 1: Growing White Circle (media_1789369904406) */}
+        <div className="absolute inset-0 flex items-center justify-center overflow-hidden pointer-events-none z-10">
+          <motion.div
+            style={
+              shouldReduceMotion
+                ? { opacity: 1, width: "100%", height: "100%", borderRadius: 0 }
+                : { scale: circleScale }
+            }
+            className="w-[50vmin] h-[50vmin] rounded-full bg-white will-change-transform"
+          />
+        </div>
+
+        {/* Phase 2: "Inside the box" Centered Title (media_1789369936878) */}
         <motion.div
           style={
             shouldReduceMotion
-              ? { opacity: irisOpacity }
-              : { clipPath: irisClipPath, willChange: "clip-path" }
+              ? { display: "none" }
+              : { opacity: titleOpacity, y: titleY, display: titleDisplay }
           }
-          className="absolute inset-0 bg-[#f5f5f3] text-[#1a1a1a] flex flex-col justify-between py-20 px-6 sm:px-10 lg:px-14"
+          className="absolute inset-0 z-30 flex-col items-center justify-center text-center px-6 pointer-events-none"
         >
-          {/* Section heading — all copy Strapi-driven */}
-          <div className="max-w-7xl mx-auto w-full">
-            <TextInkReveal
-              badge="Unboxing &amp; Packaging"
-              titleLine1={titleLine1 || "Inside"}
-              titleLine2={titleLine2 || "the box"}
-              theme="light"
-            />
-            <p className="text-[#4a4a4a] text-sm sm:text-base font-light leading-relaxed max-w-2xl pt-2">
-              {leadText}
-            </p>
-          </div>
+          <h2 className="font-serif text-6xl sm:text-8xl md:text-9xl lg:text-[110px] xl:text-[130px] font-normal leading-[0.92] tracking-tight select-none">
+            <span className="text-[#999999] block">{titleLine1}</span>
+            <span className="text-[#000000] block mt-1 sm:mt-2">{titleLine2}</span>
+          </h2>
+        </motion.div>
 
-          {/* Center Stage: un-boxed two-column step layout */}
-          <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center my-auto">
-            {/* Left Column: un-boxed large image — no card, border, radius, or padding box */}
-            <div className="lg:col-span-7 flex justify-center items-center relative min-h-[240px] sm:min-h-[340px] lg:min-h-[420px]">
-              <motion.div
-                key={`box-img-${activeStep}`}
-                initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, scale: 0.96 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.45, ease: "easeOut" }}
-                className="relative z-10 w-full flex justify-center items-center"
-              >
-                <LazyImage
-                  src={currentItem.image}
-                  alt={currentItem.title}
-                  className="w-full h-auto max-h-[280px] sm:max-h-[360px] lg:max-h-[460px] object-contain mx-auto"
-                  shimmerClassName="bg-[#e8e8e6]"
+        {/* Phase 3 & 4: Unboxing Showcase Set with Horizontal Blinds (media_1789369949345 -> media_1789369964283) */}
+        <motion.div
+          style={shouldReduceMotion ? { opacity: 1 } : { opacity: stageOpacity, y: stageY }}
+          className="relative z-20 w-full max-w-7xl mx-auto px-6 sm:px-12 lg:px-16"
+        >
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-center">
+            
+            {/* Left Column: Open Luxury Box with Horizontal Blinds */}
+            <div className="lg:col-span-7 flex justify-center items-center relative">
+              <div className="relative w-full max-w-[640px] aspect-[16/11] flex items-center justify-center overflow-hidden">
+                {/* Real Box Photograph from nota.uprock.pro */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="https://nota.uprock.pro/d/library_image-14643-symbol-ispnvazts-nota_scene_5_img_01_adaptive.jpg"
+                  alt={primaryItem.title}
+                  className="w-full h-full object-contain select-none pointer-events-none"
                 />
-              </motion.div>
-            </div>
 
-            {/* Right Column: Strapi-driven title and description in dark charcoal */}
-            <div className="lg:col-span-5 relative min-h-[240px] flex flex-col justify-center">
-              <motion.div
-                key={`box-text-${activeStep}`}
-                initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.45, ease: "easeOut" }}
-                className="space-y-6"
-              >
-                <span className="text-xs font-mono uppercase tracking-widest text-[#888888]">
-                  Item {currentItem.badge} of 03
-                </span>
-                <h3 className="text-3xl sm:text-4xl font-serif font-normal text-[#1a1a1a] leading-snug">
-                  {currentItem.title}
-                </h3>
-                <p className="text-[#4a4a4a] text-sm sm:text-base font-light leading-relaxed">
-                  {currentItem.description}
-                </p>
-              </motion.div>
-            </div>
-          </div>
-
-          {/* Segmented progress bar & counter — dark segments on off-white background */}
-          <div className="max-w-7xl mx-auto w-full pt-4">
-            <div className="flex items-center justify-center gap-4 max-w-sm mx-auto">
-              <span className="font-mono text-xs text-[#888888] tabular-nums">
-                {activeStep + 1} / {stepCount}
-              </span>
-              <div className="flex items-center gap-2 flex-1">
-                {Array.from({ length: stepCount }).map((_, idx) => {
-                  const isActive = activeStep === idx;
-                  const isPassed = activeStep > idx;
-                  return (
-                    <div
-                      key={idx}
-                      className="h-1 flex-1 rounded-full overflow-hidden bg-[#d4d4d0] transition-colors"
-                    >
-                      <div
-                        className={`h-full transition-all duration-300 ${
-                          isActive || isPassed ? "w-full bg-[#1a1a1a]" : "w-0"
-                        }`}
-                      />
-                    </div>
-                  );
-                })}
+                {/* Venetian Blinds Overlay */}
+                <HorizontalBlinds
+                  progress={scrollYProgress}
+                  shouldReduceMotion={shouldReduceMotion}
+                />
               </div>
             </div>
+
+            {/* Right Column: Title and Description */}
+            <div className="lg:col-span-5 space-y-4 text-left">
+              <h3 className="font-sans text-2xl sm:text-3xl lg:text-[34px] font-medium text-black tracking-tight leading-snug">
+                {primaryItem.title}
+              </h3>
+              <p className="font-sans text-sm sm:text-base text-neutral-500 font-normal leading-relaxed max-w-md">
+                {primaryItem.description}
+              </p>
+            </div>
+
           </div>
         </motion.div>
+
       </div>
     </div>
   );
