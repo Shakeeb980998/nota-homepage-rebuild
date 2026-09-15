@@ -73,6 +73,58 @@ const WordSpan: React.FC<{
   );
 };
 
+// Audience topic paragraphs with scroll-driven word illumination matching the headers and intro copy
+const TopicIlluminatedText: React.FC<{
+  text: string;
+  progress: any;
+  range: [number, number];
+  shouldReduceMotion: boolean | null;
+  className?: string;
+}> = ({ text, progress, range, shouldReduceMotion, className = "" }) => {
+  const words = text.split(" ");
+  const [rangeStart, rangeEnd] = range;
+  const totalRange = rangeEnd - rangeStart;
+
+  if (shouldReduceMotion) {
+    return <p className={`text-white/90 font-light leading-relaxed ${className}`}>{text}</p>;
+  }
+
+  return (
+    <p className={`flex flex-wrap text-left font-light leading-relaxed select-none ${className}`}>
+      {words.map((word, i) => {
+        const wordStart = rangeStart + (i / words.length) * totalRange * 0.85;
+        const wordEnd = Math.min(rangeEnd, wordStart + (totalRange / words.length) * 1.5);
+        return (
+          <TopicWordSpan
+            key={i}
+            word={word}
+            progress={progress}
+            range={[wordStart, wordEnd]}
+          />
+        );
+      })}
+    </p>
+  );
+};
+
+const TopicWordSpan: React.FC<{
+  word: string;
+  progress: any;
+  range: [number, number];
+}> = ({ word, progress, range }) => {
+  const color = useTransform(progress, range, ["#525252", "#ffffff"]);
+  const opacity = useTransform(progress, range, [0.45, 1]);
+
+  return (
+    <motion.span
+      style={{ color, opacity }}
+      className="mr-1 sm:mr-1.5 inline-block will-change-[color,opacity]"
+    >
+      {word}
+    </motion.span>
+  );
+};
+
 export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
   introQuote,
   sectionTitle = "Who it's for:",
@@ -227,10 +279,16 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
                     <h3 className="text-base sm:text-lg lg:text-[21px] font-medium text-white mb-0.5 tracking-tight">
                       {audiences[0]?.title || "Students & Learners"}
                     </h3>
-                    <p className="text-xs sm:text-[13px] lg:text-[13.5px] text-[#a3a3a3] font-light leading-relaxed">
-                      {audiences[0]?.description ||
-                        "Handwritten notes stay personal and intuitive, but become searchable, organized, and easy to study. Lectures, ideas, and revisions are captured as they are — then supported by AI summaries, text recognition, and quick navigation when it matters most."}
-                    </p>
+                    <TopicIlluminatedText
+                      text={
+                        audiences[0]?.description ||
+                        "Handwritten notes stay personal and intuitive, but become searchable, organized, and easy to study. Lectures, ideas, and revisions are captured as they are — then supported by AI summaries, text recognition, and quick navigation when it matters most."
+                      }
+                      progress={smoothProgress}
+                      range={[0.12, 0.24]}
+                      shouldReduceMotion={shouldReduceMotion}
+                      className="text-xs sm:text-[13px] lg:text-[13.5px]"
+                    />
                   </motion.div>
 
                   {/* Topic 2 */}
@@ -241,10 +299,16 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
                     <h3 className="text-base sm:text-lg lg:text-[21px] font-medium text-white mb-0.5 tracking-tight">
                       {audiences[1]?.title || "Creators, Designers & Architects"}
                     </h3>
-                    <p className="text-xs sm:text-[13px] lg:text-[13.5px] text-[#a3a3a3] font-light leading-relaxed">
-                      {audiences[1]?.description ||
-                        "Sketches, diagrams, concepts, and fragments of ideas belong on paper. This tool makes sure they don’t disappear. Everything drawn or written is safely stored, easy to revisit, and ready to evolve into something bigger — without interrupting the creative flow."}
-                    </p>
+                    <TopicIlluminatedText
+                      text={
+                        audiences[1]?.description ||
+                        "Sketches, diagrams, concepts, and fragments of ideas belong on paper. This tool makes sure they don’t disappear. Everything drawn or written is safely stored, easy to revisit, and ready to evolve into something bigger — without interrupting the creative flow."
+                      }
+                      progress={smoothProgress}
+                      range={[0.20, 0.32]}
+                      shouldReduceMotion={shouldReduceMotion}
+                      className="text-xs sm:text-[13px] lg:text-[13.5px]"
+                    />
                   </motion.div>
 
                   {/* Topic 3 */}
@@ -255,10 +319,16 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
                     <h3 className="text-base sm:text-lg lg:text-[21px] font-medium text-white mb-0.5 tracking-tight">
                       {audiences[2]?.title || "Managers & Product Thinkers"}
                     </h3>
-                    <p className="text-xs sm:text-[13px] lg:text-[13.5px] text-[#a3a3a3] font-light leading-relaxed">
-                      {audiences[2]?.description ||
-                        "Meetings start on paper and end with structure. Notes turn into clear summaries, tasks, and follow-ups. The pen captures everything quietly, while the app helps organize decisions without pulling attention away from the room."}
-                    </p>
+                    <TopicIlluminatedText
+                      text={
+                        audiences[2]?.description ||
+                        "Meetings start on paper and end with structure. Notes turn into clear summaries, tasks, and follow-ups. The pen captures everything quietly, while the app helps organize decisions without pulling attention away from the room."
+                      }
+                      progress={smoothProgress}
+                      range={[0.28, 0.40]}
+                      shouldReduceMotion={shouldReduceMotion}
+                      className="text-xs sm:text-[13px] lg:text-[13.5px]"
+                    />
                   </motion.div>
                 </div>
 
