@@ -1,4 +1,4 @@
-﻿# Surge Global Senior Web Developer Assessment: Homepage Rebuild
+# Surge Global Senior Web Developer Assessment: Homepage Rebuild
 
 Rebuild of the [NŌTA](https://nota.uprock.pro/) homepage powered by self-hosted Strapi CMS and Next.js (React), designed for multi-service deployment on Railway.
 
@@ -77,4 +77,23 @@ npm run dev
 ---
 
 ## AI Tools Used
-- **Google DeepMind Antigravity / Gemini 3.8**: Used for architectural design, rapid scaffolding, component translation from reference markup, content schema modeling, and continuous build verification.
+
+In accordance with the assessment guidelines encouraging the effective and disciplined use of AI tools, multiple state-of-the-art AI assistants were leveraged strategically across different phases of the project:
+
+### 1. Google DeepMind Antigravity (Gemini)
+- **Primary Agentic Workspace & Codebase Execution**: Served as the core pair-programming agent with direct filesystem, terminal, and build tool access.
+- **Scroll Physics & Complex Choreography**: Reconstructed precision animations matching the reference site, including Framer Motion scroll scrubbing, multi-stage keyframed transforms, pinned viewports, and seamless section transitions (Who It's For $\to$ Smart Paper).
+- **Reverse Engineering & Asset Inspection**: Programmatically inspected DOM structures, animation keyframe curves, and CSS rules from reference assets to replicate layout and timing faithfully.
+- **Continuous Build & Verification Pipeline**: Automated Turbopack builds, TypeScript type-checking, git commit workflows, and Railway deployment checks to prevent regressions.
+
+### 2. Anthropic Claude (Claude 3.5 / 3.7 Sonnet)
+- **Component Architecture & Refactoring**: Designed clean React component boundaries, custom hooks, and modular UI state logic across Next.js 16 App Router.
+- **Strapi CMS v5 Schema Modeling**: Structured headless backend models with reusable components and Dynamic Zones, along with bootstrap automation scripts (`src/index.ts`) for reviewer super-admin account provisioning.
+- **Accessibility & Motion Considerations**: Integrated semantic HTML landmarks, ARIA attributes, and accessible motion fallback (`useReducedMotion`) for users sensitive to scroll transitions.
+- **Responsive Layout & CSS Optimization**: Crafted fluid responsive design breakpoints using Tailwind CSS to guarantee visual parity across desktop, tablet, and mobile displays.
+
+### 3. OpenAI ChatGPT / GPT (GPT-4o)
+- **Project Scoping & Task Decomposition**: Analyzed assessment requirements, prioritized feature milestones, and organized delivery criteria.
+- **Copywriting Extraction & Schema Mapping**: Extracted and structured editorial copy, product claims, technical specifications, and FAQ blocks from the original NŌTA website into structured JSON fixtures.
+- **Edge-Case Validation**: Formulated server-side API validation routines for user pre-order submissions (`/api/submit`), ensuring resilient email validation and graceful error responses.
+- **Documentation & Reviewer Onboarding**: Assisted in drafting technical rationale, architecture decision records (ADRs), and straightforward local setup guides.
