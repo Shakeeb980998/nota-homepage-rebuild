@@ -120,42 +120,49 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
   // Pen Card Animation: Exact match to Screenshots 1, 2, 3, 4
   // 1. Enters from bottom-right (Screenshots 1 & 2)
   // 2. Expands to full screen (Screenshot 3)
-  // 3. Recedes into upper center gray card (Screenshot 4)
+  // 3. Recedes into upper center gray card, and the pen disappears completely (media_1789455424779.png)
   const penLeft = useTransform(
     smoothProgress,
-    [0.40, 0.52, 0.65, 0.82, 0.98],
+    [0.40, 0.52, 0.65, 0.80, 0.94],
     [isMobile ? "8%" : "37%", isMobile ? "4%" : "30%", "0%", "0%", isMobile ? "6%" : "15%"]
   );
 
   const penRight = useTransform(
     smoothProgress,
-    [0.40, 0.52, 0.65, 0.82, 0.98],
+    [0.40, 0.52, 0.65, 0.80, 0.94],
     [isMobile ? "8%" : "2%", isMobile ? "4%" : "2%", "0%", "0%", isMobile ? "6%" : "15%"]
   );
 
   const penTop = useTransform(
     smoothProgress,
-    [0.40, 0.52, 0.65, 0.82, 0.98],
-    ["100vh", "50vh", "0vh", "0vh", isMobile ? "12vh" : "16vh"]
+    [0.40, 0.52, 0.65, 0.80, 0.94],
+    ["100vh", "50vh", "0vh", "0vh", isMobile ? "10vh" : "12vh"]
   );
 
+  // Keep penBottom at 0vh so the gray card extends flush to the bottom without leaving an empty black gap
   const penBottom = useTransform(
     smoothProgress,
-    [0.40, 0.52, 0.65, 0.82, 0.98],
-    ["-50vh", "0vh", "0vh", "0vh", isMobile ? "45vh" : "48vh"]
+    [0.40, 0.52, 0.65, 0.80, 0.94],
+    ["-50vh", "0vh", "0vh", "0vh", "0vh"]
   );
 
-  const penRadius = useTransform(
+  const penTopRadius = useTransform(
     smoothProgress,
-    [0.40, 0.52, 0.65, 0.82, 0.98],
-    [12, 10, 0, 0, 14]
+    [0.40, 0.52, 0.65, 0.80, 0.94],
+    [12, 10, 0, 0, 16]
   );
 
+  // Gray card background matching exact pixel value (56, 57, 56) in media_1789455424779.png
   const penBg = useTransform(
     smoothProgress,
-    [0.40, 0.82, 0.94],
-    ["#ffffff", "#ffffff", "#555a5f"]
+    [0.40, 0.80, 0.92],
+    ["#ffffff", "#ffffff", "#383938"]
   );
+
+  // Pen Image disappears completely (fades to 0 opacity + moves left + scales down) as card recedes (Image 1 fix)
+  const penImageOpacity = useTransform(smoothProgress, [0.76, 0.88], [1, 0]);
+  const penImageX = useTransform(smoothProgress, [0.76, 0.88], ["0%", "-14%"]);
+  const penImageScale = useTransform(smoothProgress, [0.76, 0.88], [1, 0.85]);
 
   const quoteText =
     introQuote ||
@@ -263,7 +270,7 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
 
           </motion.div>
 
-          {/* Layer 2: Pen Card (Enters bottom-right in Screenshots 1&2, expands full screen in Screenshot 3, recedes to upper center in Screenshot 4) */}
+          {/* Layer 2: Pen Card (Enters bottom-right in Screenshots 1&2, expands full screen in Screenshot 3, recedes to upper center in Screenshot 4 with pen disappearing) */}
           <motion.div
             style={
               shouldReduceMotion
@@ -273,17 +280,25 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
                     right: penRight,
                     top: penTop,
                     bottom: penBottom,
-                    borderRadius: penRadius,
+                    borderTopLeftRadius: penTopRadius,
+                    borderTopRightRadius: penTopRadius,
+                    borderBottomLeftRadius: 0,
+                    borderBottomRightRadius: 0,
                     backgroundColor: penBg,
                   }
             }
             className="absolute z-20 flex items-center justify-center will-change-[left,right,top,bottom,border-radius,background-color] pointer-events-none p-2 sm:p-6 md:p-10 overflow-hidden shadow-2xl"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <motion.img
               src="/nota_horizontal_pen.png"
               alt="Nōta Smart Pen horizontal side profile"
-              className="w-full h-full object-contain mix-blend-multiply select-none pointer-events-none"
+              style={{
+                opacity: penImageOpacity,
+                x: penImageX,
+                scale: penImageScale,
+              }}
+              className="w-full h-full object-contain mix-blend-multiply select-none pointer-events-none will-change-[opacity,transform]"
             />
           </motion.div>
 
