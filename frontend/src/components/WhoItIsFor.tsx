@@ -76,11 +76,20 @@ const WordSpan: React.FC<{
 export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
   introQuote,
   sectionTitle = "Who it's for:",
-  description,
   audiences,
 }) => {
   const pinTrackRef = useRef<HTMLDivElement>(null);
   const shouldReduceMotion = useReducedMotion();
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   // Master scroll scrub across Manifesto/Intro, 3 Topics sliding in, Pen entrance, full-bleed expansion, and shrink-recede exit
   const { scrollYProgress } = useScroll({
@@ -94,27 +103,59 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
     restDelta: 0.001,
   });
 
-
   // 3 Audience Topics: Slide in from right sequentially
-  const topic1X = useTransform(smoothProgress, [0.18, 0.32], ["110%", "0%"]);
-  const topic1Opacity = useTransform(smoothProgress, [0.18, 0.28], [0, 1]);
+  const topic1X = useTransform(smoothProgress, [0.12, 0.25], ["110%", "0%"]);
+  const topic1Opacity = useTransform(smoothProgress, [0.12, 0.22], [0, 1]);
 
-  const topic2X = useTransform(smoothProgress, [0.28, 0.42], ["110%", "0%"]);
-  const topic2Opacity = useTransform(smoothProgress, [0.28, 0.38], [0, 1]);
+  const topic2X = useTransform(smoothProgress, [0.22, 0.35], ["110%", "0%"]);
+  const topic2Opacity = useTransform(smoothProgress, [0.22, 0.32], [0, 1]);
 
-  const topic3X = useTransform(smoothProgress, [0.38, 0.52], ["110%", "0%"]);
-  const topic3Opacity = useTransform(smoothProgress, [0.38, 0.48], [0, 1]);
+  const topic3X = useTransform(smoothProgress, [0.32, 0.45], ["110%", "0%"]);
+  const topic3Opacity = useTransform(smoothProgress, [0.32, 0.42], [0, 1]);
 
-  // Text content moves up and fades out smoothly as pen rises from below
-  const textContentOpacity = useTransform(smoothProgress, [0.46, 0.58], [1, 0]);
-  const textContentY = useTransform(smoothProgress, [0.46, 0.58], ["0px", "-24px"]);
+  // Text content moves naturally upward as the pen box enters (Screenshots 1 & 2)
+  const textContentY = useTransform(smoothProgress, [0.42, 0.65], ["0px", isMobile ? "-60vh" : "-50vh"]);
+  const textContentOpacity = useTransform(smoothProgress, [0.55, 0.66], [1, 0]);
 
-  // Pen Card Showcase: Rises from bottom, locks into full-bleed white, then recedes (matching Screenshots 2, 3, 4)
-  const penContainerY = useTransform(smoothProgress, [0.45, 0.65], ["100vh", "0vh"]);
-  const penCardScale = useTransform(smoothProgress, [0.45, 0.65, 0.82, 0.98], [1.0, 1.0, 1.0, 0.72]);
-  const penCardY = useTransform(smoothProgress, [0.82, 0.98], ["0vh", "-8vh"]);
-  const penCardBg = useTransform(smoothProgress, [0.82, 0.96], ["#ffffff", "#2a2a2a"]);
-  const penCardRadius = useTransform(smoothProgress, [0.82, 0.98], [0, 20]);
+  // Pen Card Animation: Exact match to Screenshots 1, 2, 3, 4
+  // 1. Enters from bottom-right (Screenshots 1 & 2)
+  // 2. Expands to full screen (Screenshot 3)
+  // 3. Recedes into upper center gray card (Screenshot 4)
+  const penLeft = useTransform(
+    smoothProgress,
+    [0.40, 0.52, 0.65, 0.82, 0.98],
+    [isMobile ? "8%" : "37%", isMobile ? "4%" : "30%", "0%", "0%", isMobile ? "6%" : "15%"]
+  );
+
+  const penRight = useTransform(
+    smoothProgress,
+    [0.40, 0.52, 0.65, 0.82, 0.98],
+    [isMobile ? "8%" : "2%", isMobile ? "4%" : "2%", "0%", "0%", isMobile ? "6%" : "15%"]
+  );
+
+  const penTop = useTransform(
+    smoothProgress,
+    [0.40, 0.52, 0.65, 0.82, 0.98],
+    ["100vh", "50vh", "0vh", "0vh", isMobile ? "12vh" : "16vh"]
+  );
+
+  const penBottom = useTransform(
+    smoothProgress,
+    [0.40, 0.52, 0.65, 0.82, 0.98],
+    ["-50vh", "0vh", "0vh", "0vh", isMobile ? "45vh" : "48vh"]
+  );
+
+  const penRadius = useTransform(
+    smoothProgress,
+    [0.40, 0.52, 0.65, 0.82, 0.98],
+    [12, 10, 0, 0, 14]
+  );
+
+  const penBg = useTransform(
+    smoothProgress,
+    [0.40, 0.82, 0.94],
+    ["#ffffff", "#ffffff", "#555a5f"]
+  );
 
   const quoteText =
     introQuote ||
@@ -127,13 +168,13 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
 
   return (
     <section id="who-it-is-for" className="bg-black text-white relative z-20">
-      <div ref={pinTrackRef} className="relative h-[300vh] sm:h-[320vh]">
+      <div ref={pinTrackRef} className="relative h-[320vh]">
         {/* Sticky Viewport with guaranteed top clearance beneath fixed navbar */}
         <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-center px-4 sm:px-8 md:px-12 lg:px-14">
           
           {/* Layer 1: Text Content (Quote, Divider, Label, Intro Copy never hidden, 3 Sliding Audience Topics) */}
           <motion.div
-            style={shouldReduceMotion ? {} : { opacity: textContentOpacity, y: textContentY }}
+            style={shouldReduceMotion ? {} : { y: textContentY, opacity: textContentOpacity }}
             className="max-w-7xl mx-auto w-full flex flex-col justify-between h-full max-h-[88vh] my-auto relative z-10"
           >
             {/* Top Block: Manifesto Quote + Divider Line (Matches sample site media_1789446815432.png) */}
@@ -222,37 +263,28 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
 
           </motion.div>
 
-          {/* Layer 2: Pen Showcase (Rises from bottom as user scrolls, locks full-bleed white, recedes at end) */}
+          {/* Layer 2: Pen Card (Enters bottom-right in Screenshots 1&2, expands full screen in Screenshot 3, recedes to upper center in Screenshot 4) */}
           <motion.div
             style={
               shouldReduceMotion
                 ? { display: "none" }
                 : {
-                    y: penContainerY,
+                    left: penLeft,
+                    right: penRight,
+                    top: penTop,
+                    bottom: penBottom,
+                    borderRadius: penRadius,
+                    backgroundColor: penBg,
                   }
             }
-            className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none p-0 m-0 overflow-hidden"
+            className="absolute z-20 flex items-center justify-center will-change-[left,right,top,bottom,border-radius,background-color] pointer-events-none p-2 sm:p-6 md:p-10 overflow-hidden shadow-2xl"
           >
-            <motion.div
-              style={
-                shouldReduceMotion
-                  ? {}
-                  : {
-                      scale: penCardScale,
-                      y: penCardY,
-                      backgroundColor: penCardBg,
-                      borderRadius: penCardRadius,
-                    }
-              }
-              className="w-full h-full flex items-center justify-center will-change-[transform,background-color,border-radius] shadow-2xl p-4 sm:p-8"
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/nota_horizontal_pen.png"
-                alt="Nōta Smart Pen horizontal side profile"
-                className="w-full h-full max-h-[85vh] object-contain select-none pointer-events-none"
-              />
-            </motion.div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/nota_horizontal_pen.png"
+              alt="Nōta Smart Pen horizontal side profile"
+              className="w-full h-full object-contain mix-blend-multiply select-none pointer-events-none"
+            />
           </motion.div>
 
         </div>
