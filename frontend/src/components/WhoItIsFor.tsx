@@ -103,66 +103,75 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
     restDelta: 0.001,
   });
 
-  // 3 Audience Topics: Slide in from right sequentially
-  const topic1X = useTransform(smoothProgress, [0.12, 0.25], ["110%", "0%"]);
-  const topic1Opacity = useTransform(smoothProgress, [0.12, 0.22], [0, 1]);
+  // 3 Audience Topics: Slide in from right sequentially (earlier so Topic 3 is fully in place before pen enters)
+  const topic1X = useTransform(smoothProgress, [0.10, 0.20], ["110%", "0%"]);
+  const topic1Opacity = useTransform(smoothProgress, [0.10, 0.18], [0, 1]);
 
-  const topic2X = useTransform(smoothProgress, [0.22, 0.35], ["110%", "0%"]);
-  const topic2Opacity = useTransform(smoothProgress, [0.22, 0.32], [0, 1]);
+  const topic2X = useTransform(smoothProgress, [0.18, 0.28], ["110%", "0%"]);
+  const topic2Opacity = useTransform(smoothProgress, [0.18, 0.26], [0, 1]);
 
-  const topic3X = useTransform(smoothProgress, [0.32, 0.45], ["110%", "0%"]);
-  const topic3Opacity = useTransform(smoothProgress, [0.32, 0.42], [0, 1]);
+  const topic3X = useTransform(smoothProgress, [0.26, 0.36], ["110%", "0%"]);
+  const topic3Opacity = useTransform(smoothProgress, [0.26, 0.34], [0, 1]);
 
-  // Text content moves naturally upward as the pen box enters (Screenshots 1 & 2)
-  const textContentY = useTransform(smoothProgress, [0.42, 0.65], ["0px", isMobile ? "-60vh" : "-50vh"]);
+  // Text content moves naturally upward:
+  // - 0.00 -> 0.20: Quote & Intro copy in view
+  // - 0.20 -> 0.40: Shifts upward smoothly to reveal Topic 1, Topic 2, and Topic 3
+  // - 0.40 -> 0.54: Sits steady at -46vh displaying Topic 2 & Topic 3 prominently while Pen Card enters below (media_1789456997919.png)
+  // - 0.54 -> 0.66: Slides up out of viewport as Pen Card expands to full bleed
+  const textContentY = useTransform(
+    smoothProgress,
+    [0.20, 0.40, 0.54, 0.66],
+    ["0px", isMobile ? "-45vh" : "-44vh", isMobile ? "-50vh" : "-48vh", isMobile ? "-120vh" : "-110vh"]
+  );
   const textContentOpacity = useTransform(smoothProgress, [0.55, 0.66], [1, 0]);
 
-  // Pen Card Animation: Exact match to Screenshots 1, 2, 3, 4
-  // 1. Enters from bottom-right (Screenshots 1 & 2)
-  // 2. Expands to full screen (Screenshot 3)
-  // 3. Recedes into upper center gray card, and the pen disappears completely (media_1789455424779.png)
+  // Pen Card Animation:
+  // - 0.42 -> 0.54: Enters bottom-right beneath Topic 3 (media_1789456997919.png: sits at top: 65vh)
+  // - 0.54 -> 0.68: Expands to full screen (top: 0, left: 0, right: 0)
+  // - 0.68 -> 0.82: Full bleed white lock
+  // - 0.82 -> 0.94: Recedes into upper center gray card with pen disappearing (media_1789455424779.png)
   const penLeft = useTransform(
     smoothProgress,
-    [0.40, 0.52, 0.65, 0.80, 0.94],
-    [isMobile ? "8%" : "37%", isMobile ? "4%" : "30%", "0%", "0%", isMobile ? "6%" : "15%"]
+    [0.42, 0.54, 0.68, 0.82, 0.94],
+    [isMobile ? "8%" : "40%", isMobile ? "4%" : "35%", "0%", "0%", isMobile ? "6%" : "15%"]
   );
 
   const penRight = useTransform(
     smoothProgress,
-    [0.40, 0.52, 0.65, 0.80, 0.94],
+    [0.42, 0.54, 0.68, 0.82, 0.94],
     [isMobile ? "8%" : "2%", isMobile ? "4%" : "2%", "0%", "0%", isMobile ? "6%" : "15%"]
   );
 
   const penTop = useTransform(
     smoothProgress,
-    [0.40, 0.52, 0.65, 0.80, 0.94],
-    ["100vh", "50vh", "0vh", "0vh", isMobile ? "10vh" : "12vh"]
+    [0.42, 0.54, 0.68, 0.82, 0.94],
+    ["100vh", "65vh", "0vh", "0vh", isMobile ? "10vh" : "12vh"]
   );
 
   // Keep penBottom at 0vh so the gray card extends flush to the bottom without leaving an empty black gap
   const penBottom = useTransform(
     smoothProgress,
-    [0.40, 0.52, 0.65, 0.80, 0.94],
-    ["-50vh", "0vh", "0vh", "0vh", "0vh"]
+    [0.42, 0.54, 0.68, 0.82, 0.94],
+    ["-35vh", "0vh", "0vh", "0vh", "0vh"]
   );
 
   const penTopRadius = useTransform(
     smoothProgress,
-    [0.40, 0.52, 0.65, 0.80, 0.94],
+    [0.42, 0.54, 0.68, 0.82, 0.94],
     [12, 10, 0, 0, 16]
   );
 
   // Gray card background matching exact pixel value (56, 57, 56) in media_1789455424779.png
   const penBg = useTransform(
     smoothProgress,
-    [0.40, 0.80, 0.92],
+    [0.42, 0.82, 0.92],
     ["#ffffff", "#ffffff", "#383938"]
   );
 
   // Pen Image disappears completely (fades to 0 opacity + moves left + scales down) as card recedes (Image 1 fix)
-  const penImageOpacity = useTransform(smoothProgress, [0.76, 0.88], [1, 0]);
-  const penImageX = useTransform(smoothProgress, [0.76, 0.88], ["0%", "-14%"]);
-  const penImageScale = useTransform(smoothProgress, [0.76, 0.88], [1, 0.85]);
+  const penImageOpacity = useTransform(smoothProgress, [0.78, 0.88], [1, 0]);
+  const penImageX = useTransform(smoothProgress, [0.78, 0.88], ["0%", "-14%"]);
+  const penImageScale = useTransform(smoothProgress, [0.78, 0.88], [1, 0.85]);
 
   const quoteText =
     introQuote ||
@@ -175,14 +184,14 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
 
   return (
     <section id="who-it-is-for" className="bg-black text-white relative z-20">
-      <div ref={pinTrackRef} className="relative h-[320vh]">
+      <div ref={pinTrackRef} className="relative h-[340vh]">
         {/* Sticky Viewport with guaranteed top clearance beneath fixed navbar */}
-        <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-center px-4 sm:px-8 md:px-12 lg:px-14">
+        <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-start px-4 sm:px-8 md:px-12 lg:px-14">
           
           {/* Layer 1: Text Content (Quote, Divider, Label, Intro Copy never hidden, 3 Sliding Audience Topics) */}
           <motion.div
             style={shouldReduceMotion ? {} : { y: textContentY, opacity: textContentOpacity }}
-            className="max-w-7xl mx-auto w-full flex flex-col justify-between h-full max-h-[88vh] my-auto relative z-10"
+            className="max-w-7xl mx-auto w-full flex flex-col pt-14 sm:pt-16 lg:pt-20 space-y-6 sm:space-y-8 relative z-10"
           >
             {/* Top Block: Manifesto Quote + Divider Line (Matches sample site media_1789446815432.png) */}
             <div className="space-y-3 sm:space-y-5 pt-1">
