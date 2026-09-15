@@ -99,43 +99,14 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
   const introY = useTransform(smoothProgress, [0.15, 0.26], ["0px", "-16px"]);
 
   // 3 Audience Topics: Slide in from right sequentially
-  const topic1X = useTransform(smoothProgress, [0.18, 0.32], ["110%", "0%"]);
-  const topic1Opacity = useTransform(smoothProgress, [0.18, 0.28], [0, 1]);
+  const topic1X = useTransform(smoothProgress, [0.20, 0.40], ["110%", "0%"]);
+  const topic1Opacity = useTransform(smoothProgress, [0.20, 0.35], [0, 1]);
 
-  const topic2X = useTransform(smoothProgress, [0.28, 0.42], ["110%", "0%"]);
-  const topic2Opacity = useTransform(smoothProgress, [0.28, 0.38], [0, 1]);
+  const topic2X = useTransform(smoothProgress, [0.38, 0.58], ["110%", "0%"]);
+  const topic2Opacity = useTransform(smoothProgress, [0.38, 0.52], [0, 1]);
 
-  const topic3X = useTransform(smoothProgress, [0.38, 0.52], ["110%", "0%"]);
-  const topic3Opacity = useTransform(smoothProgress, [0.38, 0.48], [0, 1]);
-
-  // Text content fades out smoothly as video enters from below
-  const textContentOpacity = useTransform(smoothProgress, [0.46, 0.58], [1, 0]);
-  const textContentY = useTransform(smoothProgress, [0.46, 0.58], ["0px", "-20px"]);
-
-  // Pen Video Showcase Entrance, Centered Showcase, and Scale/Recede Exit (matching reference site keyframes)
-  // 1. Container rises from bottom to fill screen
-  const videoContainerY = useTransform(smoothProgress, [0.46, 0.64], ["100vh", "0vh"]);
-
-  // 2. Video scale: 0.75 -> 1.0 (entrance), holds 1.0 (showcase), then 1.0 -> 0.65 (recede exit)
-  const videoScale = useTransform(
-    smoothProgress,
-    [0.46, 0.64, 0.82, 0.98],
-    [0.75, 1.0, 1.0, 0.65]
-  );
-
-  // 3. Video horizontal shift: 0% -> -15% during recede exit (matching reference: effect-iyraw9519)
-  const videoX = useTransform(
-    smoothProgress,
-    [0.82, 0.98],
-    ["0%", "-15%"]
-  );
-
-  // 4. Video opacity: stays 1 during showcase, then gently recedes
-  const videoOpacity = useTransform(
-    smoothProgress,
-    [0.82, 0.98],
-    [1, 0.4]
-  );
+  const topic3X = useTransform(smoothProgress, [0.56, 0.76], ["110%", "0%"]);
+  const topic3Opacity = useTransform(smoothProgress, [0.56, 0.70], [0, 1]);
 
   const quoteText =
     introQuote ||
@@ -148,15 +119,11 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
 
   return (
     <section id="who-it-is-for" className="bg-black text-white relative z-20">
-      <div ref={pinTrackRef} className="relative h-[320vh]">
+      <div ref={pinTrackRef} className="relative h-[150vh] sm:h-[180vh] lg:h-[200vh]">
         {/* Sticky Viewport with guaranteed top clearance beneath fixed navbar */}
         <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-center px-4 sm:px-8 md:px-12 lg:px-14">
           
-          {/* Layer 1: Text Content (Quote, Divider, Label, Intro Copy & 3 Sliding Audience Topics) */}
-          <motion.div
-            style={shouldReduceMotion ? {} : { opacity: textContentOpacity, y: textContentY }}
-            className="max-w-7xl mx-auto w-full flex flex-col justify-between h-full max-h-[86vh] my-auto relative z-10"
-          >
+          <div className="max-w-7xl mx-auto w-full flex flex-col justify-between h-full max-h-[86vh] my-auto relative z-10">
             {/* Top Block: Manifesto Quote + Divider Line (Matches sample site media_1789446815432.png) */}
             <div className="space-y-4 sm:space-y-6 pt-2">
               <ScrollIlluminatedText
@@ -244,41 +211,7 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
 
             </div>
 
-          </motion.div>
-
-          {/* Layer 2: Pen Video Showcase (Rises smoothly from bottom on solid white card, full-bleed pen video, scales & recedes) */}
-          <motion.div
-            style={
-              shouldReduceMotion
-                ? { display: "none" }
-                : {
-                    y: videoContainerY,
-                  }
-            }
-            className="absolute inset-0 z-20 bg-white overflow-hidden flex items-center justify-center will-change-transform pointer-events-none"
-          >
-            <motion.div
-              style={
-                shouldReduceMotion
-                  ? {}
-                  : {
-                      scale: videoScale,
-                      x: videoX,
-                      opacity: videoOpacity,
-                    }
-              }
-              className="w-full h-full flex items-center justify-center will-change-transform px-4 sm:px-8"
-            >
-              <video
-                src="/who_pen_video.mp4"
-                autoPlay
-                loop
-                muted
-                playsInline
-                className="w-full h-auto max-h-[85vh] object-contain select-none pointer-events-none"
-              />
-            </motion.div>
-          </motion.div>
+          </div>
 
         </div>
       </div>

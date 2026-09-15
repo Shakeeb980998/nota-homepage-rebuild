@@ -115,18 +115,18 @@ export const SmartPaper: React.FC<SmartPaperProps> = ({ badge, title, slides }) 
       {/* Sticky Viewport */}
       <div className="sticky top-0 h-screen w-full overflow-hidden z-10 flex flex-col justify-between">
         
-        {/* Layer A: Full White Cover ("Works with smart paper" - media_1789448586139 & media_1789364660655) */}
+        {/* Layer A: Centered Title ("Works with smart paper" - matches PenZoomTransition concurrent fade-in) */}
         <motion.div
           style={
             shouldReduceMotion
               ? { display: "none" }
               : { opacity: titleFadeOpacity, display: titleDisplay }
           }
-          className="absolute inset-0 z-50 flex flex-col items-center justify-center text-center px-4 sm:px-6 bg-white pointer-events-none"
+          className="absolute inset-0 z-50 flex flex-col items-center justify-center text-center px-4 sm:px-6 pointer-events-none"
         >
           <h2 className="font-serif text-5xl sm:text-7xl md:text-8xl lg:text-[110px] xl:text-[130px] font-normal leading-[0.92] tracking-tight select-none">
             <span className="text-[#888888] block">Works with</span>
-            <span className="text-[#000000] block mt-1 sm:mt-2">smart paper</span>
+            <span className="text-white block mt-1 sm:mt-2">smart paper</span>
           </h2>
         </motion.div>
 
