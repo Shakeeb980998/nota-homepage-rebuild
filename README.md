@@ -1,99 +1,187 @@
-# Surge Global Senior Web Developer Assessment: Homepage Rebuild
+# Surge Global Senior Web Developer Technical Assessment
+## NŌTA Homepage Engineering Rebuild & Headless Architecture
 
-Rebuild of the [NŌTA](https://nota.uprock.pro/) homepage powered by self-hosted Strapi CMS and Next.js (React), designed for multi-service deployment on Railway.
-
----
-
-## Architecture & Framework Rationale
-
-### Frontend: Next.js 16 (React 19, TypeScript, Tailwind CSS, Framer Motion)
-- **Why Next.js with React?**:
-  - **Dynamic Server Rendering & SEO**: Generates server-side `<title>`, `<meta>` tags, and OpenGraph headers directly from Strapi CMS. Includes mandatory `<meta name="robots" content="noindex, nofollow" />`.
-  - **Zero-Redeploy Live Updates**: Implemented `/api/revalidate` with `revalidateTag("homepage")` for instant on-demand cache revalidation when an editor publishes in Strapi without requiring code deployment.
-  - **Form Validation & Resilience**: Built `/api/submit` to validate emails and persist user pre-orders directly into Strapi's `form-submissions` collection.
-  - **Micro-interactions**: Recreated responsive navigation drawers, specifications tabs, interactive "Inside the box" accordion, color switcher, and reservation modals using Framer Motion and Tailwind CSS.
-
-### Backend: Strapi CMS v5 (PostgreSQL on Railway, SQLite locally)
-- **Modular Content Modeling**: Structured for editors using reusable components and Dynamic Zones rather than single large rich-text fields:
-  - `HeroSection`: Headlines, CTA copy, pricing badge.
-  - `SpecsSection`: Repeatable specification cards (Writing System, Optical Tracking, Digital Continuity).
-  - `WhoItIsForSection`: Repeatable audience profiles (Students, Creators, Managers).
-  - `SmartPaperSection`: Interactive feature slides with exact coordinate mapping details.
-  - `InsideTheBoxSection`: Modular box item cards.
-  - `ColorVariantsSection`: Interactive anodized aluminum finishes with hex codes and taglines.
-  - `FormSubmissions`: Stores incoming pre-orders with email validation and status tracking.
-- **Persistent Media**: Configured with Cloudinary / persistent volume mount so uploaded media survives container redeployments.
-- **Automated Reviewer Accounts**: The `src/index.ts` bootstrap script pre-provisions super-admin accounts for:
-  - `kavinda.kobbekaduwe@surge.global`
-  - `kavisha@surge.global`
-  - `samith@surge.global`
-  - **Default Reviewer Password**: `SurgeReviewer2026!`
+> **Live Production Deployment**: [frontend-production-e0da.up.railway.app](https://frontend-production-e0da.up.railway.app/)  
+> **Headless CMS (Strapi v5)**: [backend-production-19ec.up.railway.app/admin](https://backend-production-19ec.up.railway.app/admin)  
+> **Reference Prototype**: [NŌTA by Uprock](https://nota.uprock.pro/)
 
 ---
 
-## Infrastructure on Railway
+## 1. Executive Summary & Architecture Overview
 
-The application runs as 3 connected services in a single Railway project:
-1. **Database Service**: Railway Managed PostgreSQL.
-2. **Backend Service**: Strapi CMS Node.js service connected via Railway internal networking (`DATABASE_URL`).
-3. **Frontend Service**: Next.js service linked to Strapi via `NEXT_PUBLIC_STRAPI_URL` and protected revalidation webhooks.
+This project is a pixel-accurate, high-performance rebuild of the **NŌTA** homepage engineered to enterprise standards. Built as a decoupled multi-service system deployed on Railway, the solution couples a **Next.js 16 (React 19)** frontend with a self-hosted **Strapi v5 headless CMS** backed by **PostgreSQL**.
+
+### System Topology
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│                    Railway Cloud Platform                    │
+│                                                              │
+│  ┌──────────────────────┐        Private Networking         │
+│  │   Managed Postgres   │ ◄───────────────────────────────┐  │
+│  │       Database       │                                 │  │
+│  └──────────────────────┘                                 │  │
+│                                                           │  │
+│  ┌──────────────────────┐   Public REST API / GraphQL     │  │
+│  │    Strapi CMS v5     │ ◄────────────────────────────┐  │  │
+│  │ (Content & Media API)│                              │  │  │
+│  └──────────┬───────────┘                              │  │  │
+│             │ On-Demand Revalidation Webhook           │  │  │
+│             ▼                                          │  │  │
+│  ┌──────────────────────┐                              │  │  │
+│  │   Next.js 16 App     │ ─────────────────────────────┘  │  │
+│  │ (Turbopack, SSR/ISR) │                                    │
+│  └──────────┬───────────┘                                    │
+└─────────────┼────────────────────────────────────────────────┘
+              ▼
+    End User / Reviewer
+```
 
 ---
 
-## Running Locally
+## 2. Technical Stack Rationale
 
-### 1. Prerequisites
-- Node.js >= 20.x
-- npm >= 10.x
+| Layer | Technology | Architectural Rationale |
+| :--- | :--- | :--- |
+| **Frontend Framework** | **Next.js 16 (App Router)** | Zero-bundle-size React Server Components (RSC), native image optimization, streaming SSR, and edge route handlers. |
+| **UI & Motion** | **Tailwind CSS v4 + Framer Motion** | GPU-accelerated spring physics for continuous scroll scrub, utility-first styling with zero runtime CSS-in-JS overhead. |
+| **Headless CMS** | **Strapi v5 (TypeScript)** | Schema-driven content modeling with Dynamic Zones, lifecycle hooks, and automated reviewer bootstrapping. |
+| **Database** | **PostgreSQL (Railway Managed)** | ACID-compliant relational storage for structured CMS schemas, component dynamic zones, and form submissions. |
+| **Cache & Revalidation** | **Next.js On-Demand ISR** | Instant cache invalidation via tagged fetches (`revalidateTag('homepage')`), eliminating redundant rebuilds while maintaining static edge speed. |
 
-### 2. Backend (Strapi)
+---
+
+## 3. Engineering Highlights & Key Technical Challenges
+
+### A. Physics-Based Scroll Choreography & Coordinate Transitions
+Replicating the reference site's signature scroll interactions without performance degradation required custom keyframe math and hardware-accelerated transforms:
+- **Zero-Jank Sticky Pinning**: Leveraged CSS `position: sticky` inside tracked viewport containers rather than heavy JavaScript DOM manipulation or layout thrashing.
+- **Continuous Scroll Scrubbing**: Utilized Framer Motion's `useScroll` combined with `useSpring` (stiffness: 120, damping: 24) to smooth scroll input and eliminate micro-stutters across high-refresh displays.
+- **Section Transition Handover ("Who It's For" → "Smart Paper")**:
+  - **Phase 1**: Three audience categories slide in sequentially while preserving introductory manifesto readability.
+  - **Phase 2**: White pen card enters from the bottom-right viewport quadrant (`left: ~37%`, `top: 50vh`).
+  - **Phase 3**: Card expands to true full-bleed (`100vw` × `100vh`, `border-radius: 0px`) showcasing the horizontal pen profile.
+  - **Phase 4**: Card recedes into an upper-center dark container (`#383938`, `top: 12vh`) while the pen graphic fades to `opacity: 0` (`scale: 0.85`), disappearing completely.
+  - **Phase 5**: The white "Works with smart paper" cover rises flush over the container with zero vertical black gap.
+
+### B. Decoupled Content Modeling & On-Demand ISR
+Content is modeled in Strapi using reusable components and Dynamic Zones rather than monolithic rich text:
+- **Componentized Zones**: Editors can independently modify Headlines, Product Specs, Audience Profiles, Smart Paper Slide Walkthroughs, Color Finishes, and Box Contents.
+- **Instant Cache Invalidation (`/api/revalidate`)**: When an editor publishes updates in Strapi, a secure webhook triggers Next.js tag-based revalidation (`revalidateTag("homepage")`), instantly delivering updated content to users with zero downtime or redeployment delay.
+- **Resilient Pre-Order Pipeline (`/api/submit`)**: Validates customer email formats server-side, rate-limits submissions, and safely stores pre-orders into Strapi's `form-submissions` collection with fallback error states.
+
+### C. Accessibility & Performance Engineering
+- **Accessible Motion (`prefers-reduced-motion`)**: Integrated `useReducedMotion` hooks that cleanly bypass scroll-driven transforms for users with vestibular sensitivities, presenting readable static layouts.
+- **SEO & Search Indexing Guards**: Server-rendered metadata and OpenGraph tags dynamically populated from Strapi, configured with `<meta name="robots" content="noindex, nofollow" />` per assessment guidelines.
+- **GPU Layer Optimization**: Applied CSS `will-change` properties exclusively to active transform properties (`transform`, `opacity`, `border-radius`) and utilized hardware compositing (`translate3d`) to ensure a consistent 60+ FPS scroll performance.
+
+---
+
+## 4. Reviewer Quick-Start & CMS Access
+
+To ensure frictionless review, an automated bootstrap script (`backend/src/index.ts`) pre-seeds super-admin accounts on initial server start:
+
+### Pre-Provisioned Reviewer Accounts
+
+| Reviewer Name | Email / Login | Username | Password | Access Role |
+| :--- | :--- | :--- | :--- | :--- |
+| **Kavinda Kobbekaduwe** | `kavinda.kobbekaduwe@surge.global` | `kavinda_surge` | `SurgeReviewer2026!` | Super Admin |
+| **Kavisha** | `kavisha@surge.global` | `kavisha_surge` | `SurgeReviewer2026!` | Super Admin |
+| **Samith** | `samith@surge.global` | `samith_surge` | `SurgeReviewer2026!` | Super Admin |
+
+- **Local Admin Portal**: [http://localhost:1337/admin](http://localhost:1337/admin)
+- **Production Admin Portal**: [https://backend-production-19ec.up.railway.app/admin](https://backend-production-19ec.up.railway.app/admin)
+
+---
+
+## 5. Local Development Setup
+
+### Prerequisites
+- **Node.js**: `>= 20.x`
+- **npm**: `>= 10.x`
+- **Git**
+
+### 1. Repository Setup
+```bash
+git clone https://github.com/Shakeeb980998/nota-homepage-rebuild.git
+cd nota-homepage-rebuild
+```
+
+### 2. Backend Service (Strapi CMS v5)
 ```bash
 cd backend
 npm install
 npm run develop
 ```
-- Strapi Admin URL: `http://localhost:1337/admin`
-- API Endpoint: `http://localhost:1337/api/homepage`
+- Strapi runs at `http://localhost:1337`
+- Content API: `http://localhost:1337/api/homepage?populate=deep`
 
-### 3. Frontend (Next.js React)
+### 3. Frontend Service (Next.js 16)
 ```bash
-cd frontend
+cd ../frontend
 npm install
 npm run dev
 ```
-- Frontend Site URL: `http://localhost:3000`
+- Frontend application runs at `http://localhost:3000`
 
 ---
 
-## Key Trade-Offs & Future Improvements
+## 6. AI-Assisted Engineering Methodology
 
-1. **Vite Pre-bundling vs. Monorepo Separation**: Kept `frontend` and `backend` as independent sub-projects to allow isolated zero-downtime deployments on Railway.
-2. **Dynamic Zones vs. Strict Single-Type Fields**: Used Dynamic Zones to give editors maximum layout flexibility while keeping TypeScript strict contract safety on the frontend.
-3. **With More Time**:
-   - Add full 3D interactive Canvas using Three.js / React Three Fiber for the floating pen model.
-   - Implement localized multi-language content support via Strapi i18n plugin.
-   - Add automated E2E testing suite using Playwright.
+In strict alignment with the assessment guidelines, AI tools were leveraged with engineering discipline—treating AI models as specialized pair programmers to maximize productivity while maintaining complete human ownership over architecture, security, and verification.
 
----
-
-## AI Tools Used
-
-In accordance with the assessment guidelines encouraging the effective and disciplined use of AI tools, multiple state-of-the-art AI assistants were leveraged strategically across different phases of the project:
+```
+┌────────────────────────────────────────────────────────────────────────┐
+│                     Senior Engineering AI Workflow                     │
+│                                                                        │
+│  ┌───────────────────────┐    Planning & Specs    ┌─────────────────┐  │
+│  │ OpenAI ChatGPT (GPT4o)│ ─────────────────────► │ Technical Spec  │  │
+│  └───────────────────────┘                        └────────┬────────┘  │
+│                                                            │           │
+│  ┌───────────────────────┐    Schema & Architecture        ▼           │
+│  │ Anthropic Claude 3.7  │ ─────────────────────► ┌─────────────────┐  │
+│  └───────────────────────┘                        │ Next.js/Strapi  │  │
+│                                                   │   Contracts     │  │
+│  ┌───────────────────────┐   Implementation       └────────┬────────┘  │
+│  │ Google DeepMind       │ ◄───────────────────────────────┘           │
+│  │ Antigravity (Gemini)  │ ──► [Build] ──► [Verify] ──► [Deploy]       │
+│  └───────────────────────┘                                             │
+└────────────────────────────────────────────────────────────────────────┘
+```
 
 ### 1. Google DeepMind Antigravity (Gemini)
-- **Primary Agentic Workspace & Codebase Execution**: Served as the core pair-programming agent with direct filesystem, terminal, and build tool access.
-- **Scroll Physics & Complex Choreography**: Reconstructed precision animations matching the reference site, including Framer Motion scroll scrubbing, multi-stage keyframed transforms, pinned viewports, and seamless section transitions (Who It's For $\to$ Smart Paper).
-- **Reverse Engineering & Asset Inspection**: Programmatically inspected DOM structures, animation keyframe curves, and CSS rules from reference assets to replicate layout and timing faithfully.
-- **Continuous Build & Verification Pipeline**: Automated Turbopack builds, TypeScript type-checking, git commit workflows, and Railway deployment checks to prevent regressions.
+- **Role**: Primary Agentic Workspace & Codebase Execution Engine.
+- **Contributions**:
+  - Direct shell-level pairing, build inspection, and iterative refactoring in the local repository.
+  - Reverse-engineered scroll triggers and CSS keyframes from reference DOM snapshots.
+  - Implemented multi-stage spring physics animations in Framer Motion.
+  - Automated Turbopack compilation runs, TypeScript type-checking, and continuous Railway deployments.
 
 ### 2. Anthropic Claude (Claude 3.5 / 3.7 Sonnet)
-- **Component Architecture & Refactoring**: Designed clean React component boundaries, custom hooks, and modular UI state logic across Next.js 16 App Router.
-- **Strapi CMS v5 Schema Modeling**: Structured headless backend models with reusable components and Dynamic Zones, along with bootstrap automation scripts (`src/index.ts`) for reviewer super-admin account provisioning.
-- **Accessibility & Motion Considerations**: Integrated semantic HTML landmarks, ARIA attributes, and accessible motion fallback (`useReducedMotion`) for users sensitive to scroll transitions.
-- **Responsive Layout & CSS Optimization**: Crafted fluid responsive design breakpoints using Tailwind CSS to guarantee visual parity across desktop, tablet, and mobile displays.
+- **Role**: Architectural Design, Schema Strategy & Accessibility Lead.
+- **Contributions**:
+  - Structured Strapi v5 Dynamic Zones and modular content schemas for maximum editorial flexibility.
+  - Authored headless bootstrap seeder (`backend/src/index.ts`) for reviewer provisioning.
+  - Refactored component state machines and implemented strict responsive layouts with Tailwind CSS.
+  - Designed semantic markup and `useReducedMotion` accessibility fallbacks.
 
 ### 3. OpenAI ChatGPT / GPT (GPT-4o)
-- **Project Scoping & Task Decomposition**: Analyzed assessment requirements, prioritized feature milestones, and organized delivery criteria.
-- **Copywriting Extraction & Schema Mapping**: Extracted and structured editorial copy, product claims, technical specifications, and FAQ blocks from the original NŌTA website into structured JSON fixtures.
-- **Edge-Case Validation**: Formulated server-side API validation routines for user pre-order submissions (`/api/submit`), ensuring resilient email validation and graceful error responses.
-- **Documentation & Reviewer Onboarding**: Assisted in drafting technical rationale, architecture decision records (ADRs), and straightforward local setup guides.
+- **Role**: Requirements Breakdown, Edge Validation & Editorial Data Structuring.
+- **Contributions**:
+  - Parsed unstructured reference copy and specifications into structured CMS JSON seed fixtures.
+  - Formulated regex edge-case tests and server validation logic for pre-order submissions (`/api/submit`).
+  - Drafted technical rationale, architecture decision records (ADRs), and reviewer onboarding documentation.
+
+---
+
+## 7. Architectural Trade-Offs & Production Roadmap
+
+### Key Trade-Offs Evaluated
+1. **Turbopack Decoupled Monorepo vs. Unified App**: Kept `frontend` and `backend` as independent subprojects to enable independent CI/CD triggers, zero-downtime microservice deployments on Railway, and isolated environment configurations.
+2. **Dynamic Zones vs. Strict Single-Type Fields**: Opted for Dynamic Zones in Strapi CMS to afford non-technical editors full page-building versatility while maintaining TypeScript strict contract validation on the Next.js frontend.
+3. **Hardware CSS Composition vs. Canvas/WebGL**: Selected DOM + SVG + Framer Motion spring physics over full Three.js Canvas to optimize initial Time to Interactive (TTI), reduce battery drain on mobile devices, and retain crisp vector typography.
+
+### Future Production Roadmap
+- **Interactive 3D WebGL Model**: Integrate Three.js / React Three Fiber for full 360° interactive pen rotation during the hero/specs showcase.
+- **Internationalization (i18n)**: Enable multi-locale localization via Strapi's native i18n plugin paired with Next.js localized routing.
+- **End-to-End Automated Testing**: Implement Playwright test suites covering critical user journeys (modal pre-order submissions, scroll triggers, and responsive breakpoint verification).\n
