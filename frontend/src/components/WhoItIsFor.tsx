@@ -99,47 +99,43 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
   const introY = useTransform(smoothProgress, [0.15, 0.26], ["0px", "-16px"]);
 
   // 3 Audience Topics: Slide in from right sequentially
-  const topic1X = useTransform(smoothProgress, [0.20, 0.36], ["100%", "0%"]);
-  const topic1Opacity = useTransform(smoothProgress, [0.20, 0.32], [0, 1]);
+  const topic1X = useTransform(smoothProgress, [0.18, 0.32], ["110%", "0%"]);
+  const topic1Opacity = useTransform(smoothProgress, [0.18, 0.28], [0, 1]);
 
-  const topic2X = useTransform(smoothProgress, [0.32, 0.48], ["100%", "0%"]);
-  const topic2Opacity = useTransform(smoothProgress, [0.32, 0.44], [0, 1]);
+  const topic2X = useTransform(smoothProgress, [0.28, 0.42], ["110%", "0%"]);
+  const topic2Opacity = useTransform(smoothProgress, [0.28, 0.38], [0, 1]);
 
-  const topic3X = useTransform(smoothProgress, [0.44, 0.60], ["100%", "0%"]);
-  const topic3Opacity = useTransform(smoothProgress, [0.44, 0.56], [0, 1]);
+  const topic3X = useTransform(smoothProgress, [0.38, 0.52], ["110%", "0%"]);
+  const topic3Opacity = useTransform(smoothProgress, [0.38, 0.48], [0, 1]);
 
-  // Pen Photo Entrance, Expansion to Full Screen, and Shrink-Recede Exit
-  const penTop = useTransform(
+  // Text content fades out smoothly as video enters from below
+  const textContentOpacity = useTransform(smoothProgress, [0.46, 0.58], [1, 0]);
+  const textContentY = useTransform(smoothProgress, [0.46, 0.58], ["0px", "-20px"]);
+
+  // Pen Video Showcase Entrance, Centered Showcase, and Scale/Recede Exit (matching reference site keyframes)
+  // 1. Container rises from bottom to fill screen
+  const videoContainerY = useTransform(smoothProgress, [0.46, 0.64], ["100vh", "0vh"]);
+
+  // 2. Video scale: 0.75 -> 1.0 (entrance), holds 1.0 (showcase), then 1.0 -> 0.65 (recede exit)
+  const videoScale = useTransform(
     smoothProgress,
-    [0.58, 0.68, 0.76, 0.86, 0.96],
-    ["100vh", "45vh", "0vh", "0vh", "12vh"]
+    [0.46, 0.64, 0.82, 0.98],
+    [0.75, 1.0, 1.0, 0.65]
   );
 
-  const penLeft = useTransform(
+  // 3. Video horizontal shift: 0% -> -15% during recede exit (matching reference: effect-iyraw9519)
+  const videoX = useTransform(
     smoothProgress,
-    [0.58, 0.68, 0.76, 0.86, 0.96],
-    ["25%", "15%", "0%", "0%", "12%"]
+    [0.82, 0.98],
+    ["0%", "-15%"]
   );
 
-  const penRight = useTransform(
+  // 4. Video opacity: stays 1 during showcase, then gently recedes
+  const videoOpacity = useTransform(
     smoothProgress,
-    [0.76, 0.86, 0.96],
-    ["0%", "0%", "12%"]
+    [0.82, 0.98],
+    [1, 0.4]
   );
-
-  const penBottom = useTransform(
-    smoothProgress,
-    [0.76, 0.86, 0.96],
-    ["0vh", "0vh", "12vh"]
-  );
-
-  const penRadius = useTransform(
-    smoothProgress,
-    [0.76, 0.86, 0.96],
-    [0, 0, 16]
-  );
-
-  const penFadeOut = useTransform(smoothProgress, [0.94, 0.99], [1, 0]);
 
   const quoteText =
     introQuote ||
@@ -152,13 +148,16 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
 
   return (
     <section id="who-it-is-for" className="bg-black text-white relative z-20">
-      <div ref={pinTrackRef} className="relative h-[300vh]">
+      <div ref={pinTrackRef} className="relative h-[320vh]">
         {/* Sticky Viewport with guaranteed top clearance beneath fixed navbar */}
         <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-center px-4 sm:px-8 md:px-12 lg:px-14">
           
-          <div className="max-w-7xl mx-auto w-full flex flex-col justify-between h-full max-h-[86vh] my-auto relative z-10">
-            
-            {/* Top Block: Manifesto Quote + Divider Line (Matches sample site media_1789446815432.png with zero gap) */}
+          {/* Layer 1: Text Content (Quote, Divider, Label, Intro Copy & 3 Sliding Audience Topics) */}
+          <motion.div
+            style={shouldReduceMotion ? {} : { opacity: textContentOpacity, y: textContentY }}
+            className="max-w-7xl mx-auto w-full flex flex-col justify-between h-full max-h-[86vh] my-auto relative z-10"
+          >
+            {/* Top Block: Manifesto Quote + Divider Line (Matches sample site media_1789446815432.png) */}
             <div className="space-y-4 sm:space-y-6 pt-2">
               <ScrollIlluminatedText
                 text={quoteText}
@@ -245,32 +244,40 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
 
             </div>
 
-          </div>
+          </motion.div>
 
-          {/* Layer 2: Pen Photo Showcase (Rises, expands full screen white card, and shrinks/recedes) */}
+          {/* Layer 2: Pen Video Showcase (Rises smoothly from bottom on solid white card, full-bleed pen video, scales & recedes) */}
           <motion.div
             style={
               shouldReduceMotion
                 ? { display: "none" }
                 : {
-                    top: penTop,
-                    left: penLeft,
-                    right: penRight,
-                    bottom: penBottom,
-                    borderRadius: penRadius,
-                    opacity: penFadeOut,
+                    y: videoContainerY,
                   }
             }
-            className="absolute z-20 bg-white overflow-hidden will-change-[top,left,right,bottom,opacity] pointer-events-none shadow-2xl"
+            className="absolute inset-0 z-20 bg-white overflow-hidden flex items-center justify-center will-change-transform pointer-events-none"
           >
-            <div className="w-full h-full flex items-center justify-center p-6 sm:p-10 lg:p-14 select-none pointer-events-none">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/nota_horizontal_pen.png"
-                alt="Nōta Smart Pen showcase"
-                className="w-full h-full max-h-[45vh] sm:max-h-[52vh] object-contain select-none pointer-events-none"
+            <motion.div
+              style={
+                shouldReduceMotion
+                  ? {}
+                  : {
+                      scale: videoScale,
+                      x: videoX,
+                      opacity: videoOpacity,
+                    }
+              }
+              className="w-full h-full flex items-center justify-center will-change-transform px-4 sm:px-8"
+            >
+              <video
+                src="/who_pen_video.mp4"
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="w-full h-auto max-h-[85vh] object-contain select-none pointer-events-none"
               />
-            </div>
+            </motion.div>
           </motion.div>
 
         </div>
