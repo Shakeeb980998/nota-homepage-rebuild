@@ -11,34 +11,6 @@
 
 This project is a pixel-accurate, high-performance rebuild of the **NŌTA** homepage engineered to enterprise standards. Built as a decoupled multi-service system deployed on Railway, the solution couples a **Next.js 16 (React 19)** frontend with a self-hosted **Strapi v5 headless CMS** backed by **PostgreSQL**.
 
-### System Topology
-
-```
-┌──────────────────────────────────────────────────────────────┐
-│                    Railway Cloud Platform                    │
-│                                                              │
-│  ┌──────────────────────┐        Private Networking         │
-│  │   Managed Postgres   │ ◄───────────────────────────────┐  │
-│  │       Database       │                                 │  │
-│  └──────────────────────┘                                 │  │
-│                                                           │  │
-│  ┌──────────────────────┐   Public REST API / GraphQL     │  │
-│  │    Strapi CMS v5     │ ◄────────────────────────────┐  │  │
-│  │ (Content & Media API)│                              │  │  │
-│  └──────────┬───────────┘                              │  │  │
-│             │ On-Demand Revalidation Webhook           │  │  │
-│             ▼                                          │  │  │
-│  ┌──────────────────────┐                              │  │  │
-│  │   Next.js 16 App     │ ─────────────────────────────┘  │  │
-│  │ (Turbopack, SSR/ISR) │                                    │
-│  └──────────┬───────────┘                                    │
-└─────────────┼────────────────────────────────────────────────┘
-              ▼
-    End User / Reviewer
-```
-
----
-
 ## 2. Technical Stack Rationale
 
 | Layer | Technology | Architectural Rationale |
