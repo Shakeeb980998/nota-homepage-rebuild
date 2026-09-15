@@ -52,7 +52,7 @@ export const OrderModal: React.FC<OrderModalProps> = ({
   return (
     <div
       onClick={onClose}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 animate-in fade-in duration-200"
     >
       {/* Modal Card (White background matching sample site media_1789399560879) */}
       <div
