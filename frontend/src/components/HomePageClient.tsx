@@ -6,7 +6,6 @@ import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { Specs } from "@/components/Specs";
 import { WhoItIsFor } from "@/components/WhoItIsFor";
-import { PenZoomTransition } from "@/components/PenZoomTransition";
 import { SmartPaper } from "@/components/SmartPaper";
 import { InsideTheBox } from "@/components/InsideTheBox";
 import { ColorVariants } from "@/components/ColorVariants";
@@ -80,9 +79,6 @@ export const HomePageClient: React.FC<HomePageClientProps> = ({ initialData }) =
         description={initialData.whoItIsFor.description}
         audiences={initialData.whoItIsFor.audiences}
       />
-
-      {/* Pinned Pen Zoom Transition (Standard horizontal side-profile pen, true 100vw x 100vh full-bleed, concurrent title fade-in) */}
-      <PenZoomTransition />
 
       {/* Works with smart paper */}
       <SmartPaper

@@ -94,19 +94,27 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
     restDelta: 0.001,
   });
 
-  // Staged Transition: Intro copy fades smoothly as topics slide in
-  const introOpacity = useTransform(smoothProgress, [0.15, 0.26], [1, 0]);
-  const introY = useTransform(smoothProgress, [0.15, 0.26], ["0px", "-16px"]);
 
   // 3 Audience Topics: Slide in from right sequentially
-  const topic1X = useTransform(smoothProgress, [0.20, 0.40], ["110%", "0%"]);
-  const topic1Opacity = useTransform(smoothProgress, [0.20, 0.35], [0, 1]);
+  const topic1X = useTransform(smoothProgress, [0.18, 0.32], ["110%", "0%"]);
+  const topic1Opacity = useTransform(smoothProgress, [0.18, 0.28], [0, 1]);
 
-  const topic2X = useTransform(smoothProgress, [0.38, 0.58], ["110%", "0%"]);
-  const topic2Opacity = useTransform(smoothProgress, [0.38, 0.52], [0, 1]);
+  const topic2X = useTransform(smoothProgress, [0.28, 0.42], ["110%", "0%"]);
+  const topic2Opacity = useTransform(smoothProgress, [0.28, 0.38], [0, 1]);
 
-  const topic3X = useTransform(smoothProgress, [0.56, 0.76], ["110%", "0%"]);
-  const topic3Opacity = useTransform(smoothProgress, [0.56, 0.70], [0, 1]);
+  const topic3X = useTransform(smoothProgress, [0.38, 0.52], ["110%", "0%"]);
+  const topic3Opacity = useTransform(smoothProgress, [0.38, 0.48], [0, 1]);
+
+  // Text content moves up and fades out smoothly as pen rises from below
+  const textContentOpacity = useTransform(smoothProgress, [0.46, 0.58], [1, 0]);
+  const textContentY = useTransform(smoothProgress, [0.46, 0.58], ["0px", "-24px"]);
+
+  // Pen Card Showcase: Rises from bottom, locks into full-bleed white, then recedes (matching Screenshots 2, 3, 4)
+  const penContainerY = useTransform(smoothProgress, [0.45, 0.65], ["100vh", "0vh"]);
+  const penCardScale = useTransform(smoothProgress, [0.45, 0.65, 0.82, 0.98], [1.0, 1.0, 1.0, 0.72]);
+  const penCardY = useTransform(smoothProgress, [0.82, 0.98], ["0vh", "-8vh"]);
+  const penCardBg = useTransform(smoothProgress, [0.82, 0.96], ["#ffffff", "#2a2a2a"]);
+  const penCardRadius = useTransform(smoothProgress, [0.82, 0.98], [0, 20]);
 
   const quoteText =
     introQuote ||
@@ -119,23 +127,27 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
 
   return (
     <section id="who-it-is-for" className="bg-black text-white relative z-20">
-      <div ref={pinTrackRef} className="relative h-[150vh] sm:h-[180vh] lg:h-[200vh]">
+      <div ref={pinTrackRef} className="relative h-[300vh] sm:h-[320vh]">
         {/* Sticky Viewport with guaranteed top clearance beneath fixed navbar */}
         <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-center px-4 sm:px-8 md:px-12 lg:px-14">
           
-          <div className="max-w-7xl mx-auto w-full flex flex-col justify-between h-full max-h-[86vh] my-auto relative z-10">
+          {/* Layer 1: Text Content (Quote, Divider, Label, Intro Copy never hidden, 3 Sliding Audience Topics) */}
+          <motion.div
+            style={shouldReduceMotion ? {} : { opacity: textContentOpacity, y: textContentY }}
+            className="max-w-7xl mx-auto w-full flex flex-col justify-between h-full max-h-[88vh] my-auto relative z-10"
+          >
             {/* Top Block: Manifesto Quote + Divider Line (Matches sample site media_1789446815432.png) */}
-            <div className="space-y-4 sm:space-y-6 pt-2">
+            <div className="space-y-3 sm:space-y-5 pt-1">
               <ScrollIlluminatedText
                 text={quoteText}
                 className="max-w-5xl"
-                wordClassName="text-2xl sm:text-3xl md:text-4xl lg:text-[40px] font-serif font-normal leading-[1.2] tracking-tight"
+                wordClassName="text-xl sm:text-2xl md:text-3xl lg:text-[36px] xl:text-[38px] font-serif font-normal leading-[1.2] tracking-tight"
               />
               <div className="w-full h-px bg-white/20" />
             </div>
 
-            {/* Bottom Block: Two Column - Left Label & Right Sliding Topics (Matches sample site media_1789446815432.png) */}
-            <div className="flex flex-col lg:flex-row justify-between items-start gap-6 sm:gap-8 lg:gap-16 relative pt-1 pb-4">
+            {/* Bottom Block: Two Column - Left Label & Right Content (Matches Screenshot 1 & 2 without hiding intro copy) */}
+            <div className="flex flex-col lg:flex-row justify-between items-start gap-4 sm:gap-6 lg:gap-14 relative pt-1 pb-2">
               
               {/* Left Column: Label */}
               <div className="w-full lg:w-48 shrink-0 pt-1">
@@ -144,35 +156,32 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
                 </span>
               </div>
 
-              {/* Right Column: Intro Copy + 3 Sliding Topics */}
-              <div className="w-full lg:max-w-2xl ml-auto relative min-h-[260px] sm:min-h-[290px]">
+              {/* Right Column: Intro Copy + 3 Sliding Topics Stacked Below (Intro copy NEVER hidden) */}
+              <div className="w-full lg:max-w-2xl ml-auto space-y-4 sm:space-y-6">
                 
-                {/* Intro Copy: illuminated on scroll, then gently fades as topics slide in */}
-                <motion.div
-                  style={shouldReduceMotion ? {} : { opacity: introOpacity, y: introY }}
-                  className="space-y-4"
-                >
+                {/* Intro Copy: STAYS VISIBLE above audience blocks */}
+                <div className="space-y-2 sm:space-y-3">
                   <ScrollIlluminatedText
                     text={p1}
-                    wordClassName="text-base sm:text-lg lg:text-[22px] font-medium leading-[1.3] tracking-tight"
+                    wordClassName="text-sm sm:text-base lg:text-[19px] font-medium leading-[1.3] tracking-tight"
                   />
                   <ScrollIlluminatedText
                     text={p2}
-                    wordClassName="text-base sm:text-lg lg:text-[22px] font-medium leading-[1.3] tracking-tight"
+                    wordClassName="text-sm sm:text-base lg:text-[19px] font-medium leading-[1.3] tracking-tight"
                   />
-                </motion.div>
+                </div>
 
-                {/* 3 Audience Topics: Slide in sequentially from Right */}
-                <div className="absolute inset-x-0 top-0 space-y-5 sm:space-y-6 overflow-hidden py-1">
+                {/* 3 Audience Topics: Stacked below intro copy, sliding in sequentially from Right */}
+                <div className="space-y-3 sm:space-y-4 pt-1">
                   {/* Topic 1 */}
                   <motion.div
                     style={shouldReduceMotion ? { x: "0%", opacity: 1 } : { x: topic1X, opacity: topic1Opacity }}
                     className="w-full flex flex-col items-start will-change-transform"
                   >
-                    <h3 className="text-xl sm:text-2xl lg:text-[26px] font-medium text-white mb-1 tracking-tight">
+                    <h3 className="text-base sm:text-lg lg:text-[21px] font-medium text-white mb-0.5 tracking-tight">
                       {audiences[0]?.title || "Students & Learners"}
                     </h3>
-                    <p className="text-xs sm:text-sm lg:text-[15px] text-[#a3a3a3] font-light leading-relaxed">
+                    <p className="text-xs sm:text-[13px] lg:text-[13.5px] text-[#a3a3a3] font-light leading-relaxed">
                       {audiences[0]?.description ||
                         "Handwritten notes stay personal and intuitive, but become searchable, organized, and easy to study. Lectures, ideas, and revisions are captured as they are — then supported by AI summaries, text recognition, and quick navigation when it matters most."}
                     </p>
@@ -183,10 +192,10 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
                     style={shouldReduceMotion ? { x: "0%", opacity: 1 } : { x: topic2X, opacity: topic2Opacity }}
                     className="w-full flex flex-col items-start will-change-transform"
                   >
-                    <h3 className="text-xl sm:text-2xl lg:text-[26px] font-medium text-white mb-1 tracking-tight">
+                    <h3 className="text-base sm:text-lg lg:text-[21px] font-medium text-white mb-0.5 tracking-tight">
                       {audiences[1]?.title || "Creators, Designers & Architects"}
                     </h3>
-                    <p className="text-xs sm:text-sm lg:text-[15px] text-[#a3a3a3] font-light leading-relaxed">
+                    <p className="text-xs sm:text-[13px] lg:text-[13.5px] text-[#a3a3a3] font-light leading-relaxed">
                       {audiences[1]?.description ||
                         "Sketches, diagrams, concepts, and fragments of ideas belong on paper. This tool makes sure they don’t disappear. Everything drawn or written is safely stored, easy to revisit, and ready to evolve into something bigger — without interrupting the creative flow."}
                     </p>
@@ -197,10 +206,10 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
                     style={shouldReduceMotion ? { x: "0%", opacity: 1 } : { x: topic3X, opacity: topic3Opacity }}
                     className="w-full flex flex-col items-start will-change-transform"
                   >
-                    <h3 className="text-xl sm:text-2xl lg:text-[26px] font-medium text-white mb-1 tracking-tight">
+                    <h3 className="text-base sm:text-lg lg:text-[21px] font-medium text-white mb-0.5 tracking-tight">
                       {audiences[2]?.title || "Managers & Product Thinkers"}
                     </h3>
-                    <p className="text-xs sm:text-sm lg:text-[15px] text-[#a3a3a3] font-light leading-relaxed">
+                    <p className="text-xs sm:text-[13px] lg:text-[13.5px] text-[#a3a3a3] font-light leading-relaxed">
                       {audiences[2]?.description ||
                         "Meetings start on paper and end with structure. Notes turn into clear summaries, tasks, and follow-ups. The pen captures everything quietly, while the app helps organize decisions without pulling attention away from the room."}
                     </p>
@@ -211,7 +220,40 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
 
             </div>
 
-          </div>
+          </motion.div>
+
+          {/* Layer 2: Pen Showcase (Rises from bottom as user scrolls, locks full-bleed white, recedes at end) */}
+          <motion.div
+            style={
+              shouldReduceMotion
+                ? { display: "none" }
+                : {
+                    y: penContainerY,
+                  }
+            }
+            className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none p-0 m-0 overflow-hidden"
+          >
+            <motion.div
+              style={
+                shouldReduceMotion
+                  ? {}
+                  : {
+                      scale: penCardScale,
+                      y: penCardY,
+                      backgroundColor: penCardBg,
+                      borderRadius: penCardRadius,
+                    }
+              }
+              className="w-full h-full flex items-center justify-center will-change-[transform,background-color,border-radius] shadow-2xl p-4 sm:p-8"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/nota_horizontal_pen.png"
+                alt="Nōta Smart Pen horizontal side profile"
+                className="w-full h-full max-h-[85vh] object-contain select-none pointer-events-none"
+              />
+            </motion.div>
+          </motion.div>
 
         </div>
       </div>
