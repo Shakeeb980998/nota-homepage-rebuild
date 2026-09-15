@@ -145,7 +145,7 @@ export const Hero: React.FC<HeroProps> = ({
             <motion.div
               key={idx}
               style={shouldReduceMotion ? { y: 0 } : { y: curtainY }}
-              className="bg-white h-full w-full will-change-transform shadow-[0_-15px_30px_rgba(0,0,0,0.15)]"
+              className="bg-white h-full w-full will-change-transform"
             />
           ))}
         </div>

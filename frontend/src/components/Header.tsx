@@ -40,11 +40,11 @@ export const Header: React.FC<HeaderProps> = ({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isLightSection, setIsLightSection] = useState(false);
 
-  // Smart Direction-Aware Scroll Behavior (Exact match to sample site nota.uprock.pro)
-  // - Top of page (scrollPercent < 6% or scrollY < 80px): always show
-  // - Scroll down (diff > 5): hideHeader() -> translateY(-101%)
-  // - Scroll up (diff < -5): showHeader() -> translateY(0)
+  // Smart Section-Aware & Scroll Behavior
+  // - Over white sections (e.g. Specifications): Always visible, black text/logo matching sample site
+  // - Over dark sections: Direction-aware scroll
   useEffect(() => {
     let lastScrollY = window.scrollY;
     let ticking = false;
@@ -56,6 +56,27 @@ export const Header: React.FC<HeaderProps> = ({
           const docHeight = document.documentElement.scrollHeight;
           const winHeight = window.innerHeight;
           const scrollPercent = (currentScroll / (docHeight - winHeight)) * 100;
+
+          // Check if currently inside Specifications section
+          const specsEl = document.getElementById("specifications");
+          let inSpecs = false;
+          if (specsEl) {
+            const rect = specsEl.getBoundingClientRect();
+            // Header is 80px tall; active when specs is under header
+            if (rect.top <= 80 && rect.bottom >= 80) {
+              inSpecs = true;
+            }
+          }
+          setIsLightSection(inSpecs);
+
+          if (inSpecs) {
+            // In Specs: Always show header with black text matching sample site
+            setIsVisible(true);
+            setIsScrolled(true);
+            lastScrollY = currentScroll;
+            ticking = false;
+            return;
+          }
 
           if (scrollPercent < 6 || currentScroll < 80) {
             setIsVisible(true);
@@ -69,10 +90,8 @@ export const Header: React.FC<HeaderProps> = ({
 
           const diff = currentScroll - lastScrollY;
           if (diff > 5) {
-            // Scrolling down -> hide header so white pen & content are completely unobstructed
             setIsVisible(false);
           } else if (diff < -5) {
-            // Scrolling up -> smoothly reveal header
             setIsVisible(true);
           }
 
@@ -92,11 +111,13 @@ export const Header: React.FC<HeaderProps> = ({
       style={{
         transform: isVisible ? "translateY(0)" : "translateY(-101%)",
         transition:
-          "transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease, border-color 0.3s ease",
+          "transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease",
         willChange: "transform",
       }}
       className={`fixed top-0 left-0 right-0 z-50 pointer-events-none h-16 sm:h-20 flex items-center ${
-        isScrolled
+        isLightSection
+          ? "bg-white/80 backdrop-blur-md border-b border-black/5"
+          : isScrolled
           ? "bg-black/75 backdrop-blur-xl border-b border-white/10 shadow-lg"
           : "bg-transparent"
       }`}
@@ -113,17 +134,29 @@ export const Header: React.FC<HeaderProps> = ({
             className="flex items-center gap-2 group transition-opacity hover:opacity-80 cursor-pointer bg-transparent border-none p-0 outline-none"
             aria-label="Refresh page"
           >
-            <NotaWordmark className="h-5 sm:h-6 w-auto text-white fill-white" />
+            <NotaWordmark
+              className={`h-5 sm:h-6 w-auto transition-colors duration-300 ${
+                isLightSection ? "text-black fill-black" : "text-white fill-white"
+              }`}
+            />
             <span className="sr-only">{siteName}</span>
           </button>
 
-          {/* Desktop Nav: Title/sentence case, text-sm, clean white with hover underline */}
-          <nav className="hidden md:flex items-center gap-8 text-sm font-sans font-normal text-white/90">
+          {/* Desktop Nav: Title/sentence case, text-sm, clean styling with hover underline */}
+          <nav
+            className={`hidden md:flex items-center gap-8 text-sm font-sans font-normal transition-colors duration-300 ${
+              isLightSection ? "text-neutral-800" : "text-white/90"
+            }`}
+          >
             {links.map((link, idx) => (
               <a
                 key={link.label}
                 href={link.href}
-                className="relative py-1 text-white/90 hover:text-white transition-colors duration-200 group/nav"
+                className={`relative py-1 transition-colors duration-200 group/nav ${
+                  isLightSection
+                    ? "text-neutral-800 hover:text-black"
+                    : "text-white/90 hover:text-white"
+                }`}
               >
                 <ScrambleText
                   text={link.label}
@@ -132,7 +165,11 @@ export const Header: React.FC<HeaderProps> = ({
                   duration={480}
                 />
                 {/* Clean hover underline indicator matching sample site (media_1789402901410.png) */}
-                <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-white transition-all duration-200 ease-out group-hover/nav:w-full" />
+                <span
+                  className={`absolute bottom-0 left-0 w-0 h-[1px] transition-all duration-200 ease-out group-hover/nav:w-full ${
+                    isLightSection ? "bg-black" : "bg-white"
+                  }`}
+                />
               </a>
             ))}
           </nav>

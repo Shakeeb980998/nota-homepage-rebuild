@@ -18,60 +18,77 @@ export const Specs: React.FC<SpecsProps> = ({
   const pinContainerRef = useRef<HTMLDivElement>(null);
   const shouldReduceMotion = useReducedMotion();
 
-  // Scroll scrub tracking across pinned section (~220vh of scroll)
+  // Scroll scrub tracking across pinned section (~260vh for smooth, unhurried progression)
   const { scrollYProgress } = useScroll({
     target: pinContainerRef,
     offset: ["start start", "end end"],
   });
 
-  // Crisp, responsive scroll scrub (high stiffness eliminates lag/delay)
+  // Smooth spring scrub
   const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 260,
-    damping: 32,
+    stiffness: 140,
+    damping: 24,
     restDelta: 0.001,
   });
 
-  // Vertical pen rises UP from bottom so nib reaches into the "Specifications" text
-  const penTravelY = useTransform(smoothProgress, [0.02, 0.45], [360, -135]);
-  const penOpacity = useTransform(smoothProgress, [0.01, 0.12], [0.3, 1]);
+  // Step 1: 0.00 -> 0.12 : Headline starts vertically centered (30vh), pen & cards hidden below
+  // Step 2: 0.12 -> 0.38 : Headline glides upward towards resting position (0vh). Nib rises from bottom.
+  // Step 3: 0.38 -> 0.60 : Pen reaches height beneath headline, 3 cards rise up, middle card frosted over pen body.
+  // Step 4: 0.60 -> 0.85 : All 3 cards and pen held stably in full view.
+  // Step 5: 0.85 -> 1.00 : Stepped 4-curtain transition wipes into Who section.
 
-  // Cards rise UP simultaneously with the pen in a fluid, continuous flow (no delay)
-  const card1Opacity = useTransform(smoothProgress, [0.06, 0.35], [0, 1]);
-  const card1Y = useTransform(smoothProgress, [0.06, 0.45], [100, 0]);
+  const headlineY = useTransform(
+    smoothProgress,
+    [0.00, 0.12, 0.45],
+    ["30vh", "30vh", "0vh"]
+  );
 
-  const card2Opacity = useTransform(smoothProgress, [0.08, 0.38], [0, 1]);
-  const card2Y = useTransform(smoothProgress, [0.08, 0.48], [100, 0]);
+  const penTravelY = useTransform(
+    smoothProgress,
+    [0.00, 0.12, 0.36, 0.58, 0.85],
+    ["110vh", "110vh", "40vh", "-8vh", "-8vh"]
+  );
+  const penOpacity = useTransform(
+    smoothProgress,
+    [0.10, 0.18],
+    [0, 1]
+  );
 
-  const card3Opacity = useTransform(smoothProgress, [0.10, 0.40], [0, 1]);
-  const card3Y = useTransform(smoothProgress, [0.10, 0.50], [100, 0]);
-
-  const cardTransforms = [
-    { y: card1Y, opacity: card1Opacity },
-    { y: card2Y, opacity: card2Opacity },
-    { y: card3Y, opacity: card3Opacity },
-  ];
+  const cardsY = useTransform(
+    smoothProgress,
+    [0.00, 0.28, 0.58, 0.85],
+    ["100vh", "100vh", "0vh", "0vh"]
+  );
+  const cardsOpacity = useTransform(
+    smoothProgress,
+    [0.26, 0.42],
+    [0, 1]
+  );
 
   // 4 Horizontal Stepped Curtains expanding outward from center (Matches sample site nota.uprock.pro exactly)
   // Grid layout: grid-template-rows: 1fr 2.625fr 2.625fr 2.625fr (top to bottom)
-  // Bottom row expands widest first, followed by row 3, row 2, and row 1 (top)
-  const curtainRow4Width = useTransform(smoothProgress, [0.60, 0.85], ["0%", "100%"]); // bottom
-  const curtainRow3Width = useTransform(smoothProgress, [0.65, 0.90], ["0%", "100%"]);
-  const curtainRow2Width = useTransform(smoothProgress, [0.70, 0.95], ["0%", "100%"]);
-  const curtainRow1Width = useTransform(smoothProgress, [0.75, 1.00], ["0%", "100%"]); // top
+  const curtainRow4Width = useTransform(smoothProgress, [0.84, 0.96], ["0%", "100%"]); // bottom
+  const curtainRow3Width = useTransform(smoothProgress, [0.87, 0.98], ["0%", "100%"]);
+  const curtainRow2Width = useTransform(smoothProgress, [0.90, 1.00], ["0%", "100%"]);
+  const curtainRow1Width = useTransform(smoothProgress, [0.92, 1.00], ["0%", "100%"]); // top
 
   return (
-    // Outer pinned scroll container (~220vh, allows comfortable hold + curtain wipe into next section)
-    <div id="specifications" ref={pinContainerRef} className="relative h-[220vh] bg-white text-[#111111]">
+    // Outer pinned scroll container (~260vh, allows comfortable hold + curtain wipe into next section)
+    <div id="specifications" ref={pinContainerRef} className="relative h-[260vh] bg-white text-[#111111]">
       {/* Sticky Viewport with guaranteed top clearance beneath fixed 80px navbar */}
       <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between pt-20 sm:pt-24 md:pt-28 pb-4 sm:pb-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto w-full relative z-10 flex flex-col justify-between h-full my-auto">
-          {/* Centered Large Didone Headline (Fluid sizing across all viewports) */}
-          <div className="text-center max-w-4xl mx-auto pt-1 sm:pt-3 mb-1 sm:mb-3 relative z-20">
+          
+          {/* Centered Large Didone Headline (Starts centered, smoothly glides up) */}
+          <motion.div
+            style={shouldReduceMotion ? {} : { y: headlineY }}
+            className="text-center max-w-4xl mx-auto pt-1 sm:pt-3 mb-1 sm:mb-3 relative z-20 will-change-transform"
+          >
             <h2 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-serif font-normal leading-[1.0] tracking-tight">
               <span className="block italic text-[#8a8a8a] text-lg sm:text-2xl md:text-3xl lg:text-4xl mb-0.5 sm:mb-1">{badge}</span>
               <span className="block text-[#000000]">{title}</span>
             </h2>
-          </div>
+          </motion.div>
 
           {/* Relative Cards Grid Container with Pen behind cards (z-0) */}
           <div className="relative max-w-6xl mx-auto w-full mb-auto pb-2 sm:pb-4">
@@ -80,44 +97,38 @@ export const Specs: React.FC<SpecsProps> = ({
               <motion.div
                 style={
                   shouldReduceMotion
-                    ? { y: -135, opacity: 1 }
+                    ? { y: "-8vh", opacity: 1 }
                     : {
                         y: penTravelY,
                         opacity: penOpacity,
                       }
                 }
-                className="w-auto flex justify-center will-change-transform filter drop-shadow-[0_25px_50px_rgba(0,0,0,0.22)]"
+                className="w-auto flex justify-center will-change-transform filter drop-shadow-[0_25px_50px_rgba(0,0,0,0.18)]"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="/nota_scene_2_img.png"
                   alt="Nōta Vertical Smart Pen"
-                  className="w-auto h-[360px] sm:h-[460px] md:h-[540px] max-h-[60vh] max-w-none object-contain select-none"
+                  className="w-auto h-[400px] sm:h-[500px] md:h-[580px] max-h-[62vh] max-w-none object-contain select-none"
                 />
               </motion.div>
             </div>
 
             {/* Staggered Card Reveal: Horizontal snap carousel on mobile, 3-column grid on desktop */}
-            <div className="flex md:grid md:grid-cols-3 gap-3 sm:gap-5 md:gap-6 items-stretch overflow-x-auto md:overflow-x-visible pb-3 md:pb-0 snap-x snap-mandatory relative z-10 no-scrollbar px-1">
+            <motion.div
+              style={shouldReduceMotion ? { y: "0vh", opacity: 1 } : { y: cardsY, opacity: cardsOpacity }}
+              className="flex md:grid md:grid-cols-3 gap-3 sm:gap-5 md:gap-6 items-stretch overflow-x-auto md:overflow-x-visible pb-3 md:pb-0 snap-x snap-mandatory relative z-10 no-scrollbar px-1 will-change-transform"
+            >
               {cards.map((card, idx) => {
                 const isMiddle = idx === 1;
-                const transform = cardTransforms[idx % cardTransforms.length];
 
                 return (
-                  <motion.div
+                  <div
                     key={card.title}
-                    style={
-                      shouldReduceMotion
-                        ? { opacity: 1, y: 0 }
-                        : {
-                            opacity: transform.opacity,
-                            y: transform.y,
-                          }
-                    }
-                    className={`relative rounded-[20px] sm:rounded-[24px] p-5 sm:p-6 md:p-7 shadow-[0_10px_35px_rgba(0,0,0,0.04)] border border-neutral-200/70 hover:shadow-[0_20px_45px_rgba(0,0,0,0.08)] transition-all z-10 min-w-[78vw] sm:min-w-[320px] md:min-w-0 snap-center shrink-0 md:shrink ${
+                    className={`relative rounded-[20px] sm:rounded-[24px] p-5 sm:p-6 md:p-7 transition-all z-10 min-w-[78vw] sm:min-w-[320px] md:min-w-0 snap-center shrink-0 md:shrink ${
                       isMiddle
-                        ? "bg-white/55 backdrop-blur-md md:-translate-y-2 border-neutral-300/80 shadow-[0_15px_40px_rgba(0,0,0,0.06)]"
-                        : "bg-[#f4f4f5]/90 backdrop-blur-md"
+                        ? "bg-white/75 backdrop-blur-xl md:-translate-y-2 border border-neutral-300/80 shadow-[0_15px_40px_rgba(0,0,0,0.06)]"
+                        : "bg-[#f8f8f8]/90 backdrop-blur-md border border-neutral-200/70 shadow-[0_10px_35px_rgba(0,0,0,0.04)]"
                     }`}
                   >
                     <h3 className="text-lg sm:text-xl md:text-2xl font-serif font-normal text-[#111111] mb-3 sm:mb-5">
@@ -135,10 +146,10 @@ export const Specs: React.FC<SpecsProps> = ({
                         </div>
                       ))}
                     </div>
-                  </motion.div>
+                  </div>
                 );
               })}
-            </div>
+            </motion.div>
           </div>
         </div>
 
