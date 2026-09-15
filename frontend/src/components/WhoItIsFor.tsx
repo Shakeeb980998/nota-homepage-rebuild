@@ -79,6 +79,68 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
   description,
   audiences,
 }) => {
+  const pinTrackRef = useRef<HTMLDivElement>(null);
+  const shouldReduceMotion = useReducedMotion();
+
+  // Master scroll scrub across Manifesto/Intro, 3 Topics sliding in, Pen entrance, full-bleed expansion, and shrink-recede exit
+  const { scrollYProgress } = useScroll({
+    target: pinTrackRef,
+    offset: ["start start", "end end"],
+  });
+
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 120,
+    damping: 24,
+    restDelta: 0.001,
+  });
+
+  // Staged Transition: Intro copy fades smoothly as topics slide in
+  const introOpacity = useTransform(smoothProgress, [0.15, 0.26], [1, 0]);
+  const introY = useTransform(smoothProgress, [0.15, 0.26], ["0px", "-16px"]);
+
+  // 3 Audience Topics: Slide in from right sequentially
+  const topic1X = useTransform(smoothProgress, [0.20, 0.36], ["100%", "0%"]);
+  const topic1Opacity = useTransform(smoothProgress, [0.20, 0.32], [0, 1]);
+
+  const topic2X = useTransform(smoothProgress, [0.32, 0.48], ["100%", "0%"]);
+  const topic2Opacity = useTransform(smoothProgress, [0.32, 0.44], [0, 1]);
+
+  const topic3X = useTransform(smoothProgress, [0.44, 0.60], ["100%", "0%"]);
+  const topic3Opacity = useTransform(smoothProgress, [0.44, 0.56], [0, 1]);
+
+  // Pen Photo Entrance, Expansion to Full Screen, and Shrink-Recede Exit
+  const penTop = useTransform(
+    smoothProgress,
+    [0.58, 0.68, 0.76, 0.86, 0.96],
+    ["100vh", "45vh", "0vh", "0vh", "12vh"]
+  );
+
+  const penLeft = useTransform(
+    smoothProgress,
+    [0.58, 0.68, 0.76, 0.86, 0.96],
+    ["25%", "15%", "0%", "0%", "12%"]
+  );
+
+  const penRight = useTransform(
+    smoothProgress,
+    [0.76, 0.86, 0.96],
+    ["0%", "0%", "12%"]
+  );
+
+  const penBottom = useTransform(
+    smoothProgress,
+    [0.76, 0.86, 0.96],
+    ["0vh", "0vh", "12vh"]
+  );
+
+  const penRadius = useTransform(
+    smoothProgress,
+    [0.76, 0.86, 0.96],
+    [0, 0, 16]
+  );
+
+  const penFadeOut = useTransform(smoothProgress, [0.94, 0.99], [1, 0]);
+
   const quoteText =
     introQuote ||
     "Some thoughts need time, space, and a physical trace to exist. Writing by hand creates focus, presence, and a deeper connection with ideas. This tool is built around that simple truth.";
@@ -89,77 +151,129 @@ export const WhoItIsFor: React.FC<WhoItIsForProps> = ({
     "Everything you write syncs to the app, where your notes are organized, searchable, and ready to work with AI when you need more clarity or structure.";
 
   return (
-    <section id="who-it-is-for" className="bg-black text-white relative z-20 pt-20 sm:pt-28 md:pt-32 pb-20 sm:pb-28 px-4 sm:px-8 md:px-12 lg:px-14">
-      <div className="max-w-7xl mx-auto w-full space-y-16 sm:space-y-20 md:space-y-24">
-        
-        {/* Top Part: Manifesto Quote + Divider + Two-Column "Who it's for" (Matches sample site media_1789446815432.png) */}
-        <div className="space-y-8 sm:space-y-10 md:space-y-12">
-          {/* Manifesto Quote */}
-          <div className="max-w-5xl">
-            <ScrollIlluminatedText
-              text={quoteText}
-              wordClassName="text-2xl sm:text-3xl md:text-4xl lg:text-[46px] font-serif font-normal leading-[1.22] sm:leading-[1.18] tracking-tight"
-            />
-          </div>
-
-          {/* Thin Divider Line matching sample site */}
-          <div className="w-full h-px bg-white/20" />
-
-          {/* Two-Column: Left Label & Right Paragraphs */}
-          <div className="flex flex-col lg:flex-row justify-between items-start gap-6 sm:gap-8 lg:gap-16 pt-2">
-            {/* Left Column: Label */}
-            <div className="w-full lg:w-48 shrink-0 pt-1 sm:pt-2">
-              <span className="text-xs sm:text-sm font-mono uppercase tracking-[0.15em] text-[#8a8a8a] block">
-                {sectionTitle || "WHO IT'S FOR:"}
-              </span>
-            </div>
-
-            {/* Right Column: Illuminated Paragraphs */}
-            <div className="w-full lg:max-w-2xl ml-auto space-y-4 sm:space-y-6">
-              <ScrollIlluminatedText
-                text={p1}
-                wordClassName="text-lg sm:text-xl md:text-2xl font-medium leading-[1.3] sm:leading-[1.28] tracking-tight"
-              />
-              <ScrollIlluminatedText
-                text={p2}
-                wordClassName="text-lg sm:text-xl md:text-2xl font-medium leading-[1.3] sm:leading-[1.28] tracking-tight"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom Part: 3 Audience Topics on the Right + Pen Showcase (Matches sample site media_1789446834370.png) */}
-        <div className="space-y-16 sm:space-y-20 md:space-y-24">
+    <section id="who-it-is-for" className="bg-black text-white relative z-20">
+      <div ref={pinTrackRef} className="relative h-[300vh]">
+        {/* Sticky Viewport with guaranteed top clearance beneath fixed navbar */}
+        <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-center px-4 sm:px-8 md:px-12 lg:px-14">
           
-          {/* 3 Audience Topics aligned to the right column */}
-          <div className="w-full lg:max-w-2xl ml-auto space-y-10 sm:space-y-14 md:space-y-16">
-            {audiences.map((aud, idx) => (
-              <div
-                key={idx}
-                className="space-y-2.5 sm:space-y-3"
-              >
-                <h3 className="text-2xl sm:text-[28px] md:text-3xl font-medium text-white tracking-tight">
-                  {aud.title}
-                </h3>
-                <p className="text-sm sm:text-base md:text-[17px] text-[#a3a3a3] font-light leading-relaxed">
-                  {aud.description}
-                </p>
+          <div className="max-w-7xl mx-auto w-full flex flex-col justify-between h-full max-h-[86vh] my-auto relative z-10">
+            
+            {/* Top Block: Manifesto Quote + Divider Line (Matches sample site media_1789446815432.png with zero gap) */}
+            <div className="space-y-4 sm:space-y-6 pt-2">
+              <ScrollIlluminatedText
+                text={quoteText}
+                className="max-w-5xl"
+                wordClassName="text-2xl sm:text-3xl md:text-4xl lg:text-[40px] font-serif font-normal leading-[1.2] tracking-tight"
+              />
+              <div className="w-full h-px bg-white/20" />
+            </div>
+
+            {/* Bottom Block: Two Column - Left Label & Right Sliding Topics (Matches sample site media_1789446815432.png) */}
+            <div className="flex flex-col lg:flex-row justify-between items-start gap-6 sm:gap-8 lg:gap-16 relative pt-1 pb-4">
+              
+              {/* Left Column: Label */}
+              <div className="w-full lg:w-48 shrink-0 pt-1">
+                <span className="text-xs sm:text-sm font-mono uppercase tracking-[0.15em] text-[#8a8a8a] block">
+                  {sectionTitle || "WHO IT'S FOR:"}
+                </span>
               </div>
-            ))}
+
+              {/* Right Column: Intro Copy + 3 Sliding Topics */}
+              <div className="w-full lg:max-w-2xl ml-auto relative min-h-[260px] sm:min-h-[290px]">
+                
+                {/* Intro Copy: illuminated on scroll, then gently fades as topics slide in */}
+                <motion.div
+                  style={shouldReduceMotion ? {} : { opacity: introOpacity, y: introY }}
+                  className="space-y-4"
+                >
+                  <ScrollIlluminatedText
+                    text={p1}
+                    wordClassName="text-base sm:text-lg lg:text-[22px] font-medium leading-[1.3] tracking-tight"
+                  />
+                  <ScrollIlluminatedText
+                    text={p2}
+                    wordClassName="text-base sm:text-lg lg:text-[22px] font-medium leading-[1.3] tracking-tight"
+                  />
+                </motion.div>
+
+                {/* 3 Audience Topics: Slide in sequentially from Right */}
+                <div className="absolute inset-x-0 top-0 space-y-5 sm:space-y-6 overflow-hidden py-1">
+                  {/* Topic 1 */}
+                  <motion.div
+                    style={shouldReduceMotion ? { x: "0%", opacity: 1 } : { x: topic1X, opacity: topic1Opacity }}
+                    className="w-full flex flex-col items-start will-change-transform"
+                  >
+                    <h3 className="text-xl sm:text-2xl lg:text-[26px] font-medium text-white mb-1 tracking-tight">
+                      {audiences[0]?.title || "Students & Learners"}
+                    </h3>
+                    <p className="text-xs sm:text-sm lg:text-[15px] text-[#a3a3a3] font-light leading-relaxed">
+                      {audiences[0]?.description ||
+                        "Handwritten notes stay personal and intuitive, but become searchable, organized, and easy to study. Lectures, ideas, and revisions are captured as they are — then supported by AI summaries, text recognition, and quick navigation when it matters most."}
+                    </p>
+                  </motion.div>
+
+                  {/* Topic 2 */}
+                  <motion.div
+                    style={shouldReduceMotion ? { x: "0%", opacity: 1 } : { x: topic2X, opacity: topic2Opacity }}
+                    className="w-full flex flex-col items-start will-change-transform"
+                  >
+                    <h3 className="text-xl sm:text-2xl lg:text-[26px] font-medium text-white mb-1 tracking-tight">
+                      {audiences[1]?.title || "Creators, Designers & Architects"}
+                    </h3>
+                    <p className="text-xs sm:text-sm lg:text-[15px] text-[#a3a3a3] font-light leading-relaxed">
+                      {audiences[1]?.description ||
+                        "Sketches, diagrams, concepts, and fragments of ideas belong on paper. This tool makes sure they don’t disappear. Everything drawn or written is safely stored, easy to revisit, and ready to evolve into something bigger — without interrupting the creative flow."}
+                    </p>
+                  </motion.div>
+
+                  {/* Topic 3 */}
+                  <motion.div
+                    style={shouldReduceMotion ? { x: "0%", opacity: 1 } : { x: topic3X, opacity: topic3Opacity }}
+                    className="w-full flex flex-col items-start will-change-transform"
+                  >
+                    <h3 className="text-xl sm:text-2xl lg:text-[26px] font-medium text-white mb-1 tracking-tight">
+                      {audiences[2]?.title || "Managers & Product Thinkers"}
+                    </h3>
+                    <p className="text-xs sm:text-sm lg:text-[15px] text-[#a3a3a3] font-light leading-relaxed">
+                      {audiences[2]?.description ||
+                        "Meetings start on paper and end with structure. Notes turn into clear summaries, tasks, and follow-ups. The pen captures everything quietly, while the app helps organize decisions without pulling attention away from the room."}
+                    </p>
+                  </motion.div>
+                </div>
+
+              </div>
+
+            </div>
+
           </div>
 
-          {/* Smart Pen Showcase (Pure white card with horizontal pen photo) */}
-          <div className="w-full bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-12 md:p-16 flex items-center justify-center shadow-2xl overflow-hidden">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/nota_horizontal_pen.png"
-              alt="Nōta Smart Pen showcase"
-              className="w-full max-h-[35vh] sm:max-h-[45vh] md:max-h-[55vh] object-contain select-none"
-            />
-          </div>
+          {/* Layer 2: Pen Photo Showcase (Rises, expands full screen white card, and shrinks/recedes) */}
+          <motion.div
+            style={
+              shouldReduceMotion
+                ? { display: "none" }
+                : {
+                    top: penTop,
+                    left: penLeft,
+                    right: penRight,
+                    bottom: penBottom,
+                    borderRadius: penRadius,
+                    opacity: penFadeOut,
+                  }
+            }
+            className="absolute z-20 bg-white overflow-hidden will-change-[top,left,right,bottom,opacity] pointer-events-none shadow-2xl"
+          >
+            <div className="w-full h-full flex items-center justify-center p-6 sm:p-10 lg:p-14 select-none pointer-events-none">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/nota_horizontal_pen.png"
+                alt="Nōta Smart Pen showcase"
+                className="w-full h-full max-h-[45vh] sm:max-h-[52vh] object-contain select-none pointer-events-none"
+              />
+            </div>
+          </motion.div>
 
         </div>
-
       </div>
     </section>
   );
