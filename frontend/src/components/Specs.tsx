@@ -79,11 +79,15 @@ export const Specs: React.FC<SpecsProps> = ({
           {/* Section Headline */}
           <motion.div
             style={shouldReduceMotion ? {} : { y: headlineY }}
-            className="text-center max-w-4xl mx-auto pt-1 sm:pt-3 mb-1 sm:mb-3 relative z-20 will-change-transform"
+            className="text-center max-w-5xl mx-auto pt-1 sm:pt-3 mb-1 sm:mb-3 relative z-20 will-change-transform"
           >
-            <h2 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-serif font-normal leading-[1.0] tracking-tight">
-              <span className="block italic text-[#8a8a8a] text-lg sm:text-2xl md:text-3xl lg:text-4xl mb-0.5 sm:mb-1">{badge}</span>
-              <span className="block text-[#000000]">{title}</span>
+            <h2 className="font-serif font-normal leading-[0.92] tracking-tight sm:tracking-[-0.035em] text-center select-none">
+              <span className="block text-[#666666] text-4xl sm:text-6xl md:text-7xl lg:text-[88px] xl:text-[98px]">
+                {badge || "Nota pen"}
+              </span>
+              <span className="block text-[#000000] text-4xl sm:text-6xl md:text-7xl lg:text-[88px] xl:text-[98px] mt-0.5 sm:mt-1">
+                {title || "Specifications"}
+              </span>
             </h2>
           </motion.div>
 
@@ -122,24 +126,24 @@ export const Specs: React.FC<SpecsProps> = ({
                 return (
                   <div
                     key={card.title}
-                    className={`relative rounded-[20px] sm:rounded-[24px] p-5 sm:p-6 md:p-7 transition-all z-10 min-w-[78vw] sm:min-w-[320px] md:min-w-0 snap-center shrink-0 md:shrink ${
+                    className={`relative rounded-[20px] sm:rounded-[24px] p-5 sm:p-6 md:p-7 transition-all z-10 min-w-[78vw] sm:min-w-[320px] md:min-w-0 snap-center shrink-0 md:shrink flex flex-col justify-between ${
                       isMiddle
-                        ? "bg-white/75 backdrop-blur-xl md:-translate-y-2 border border-neutral-300/80 shadow-[0_15px_40px_rgba(0,0,0,0.06)]"
+                        ? "bg-white/80 backdrop-blur-xl md:-translate-y-2 border border-neutral-300/80 shadow-[0_15px_40px_rgba(0,0,0,0.06)]"
                         : "bg-[#f8f8f8]/90 backdrop-blur-md border border-neutral-200/70 shadow-[0_10px_35px_rgba(0,0,0,0.04)]"
                     }`}
                   >
-                    <h3 className="text-lg sm:text-xl md:text-2xl font-serif font-normal text-[#111111] mb-3 sm:mb-5">
+                    <h3 className="font-sans font-semibold text-lg sm:text-xl lg:text-[22px] text-black tracking-[-0.04em] mb-4 sm:mb-6">
                       {card.title}
                     </h3>
 
-                    <div className="divide-y divide-neutral-200/60">
+                    <div className="divide-y divide-neutral-200/60 mt-auto">
                       {card.features.map((feature, fIdx) => (
                         <div
                           key={fIdx}
-                          className="py-2.5 sm:py-3 flex items-center justify-between gap-2.5 sm:gap-3 text-xs sm:text-sm text-neutral-800 font-light"
+                          className="py-2.5 sm:py-3 flex items-center justify-between gap-2.5 sm:gap-3 text-xs sm:text-sm font-sans font-medium text-black tracking-[-0.02em]"
                         >
                           <span className="leading-snug">{feature}</span>
-                          <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-neutral-300 shrink-0" />
+                          <div className="w-1.5 h-1.5 rounded-full bg-neutral-300 shrink-0" />
                         </div>
                       ))}
                     </div>
