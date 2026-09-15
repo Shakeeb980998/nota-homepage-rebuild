@@ -2,7 +2,7 @@
 ## NŌTA Homepage Engineering Rebuild & Headless Architecture
 
 > **Live Production Deployment**: [frontend-production-e0da.up.railway.app](https://frontend-production-e0da.up.railway.app/)  
-> **Headless CMS (Strapi v5)**: [backend-production-19ec.up.railway.app/admin](https://backend-production-19ec.up.railway.app/admin)  
+> **Headless CMS (Strapi v5)**: [[backend-production-19ec.up.railway.app/admin](https://nota-homepage-rebuild-production-efde.up.railway.app/admin/auth/login)]([https://backend-production-19ec.up.railway.app/admin](https://nota-homepage-rebuild-production-efde.up.railway.app/admin/auth/login))  
 > **Reference Prototype**: [NŌTA by Uprock](https://nota.uprock.pro/)
 
 ---
