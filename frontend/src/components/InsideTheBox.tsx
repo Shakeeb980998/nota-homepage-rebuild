@@ -13,7 +13,7 @@ interface InsideTheBoxProps {
 
 const BLINDS_COUNT = 18;
 
-// Full-width Venetian Blinds Overlay that collapses open (media_1789370947573 -> media_1789370960390)
+// Full-width venetian blinds overlay that collapses open on scroll
 const FullWidthHorizontalBlinds: React.FC<{
   progress: any;
   shouldReduceMotion: boolean | null;
@@ -60,7 +60,7 @@ const WordWithInk: React.FC<{
   );
 };
 
-// Scroll Ink Reveal Lead Paragraph (media_1789373505196)
+// Lead paragraph with progressive scroll-driven ink illumination
 const ScrollInkLeadSection: React.FC<{ text: string }> = ({ text }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
@@ -92,7 +92,7 @@ const ScrollInkLeadSection: React.FC<{ text: string }> = ({ text }) => {
   );
 };
 
-// Device Card Venetian Blinds (media_1789373538360)
+// Device card blinds reveal overlay
 const DeviceCardBlinds: React.FC<{ progress: any }> = ({ progress }) => {
   const scaleY = useTransform(progress, [0.12, 0.48], [1, 0]);
   const opacity = useTransform(progress, [0.42, 0.50], [1, 0]);
@@ -114,7 +114,7 @@ const DeviceCardBlinds: React.FC<{ progress: any }> = ({ progress }) => {
   );
 };
 
-// Two Device Showcase Cards with Blinds & Adapter Hover Swap (media_1789373589438 & media_1789373605726)
+// Secondary hardware showcase cards with interactive hover states
 const DeviceShowcaseCards: React.FC<{ items: BoxItem[] }> = ({ items }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
@@ -178,7 +178,7 @@ const DeviceShowcaseCards: React.FC<{ items: BoxItem[] }> = ({ items }) => {
 
           {/* Image Container with Hover Swap & Blinds */}
           <div className="relative w-full aspect-[16/10] sm:aspect-[16/11] flex items-center justify-center overflow-hidden">
-            {/* Default Image: Adapter with plugged USB-C cable (media_1789373589438) */}
+            {/* Default state: Adapter with USB-C cable */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="https://nota.uprock.pro/d/library_image-14643-symbol-ispnvazts-nota_scene_5_img_03.jpg"
@@ -186,7 +186,7 @@ const DeviceShowcaseCards: React.FC<{ items: BoxItem[] }> = ({ items }) => {
               className="absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-500 group-hover:opacity-0 select-none pointer-events-none"
             />
 
-            {/* Hover Image: Adapter showing two-prong plug (media_1789373605726) */}
+            {/* Hover state: Two-prong plug variant */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="https://nota.uprock.pro/d/library_image-14642-symbol-it4oyiz32-new-scene_5_adapter.jpg"
@@ -245,7 +245,7 @@ export const InsideTheBox: React.FC<InsideTheBoxProps> = ({
 
   return (
     <section id="inside-the-box" className="relative bg-white">
-      {/* Pinned Viewport: Circle Reveal + Title + Luxury Unboxing Set */}
+      {/* Pinned Viewport: Circle Reveal + Title + Unboxing Set */}
       <div ref={containerRef} className="relative h-[450vh] bg-black">
         <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-end bg-transparent">
           
@@ -267,7 +267,7 @@ export const InsideTheBox: React.FC<InsideTheBoxProps> = ({
             />
           </div>
 
-          {/* Phase 2: "Inside the box" Centered Title gliding up (media_1789370947573) */}
+          {/* Phase 2: Centered Title */}
           <motion.div
             style={
               shouldReduceMotion
@@ -282,12 +282,12 @@ export const InsideTheBox: React.FC<InsideTheBoxProps> = ({
             </h2>
           </motion.div>
 
-          {/* Phase 3 & 4: Full-Screen Showcase Stage with Full-Width Blinds (media_1789371918106) */}
+          {/* Phase 3 & 4: Showcase Stage with Horizontal Blinds */}
           <motion.div
             style={shouldReduceMotion ? { opacity: 1 } : { opacity: stageOpacity, y: stageY }}
             className="relative z-20 w-full h-[82vh] sm:h-[84vh] lg:h-[86vh] bg-[#f2f2f2] flex items-end justify-center"
           >
-            {/* Venetian Blinds Overlay spanning the full width of the screen */}
+            {/* Venetian Blinds Overlay */}
             <FullWidthHorizontalBlinds
               progress={scrollYProgress}
               shouldReduceMotion={shouldReduceMotion}
@@ -298,7 +298,6 @@ export const InsideTheBox: React.FC<InsideTheBoxProps> = ({
               
               {/* Left Column: Full-Height Open Luxury Box touching bottom */}
               <div className="relative w-full lg:w-[56%] h-[55%] sm:h-[62%] lg:h-full flex items-end justify-center lg:justify-end order-2 lg:order-1">
-                {/* High-resolution cropped box image without margins */}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={primaryItem.image || "/inside_box.webp"}
@@ -323,10 +322,10 @@ export const InsideTheBox: React.FC<InsideTheBoxProps> = ({
         </div>
       </div>
 
-      {/* Part 2: Scroll-Driven Ink Reveal for Lead Text (media_1789373505196) */}
+      {/* Part 2: Section Lead Text */}
       <ScrollInkLeadSection text={leadText} />
 
-      {/* Part 3: Two Device Showcase Cards with Blinds & Charging Adapter Hover Swap (media_1789373589438 & media_1789373605726) */}
+      {/* Part 3: Secondary Hardware Cards */}
       <DeviceShowcaseCards items={items} />
     </section>
   );

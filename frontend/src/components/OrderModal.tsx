@@ -54,7 +54,7 @@ export const OrderModal: React.FC<OrderModalProps> = ({
       onClick={onClose}
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 animate-in fade-in duration-200"
     >
-      {/* Modal Card (White background matching sample site media_1789399560879) */}
+      {/* Modal Container */}
       <div
         onClick={(e) => e.stopPropagation()}
         className="relative w-full max-w-[460px] bg-white rounded-xl sm:rounded-2xl px-8 py-10 sm:px-12 sm:py-12 text-center shadow-2xl text-black animate-in zoom-in-95 duration-200"
@@ -110,7 +110,7 @@ export const OrderModal: React.FC<OrderModalProps> = ({
               )}
             </div>
 
-            {/* Notify me Button (hover:bg-[#ff2200] matching sample site button-notify:hover) */}
+            {/* Submit Action */}
             <div className="pt-2 space-y-4">
               <button
                 type="submit"

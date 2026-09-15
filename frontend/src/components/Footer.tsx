@@ -36,7 +36,7 @@ export const Footer: React.FC<FooterProps> = ({
     <footer className="bg-black text-white pt-16 sm:pt-20 md:pt-24 pb-8 sm:pb-12 px-4 sm:px-8 md:px-12 lg:px-20 border-t border-neutral-900">
       <div className="max-w-[1520px] mx-auto space-y-12 sm:space-y-16 md:space-y-20">
         
-        {/* Top Grid: Description, Navigation, Year (media_1789376130368) */}
+        {/* Top Grid: Description, Navigation, Year */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 sm:gap-10 md:gap-14 items-start">
           
           {/* Left Column (Span 6): Statement */}
@@ -70,7 +70,7 @@ export const Footer: React.FC<FooterProps> = ({
 
         </div>
 
-        {/* Bottom Bar: Copyright, Team links, Credits (media_1789376130368) */}
+        {/* Bottom Bar: Copyright, Team links, Credits */}
         <div className="pt-6 sm:pt-8 border-t border-neutral-900 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 text-xs font-sans text-neutral-500 text-center sm:text-left">
           <div>{copyright}</div>
 

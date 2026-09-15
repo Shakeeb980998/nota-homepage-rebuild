@@ -10,13 +10,12 @@ interface SmartPaperProps {
   slides: SmartPaperFeature[];
 }
 
-// Vertical Dividing Line that draws down from top to bottom (media_1789366700783 & media_1789365968867)
+// Vertical dividing lines with top-to-bottom draw animation
 const DividingLine: React.FC<{
   index: number;
   progress: any;
   shouldReduceMotion: boolean | null;
 }> = ({ index, progress, shouldReduceMotion }) => {
-  // Lines draw down from right to left between 0.08 and 0.17 (matching media_1789366700783 and media_1789365968867)
   const lineStart = 0.08 + (4 - index) * 0.014;
   const lineEnd = lineStart + 0.045;
   const scaleY = useTransform(progress, [lineStart, Math.min(lineEnd, 0.17)], [0, 1]);
@@ -35,13 +34,12 @@ const DividingLine: React.FC<{
   );
 };
 
-// Vertical Curtain Column that drops down AFTER lines are drawn and vanished (media_1789365992897)
+// Vertical curtain columns with staggered drop animation
 const CurtainColumn: React.FC<{
   index: number;
   progress: any;
   shouldReduceMotion: boolean | null;
 }> = ({ index, progress, shouldReduceMotion }) => {
-  // Drops down between 0.22 and 0.42 in staggered cascade from left to right (matching media_1789365992897)
   const colStart = 0.22 + index * 0.024;
   const colEnd = colStart + 0.10;
   const y = useTransform(progress, [colStart, colEnd], ["0%", "100%"]);
@@ -115,7 +113,7 @@ export const SmartPaper: React.FC<SmartPaperProps> = ({ badge, title, slides }) 
       {/* Sticky Viewport */}
       <div className="sticky top-0 h-screen w-full overflow-hidden z-10 flex flex-col justify-between">
         
-        {/* Layer A: Massive White Cover ("Works with smart paper" - matches Screenshot 4 media_1789453947995.png) */}
+        {/* Layer A: White Cover ("Works with smart paper") */}
         <motion.div
           style={
             shouldReduceMotion
@@ -130,7 +128,7 @@ export const SmartPaper: React.FC<SmartPaperProps> = ({ badge, title, slides }) 
           </h2>
         </motion.div>
 
-        {/* Layer B1: 5 Vertical Dividing Lines (vanishes with display: none before columns drop) */}
+        {/* Layer B1: 5 Vertical Dividing Lines */}
         <motion.div
           style={
             shouldReduceMotion
@@ -149,7 +147,7 @@ export const SmartPaper: React.FC<SmartPaperProps> = ({ badge, title, slides }) 
           ))}
         </motion.div>
 
-        {/* Layer B2: 6 Vertical Curtain Columns Dropping Down (media_1789365992897) */}
+        {/* Layer B2: 6 Vertical Curtain Columns */}
         <div className="absolute inset-0 z-40 pointer-events-none overflow-hidden flex">
           {Array.from({ length: 6 }).map((_, i) => (
             <CurtainColumn
@@ -161,7 +159,7 @@ export const SmartPaper: React.FC<SmartPaperProps> = ({ badge, title, slides }) 
           ))}
         </div>
 
-        {/* Layer C: Step 3 Revealed Dark Section (media_1789368040023) */}
+        {/* Layer C: Slide Showcase Stage */}
         {/* Full-bleed Studio Background Image */}
         <div className="absolute inset-0 z-10 overflow-hidden pointer-events-none">
           <motion.img

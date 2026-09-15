@@ -65,21 +65,18 @@ export const Specs: React.FC<SpecsProps> = ({
     [0, 1]
   );
 
-  // 4 Horizontal Stepped Curtains expanding outward from center (Matches sample site nota.uprock.pro exactly)
-  // Grid layout: grid-template-rows: 1fr 2.625fr 2.625fr 2.625fr (top to bottom)
-  const curtainRow4Width = useTransform(smoothProgress, [0.84, 0.96], ["0%", "100%"]); // bottom
+  // Horizontal stepped curtains expanding outward from center
+  const curtainRow4Width = useTransform(smoothProgress, [0.84, 0.96], ["0%", "100%"]);
   const curtainRow3Width = useTransform(smoothProgress, [0.87, 0.98], ["0%", "100%"]);
   const curtainRow2Width = useTransform(smoothProgress, [0.90, 1.00], ["0%", "100%"]);
-  const curtainRow1Width = useTransform(smoothProgress, [0.92, 1.00], ["0%", "100%"]); // top
+  const curtainRow1Width = useTransform(smoothProgress, [0.92, 1.00], ["0%", "100%"]);
 
   return (
-    // Outer pinned scroll container (~260vh, allows comfortable hold + curtain wipe into next section)
     <div id="specifications" ref={pinContainerRef} className="relative h-[260vh] bg-white text-[#111111]">
-      {/* Sticky Viewport with guaranteed top clearance beneath fixed 80px navbar */}
       <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between pt-20 sm:pt-24 md:pt-28 pb-4 sm:pb-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto w-full relative z-10 flex flex-col justify-between h-full my-auto">
           
-          {/* Centered Large Didone Headline (Starts centered, smoothly glides up) */}
+          {/* Section Headline */}
           <motion.div
             style={shouldReduceMotion ? {} : { y: headlineY }}
             className="text-center max-w-4xl mx-auto pt-1 sm:pt-3 mb-1 sm:mb-3 relative z-20 will-change-transform"

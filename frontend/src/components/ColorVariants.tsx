@@ -130,7 +130,7 @@ export const ColorVariants: React.FC<ColorVariantsProps> = ({ variants = DEFAULT
           );
         })}
 
-        {/* Bottom Segmented Progress Indicators (media_1789376073867 & media_1789376086068) */}
+        {/* Segmented Progress Indicators */}
         <div className="absolute bottom-8 sm:bottom-10 inset-x-0 z-30 flex justify-center items-center px-6 pointer-events-auto">
           <div className="flex items-center gap-2 sm:gap-3 w-full max-w-lg">
             {displayVariants.map((v, idx) => {

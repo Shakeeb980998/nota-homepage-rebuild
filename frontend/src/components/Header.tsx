@@ -43,7 +43,7 @@ export const Header: React.FC<HeaderProps> = ({
   const [isLightSection, setIsLightSection] = useState(false);
 
   // Smart Section-Aware & Scroll Behavior
-  // - Over white sections (e.g. Specifications): Always visible, black text/logo matching sample site
+  // - Over white sections (e.g. Specifications): Always visible with contrasting dark text
   // - Over dark sections: Direction-aware scroll
   useEffect(() => {
     let lastScrollY = window.scrollY;
@@ -62,7 +62,6 @@ export const Header: React.FC<HeaderProps> = ({
           let inSpecs = false;
           if (specsEl) {
             const rect = specsEl.getBoundingClientRect();
-            // Header is 80px tall; active when specs is under header
             if (rect.top <= 80 && rect.bottom >= 80) {
               inSpecs = true;
             }
@@ -70,7 +69,6 @@ export const Header: React.FC<HeaderProps> = ({
           setIsLightSection(inSpecs);
 
           if (inSpecs) {
-            // In Specs: Always show header with black text matching sample site
             setIsVisible(true);
             setIsScrolled(true);
             lastScrollY = currentScroll;
@@ -164,7 +162,7 @@ export const Header: React.FC<HeaderProps> = ({
                   delay={idx * 60}
                   duration={480}
                 />
-                {/* Clean hover underline indicator matching sample site (media_1789402901410.png) */}
+                {/* Hover underline indicator */}
                 <span
                   className={`absolute bottom-0 left-0 w-0 h-[1px] transition-all duration-200 ease-out group-hover/nav:w-full ${
                     isLightSection ? "bg-black" : "bg-white"
@@ -175,7 +173,7 @@ export const Header: React.FC<HeaderProps> = ({
           </nav>
         </div>
 
-        {/* Right Side: White rectangular card with flower logo & Order button (Matches sample media_1789402803096 & media_1789402873932) */}
+        {/* Right Side: Brand Badge & Order Action */}
         <div className="flex items-center gap-3">
           <div className="hidden sm:flex items-center bg-[#ffffff] text-[#000000] rounded-sm py-2 px-3 sm:py-2.5 sm:px-4 shadow-xl gap-4 sm:gap-6 border border-white/20">
             {/* Flower Logo */}

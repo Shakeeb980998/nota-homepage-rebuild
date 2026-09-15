@@ -72,7 +72,7 @@ export const Hero: React.FC<HeroProps> = ({
     };
   }, []);
 
-  // Staggered 6-curtain wipe transforms matching sample site transition
+  // Staggered 6-column curtain wipe transforms
   const curtain0Y = useTransform(smoothProgress, [0.62, 0.82], ["100%", "0%"]);
   const curtain1Y = useTransform(smoothProgress, [0.65, 0.85], ["100%", "0%"]);
   const curtain2Y = useTransform(smoothProgress, [0.68, 0.88], ["100%", "0%"]);
@@ -99,9 +99,8 @@ export const Hero: React.FC<HeroProps> = ({
   }, [smoothProgress, shouldReduceMotion]);
 
   return (
-    // Outer pinned scroll container (pinned for ~150vh of scroll)
     <div ref={pinContainerRef} className="relative h-[250vh] bg-black">
-      {/* Sticky Viewport pinned firmly during scroll */}
+      {/* Sticky Viewport */}
       <div
         className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between"
         style={{
@@ -111,13 +110,13 @@ export const Hero: React.FC<HeroProps> = ({
         {/* Subtle Ambient Vignette Glow */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-white/10 via-transparent to-transparent pointer-events-none" />
 
-        {/* 3D Horizontal Pen Lottie Player Container (Fills viewport, horizontally centered & right-aligned nib) */}
+        {/* 3D Pen Lottie Player Container */}
         <div
           ref={lottieContainerRef}
           className="absolute inset-0 w-full h-full pointer-events-none z-10 flex items-center justify-center [&_svg]:w-full [&_svg]:h-full [&_svg]:object-cover"
         />
 
-        {/* Bottom-Left Big Headline (Matches sample site exactly: Smart pen / for real thinking) */}
+        {/* Hero Headline */}
         <div className="absolute bottom-6 sm:bottom-10 md:bottom-14 lg:bottom-20 left-4 sm:left-8 md:left-10 lg:left-14 z-20 pointer-events-none max-w-4xl pr-4 sm:pr-6">
           <h1 className="text-3xl sm:text-5xl md:text-7xl lg:text-[96px] xl:text-[104px] font-serif font-normal text-white leading-[0.98] tracking-tight">
             <span className="block">
@@ -139,7 +138,7 @@ export const Hero: React.FC<HeroProps> = ({
           </h1>
         </div>
 
-        {/* Staggered 6-Curtain Wipe Transition into Specifications (Matches sample site exactly) */}
+        {/* Staggered 6-Column Curtain Wipe Transition */}
         <div className="absolute inset-0 z-30 pointer-events-none grid grid-cols-6 h-full w-full overflow-hidden">
           {curtainTransforms.map((curtainY, idx) => (
             <motion.div
